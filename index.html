@@ -282,36 +282,25 @@
     }
 
     // --- 강력해진 체형 이미지 파싱 함수 ---
-    function getShapeImg(shapeName) {
+function getShapeImg(shapeName) {
         if(!shapeName) return null;
-        const s = shapeName.trim();
         const map = {
-            '머리': 'Body01', '머리형': 'Body01',
-            '뱀': 'Body02', '뱀형': 'Body02',
-            '물고기': 'Body03', '물고기형': 'Body03', '팔형': 'Body03',
-            '지느러미': 'Body04', '지느러미형': 'Body04', '가슴형': 'Body04',
-            '기둥': 'Body05', '기둥형': 'Body05', '머리몸통형': 'Body05',
-            '이족꼬리': 'Body06', '이족꼬리형': 'Body06',
-            '다리': 'Body07', '다리형': 'Body07',
-            '사족': 'Body08', '사족형': 'Body08', '네발형': 'Body08',
-            '단익': 'Body09', '단익형': 'Body09', '날개형': 'Body09',
-            '다족': 'Body10', '다족형': 'Body10', '촉수형': 'Body10',
-            '군집': 'Body11', '군집형': 'Body11', '복수형': 'Body11',
-            '인간': 'Body12', '인간형': 'Body12', '이족무꼬리형': 'Body12', '이족무꼬리': 'Body12',
-            '다익': 'Body13', '다익형': 'Body13',
-            '곤충': 'Body14', '곤충형': 'Body14'
+            '머리형': 'https://archives.bulbagarden.net/media/upload/1/17/Body01.png',
+            '다리형': 'https://archives.bulbagarden.net/media/upload/b/bc/Body07.png',
+            '물고기형': 'https://archives.bulbagarden.net/media/upload/d/d3/Body03.png',
+            '곤충형': 'https://archives.bulbagarden.net/media/upload/4/4b/Body14.png',
+            '사족형': 'https://archives.bulbagarden.net/media/upload/c/cc/Body08.png',
+            '다익형': 'https://archives.bulbagarden.net/media/upload/0/09/Body13.png',
+            '군집형': 'https://archives.bulbagarden.net/media/upload/3/36/Body11.png',
+            '다족형': 'https://archives.bulbagarden.net/media/upload/9/97/Body10.png',
+            '기둥형': 'https://archives.bulbagarden.net/media/upload/d/da/Body05.png',
+            '이족꼬리형': 'https://archives.bulbagarden.net/media/upload/8/88/Body06.png',
+            '인간형': 'https://archives.bulbagarden.net/media/upload/4/45/Body12.png',
+            '단익형': 'https://archives.bulbagarden.net/media/upload/9/98/Body09.png',
+            '뱀형': 'https://archives.bulbagarden.net/media/upload/7/7a/Body02.png',
+            '팔형': 'https://archives.bulbagarden.net/media/upload/2/2c/Body04.png'
         };
-        const code = map[s] || map[s + '형']; // '형'이 빠진 데이터도 방어
-        if(!code) return null;
-        
-        const urlMap = {
-            'Body01': '1/17/Body01.png', 'Body02': '7/7a/Body02.png', 'Body03': 'd/d3/Body03.png',
-            'Body04': 'c/c5/Body04.png', 'Body05': 'd/da/Body05.png', 'Body06': '8/88/Body06.png',
-            'Body07': 'b/bc/Body07.png', 'Body08': 'c/cc/Body08.png', 'Body09': '9/98/Body09.png',
-            'Body10': '9/97/Body10.png', 'Body11': '3/36/Body11.png', 'Body12': '4/45/Body12.png',
-            'Body13': '0/09/Body13.png', 'Body14': '4/4b/Body14.png'
-        };
-        return 'https://archives.bulbagarden.net/media/upload/' + urlMap[code];
+        return map[shapeName.trim()] || null;
     }
 
     const inputEl = document.getElementById('guessInput');
@@ -596,4 +585,5 @@
 </script>
 </body>
 </html>
+
 
