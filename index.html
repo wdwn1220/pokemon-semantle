@@ -184,8 +184,9 @@
         db = lines.slice(1).filter(l => l.trim()).map(l => {
             const r = l.split(',');
             if (r.length < h.length) return null;
-            const ko = get(r, 'name_ko');
+            let ko = get(r, 'name_ko');
             if (!ko) return null;
+            ko = ko.normalize('NFC');
             allKoNames.push(ko);
 
             const isRegion = getBool(r, 'is_alolan') || getBool(r, 'is_galarian') || 
@@ -307,7 +308,7 @@
     let currentFocus = -1;
 
     inputEl.addEventListener('input', function() {
-        const val = this.value; closeAllLists(); if (!val) return; currentFocus = -1;
+        const val = this.value.normalize('NFC'); closeAllLists(); if (!val) return; currentFocus = -1;
         const matches = allKoNames.filter(n => n.includes(val)).slice(0, 8);
         if (matches.length > 0) {
             autoList.style.display = 'block';
@@ -342,7 +343,7 @@
 
     function handleGuess() {
         closeAllLists();
-        const name = inputEl.value.trim();
+        const name = inputEl.value.trim().normalize('NFC');
         const pData = db.find(d => d.ko === name);
         if (!pData) return alert("도감에 없는 이름입니다.");
         if (history.find(h => h.ko === name)) return alert("이미 시도했습니다.");
@@ -584,6 +585,7 @@
 </script>
 </body>
 </html>
+
 
 
 
