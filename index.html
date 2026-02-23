@@ -124,8 +124,23 @@
         </div>
     </div>
 
-    <div id="gameArea">
-        <div class="input-area">
+<div id="gameArea" style="display: none; width: 100%;">
+        
+        <div id="successArea" style="display: none; background: #e8f5e9; border: 2px solid #4caf50; border-radius: 16px; padding: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(76,175,80,0.15);">
+            <h2 style="color: #2e7d32; margin: 0 0 15px 0; font-size: 1.6rem;">🎉 정답입니다! <span id="answerName" style="color: #ff5252;"></span>!!! 🎉</h2>
+            <div style="background: white; border-radius: 12px; padding: 15px; display: inline-block; text-align: left; font-size: 1.05rem; line-height: 1.6; border: 1px solid #c8e6c9;">
+                🔥 현재 연속 정답: <strong id="streakCount" style="color:#ff5252;">0</strong>회<br>
+                🎯 이번 게임 도전 횟수: <strong id="tryCountDisplay" style="color:#ff5252;">0</strong>번<br>
+                📈 정답 제외 최고 근접 순위: <strong id="bestRankDisplay" style="color:#ff5252;">-</strong>위
+            </div>
+            <div>
+                <button id="showRankBtn" onclick="openRankingTab()">🏆 전체 순위 보기 (새 탭)</button>
+            </div>
+        </div>
+
+        <div class="input-area" id="inputAreaDiv">
+            <div id="errorMsg" style="color: #ff5252; font-weight: bold; margin-bottom: 10px; text-align: center; display: none; font-size: 0.95rem;"></div>
+            
             <div class="input-wrapper">
                 <input type="text" id="guessInput" placeholder="포켓몬 이름 입력..." autocomplete="off">
                 <button class="submit-btn" onclick="handleGuess()">확인</button>
@@ -133,7 +148,6 @@
             <div id="autocomplete-list"></div>
         </div>
         
-        <button id="showRankBtn" onclick="openRankingTab()">🏆 전체 순위 보기 (새 탭)</button>
         <div id="historyList" class="history-list"></div>
     </div>
 </div>
@@ -143,6 +157,10 @@
     let targetData = null, targetVec = null, globalRankList = [], history = [];
     let tryCount = 0;
     let expandedCards = new Set(); 
+    // 👇 기존 변수들 밑에 아래 3줄을 추가해 주세요.
+    let streak = parseInt(localStorage.getItem('pokeSemantleStreak')) || 0; // 연속 정답 횟수
+    let bestRank = Infinity; // 이번 게임 최고 근접 순위
+    let gameSolved = false;  // 정답을 맞췄는지 여부
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
@@ -342,24 +360,95 @@
     function closeAllLists() { autoList.innerHTML = ''; autoList.style.display = 'none'; }
     document.addEventListener('click', e => { if (e.target !== inputEl) closeAllLists(); });
 
-function handleGuess() {
-    // 1. 입력값 가져오기 및 정규화
-    const val = inputEl.value.trim().normalize('NFC');
-    if (!val) return;
+// 에러 텍스트 숨기기 (입력창에 글자를 칠 때마다 에러 메시지가 사라지게 함)
+    inputEl.addEventListener('input', function() {
+        document.getElementById('errorMsg').style.display = 'none';
+        /* ... 기존 자동완성 로직 (const val = this.value.normalize('NFC'); 부터 쭉 유지) ... */
+    });
 
-    // 2. 데이터 찾기
-    const pData = db.find(d => d.ko === val);
+    function handleGuess() {
+        if (gameSolved) return; // 이미 정답을 맞췄으면 더 이상 입력 안 됨
 
-    // 3. 예외 처리
-    if (!pData) {
-        alert("도감에 없는 포켓몬입니다. 이름을 확인해 주세요!");
-        return;
+        const errorEl = document.getElementById('errorMsg');
+        errorEl.style.display = 'none';
+
+        const val = inputEl.value.trim().normalize('NFC');
+        if (!val) return;
+
+        const pData = db.find(d => d.ko === val);
+
+        // 1. 도감에 없는 경우 Alert 대신 빨간 텍스트 표시
+        if (!pData) {
+            errorEl.innerText = "🚨 도감에 없는 포켓몬입니다. 이름을 확인해 주세요!";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // 2. 이미 입력한 경우 Alert 대신 빨간 텍스트 표시
+        if (history.find(h => h.ko === val)) {
+            errorEl.innerText = "🚨 이미 입력한 포켓몬입니다.";
+            errorEl.style.display = 'block';
+            inputEl.value = "";
+            return;
+        }
+
+        // 정상 입력 처리
+        const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
+        const currentRank = rankIdx + 1;
+        tryCount++;
+
+        // 정답이 아닐 경우 최고 근접 순위 갱신
+        if (currentRank > 1 && currentRank < bestRank) {
+            bestRank = currentRank;
+        }
+
+        history.unshift({ ...pData, rank: currentRank, score: globalRankList[rankIdx].score, tryNo: tryCount });
+        
+        renderHistory();
+        inputEl.value = "";
+        autoList.style.display = 'none';
+
+        // 3. 정답을 맞췄을 때 이벤트 실행
+        if (currentRank === 1) {
+            handleWin(val);
+        }
     }
 
-    if (history.find(h => h.ko === val)) {
-        alert("이미 입력한 포켓몬입니다.");
-        inputEl.value = "";
-        return;
+    // 🎉 정답을 맞췄을 때 실행되는 함수
+    function handleWin(pokemonName) {
+        gameSolved = true;
+        streak++; // 연속 정답 추가
+        localStorage.setItem('pokeSemantleStreak', streak); // 저장
+
+        // UI 변경: 입력창 숨기고 축하 영역 보이기
+        document.getElementById('inputAreaDiv').style.display = 'none';
+        document.getElementById('successArea').style.display = 'block';
+        
+        // 데이터 채워 넣기
+        document.getElementById('answerName').innerText = pokemonName;
+        document.getElementById('streakCount').innerText = streak;
+        document.getElementById('tryCountDisplay').innerText = tryCount;
+        document.getElementById('bestRankDisplay').innerText = bestRank === Infinity ? '-' : bestRank;
+        document.getElementById('showRankBtn').style.display = 'inline-block';
+
+        // 🎊 화려한 꽃가루(Confetti) 이펙트 실행
+        if (typeof confetti === 'function') {
+            const duration = 3000; // 3초 동안
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                
+                const particleCount = 50 * (timeLeft / duration);
+                // 양쪽에서 팡팡 터지는 효과
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
     }
 
     // 4. 성공 시 로직 (정답 처리 및 히스토리 추가)
@@ -599,6 +688,7 @@ function handleGuess() {
 </script>
 </body>
 </html>
+
 
 
 
