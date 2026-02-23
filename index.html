@@ -2,7 +2,6 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poke-Semantle Ultimate</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
@@ -281,24 +280,24 @@
         return `https://img.pokemondb.net/sprites/home/normal/2x/${slug}.jpg`;
     }
 
-    // --- 강력해진 체형 이미지 파싱 함수 ---
-function getShapeImg(shapeName) {
+/* --- 체형 이미지 1:1 매핑 (로컬 폴더 경로 사용) --- */
+    function getShapeImg(shapeName) {
         if(!shapeName) return null;
         const map = {
-            '머리형': 'https://archives.bulbagarden.net/media/upload/1/17/Body01.png',
-            '다리형': 'https://archives.bulbagarden.net/media/upload/b/bc/Body07.png',
-            '물고기형': 'https://archives.bulbagarden.net/media/upload/d/d3/Body03.png',
-            '곤충형': 'https://archives.bulbagarden.net/media/upload/4/4b/Body14.png',
-            '사족형': 'https://archives.bulbagarden.net/media/upload/c/cc/Body08.png',
-            '다익형': 'https://archives.bulbagarden.net/media/upload/0/09/Body13.png',
-            '군집형': 'https://archives.bulbagarden.net/media/upload/3/36/Body11.png',
-            '다족형': 'https://archives.bulbagarden.net/media/upload/9/97/Body10.png',
-            '기둥형': 'https://archives.bulbagarden.net/media/upload/d/da/Body05.png',
-            '이족꼬리형': 'https://archives.bulbagarden.net/media/upload/8/88/Body06.png',
-            '인간형': 'https://archives.bulbagarden.net/media/upload/4/45/Body12.png',
-            '단익형': 'https://archives.bulbagarden.net/media/upload/9/98/Body09.png',
-            '뱀형': 'https://archives.bulbagarden.net/media/upload/7/7a/Body02.png',
-            '팔형': 'https://archives.bulbagarden.net/media/upload/2/2c/Body04.png'
+            '머리형': './icons/Body01.png',
+            '뱀형': './icons/Body02.png',
+            '물고기형': './icons/Body03.png',
+            '팔형': './icons/Body04.png',
+            '기둥형': './icons/Body05.png',
+            '이족꼬리형': './icons/Body06.png',
+            '다리형': './icons/Body07.png',
+            '사족형': './icons/Body08.png',
+            '단익형': './icons/Body09.png',
+            '다족형': './icons/Body10.png',
+            '군집형': './icons/Body11.png',
+            '인간형': './icons/Body12.png',
+            '다익형': './icons/Body13.png',
+            '곤충형': './icons/Body14.png'
         };
         return map[shapeName.trim()] || null;
     }
@@ -585,5 +584,6 @@ function getShapeImg(shapeName) {
 </script>
 </body>
 </html>
+
 
 
