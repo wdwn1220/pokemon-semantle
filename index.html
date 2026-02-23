@@ -322,6 +322,7 @@
     });
 
     inputEl.addEventListener('keydown', function(e) {
+        if (e.isComposing || e.keyCode === 229) return;
         let x = autoList.getElementsByTagName('div');
         if (e.key === 'ArrowDown') { currentFocus++; addActive(x); }
         else if (e.key === 'ArrowUp') { currentFocus--; addActive(x); }
@@ -341,27 +342,40 @@
     function closeAllLists() { autoList.innerHTML = ''; autoList.style.display = 'none'; }
     document.addEventListener('click', e => { if (e.target !== inputEl) closeAllLists(); });
 
-    function handleGuess() {
-        closeAllLists();
-        const name = inputEl.value.trim().normalize('NFC');
-        const pData = db.find(d => d.ko === name);
-        if (!pData) return alert("도감에 없는 이름입니다.");
-        if (history.find(h => h.ko === name)) return alert("이미 시도했습니다.");
+function handleGuess() {
+    // 1. 입력값 가져오기 및 정규화
+    const val = inputEl.value.trim().normalize('NFC');
+    if (!val) return;
 
-        const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
-        const rank = rankIdx + 1;
-        const score = globalRankList[rankIdx].score;
+    // 2. 데이터 찾기
+    const pData = db.find(d => d.ko === val);
 
-        tryCount++;
-        history.unshift({ ...pData, rank, score, tryNo: tryCount }); 
-        renderHistory();
-        inputEl.value = "";
-
-        if (rank === 1) {
-            alert(`🎉 정답입니다! ${name}`);
-            document.getElementById('showRankBtn').style.display = 'block';
-        }
+    // 3. 예외 처리
+    if (!pData) {
+        alert("도감에 없는 포켓몬입니다. 이름을 확인해 주세요!");
+        return;
     }
+
+    if (history.find(h => h.ko === val)) {
+        alert("이미 입력한 포켓몬입니다.");
+        inputEl.value = "";
+        return;
+    }
+
+    // 4. 성공 시 로직 (정답 처리 및 히스토리 추가)
+    const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
+    tryCount++;
+    history.unshift({ ...pData, rank: rankIdx + 1, score: globalRankList[rankIdx].score, tryNo: tryCount });
+    
+    renderHistory();
+    inputEl.value = "";
+    autoList.style.display = 'none';
+
+    if (rankIdx === 0) {
+        alert(`🎉 정답입니다! ${val}!!!`);
+        document.getElementById('showRankBtn').style.display = 'block';
+    }
+}
 
     function renderHistory() {
         const container = document.getElementById('historyList');
@@ -585,6 +599,7 @@
 </script>
 </body>
 </html>
+
 
 
 
