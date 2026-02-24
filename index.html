@@ -59,9 +59,10 @@
         .mini-img { width: 40px; height: 40px; object-fit: contain; background: #f8f9fa; border-radius: 50%; border: 1px solid #ddd; }
         .header-name { flex: 1; font-weight: 800; font-size: 1.1rem; color: var(--accent); }
         
-        /* 변경된 점수 및 순위 레이아웃 */
-        .score-disp { font-size: 0.95rem; color: #666; font-weight: 700; margin-right: 5px; }
-        .rank-disp { font-size: 1.2rem; font-weight: 900; color: var(--primary); min-width: 50px; text-align: right; }
+        /* ✅ 배경이 진해져도 무조건 잘 보이는 랭크/일치율 캡슐 디자인 */
+        .rank-score-wrapper { display: flex; align-items: center; background: rgba(255, 255, 255, 0.85); padding: 4px 12px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); margin-left: auto; gap: 6px; }
+        .score-disp { font-size: 0.95rem; color: #555; font-weight: 700; }
+        .rank-disp { font-size: 1.2rem; font-weight: 900; color: var(--primary); }
 
         .card-body { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.4s ease; background: #fafafa; border-top: 1px solid #eee; }
         .card.expanded .card-body { max-height: 1000px; opacity: 1; padding: 20px; }
@@ -71,13 +72,12 @@
         .big-img-box { width: 140px; height: 140px; background: white; border-radius: 16px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; }
         .big-img { width: 130px; height: 130px; object-fit: contain; }
 
-        /* 카드 데이터 2열 배치 레이아웃 수정 */
         .col-mid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-content: center; }
         .info-column { display: flex; flex-direction: column; gap: 8px; }
         .info-row { display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #e0e0e0; padding-bottom: 4px; }
         
         .label-text { font-size: 0.8rem; font-weight: bold; color: var(--label); min-width: 40px; }
-        .val-text { font-weight: 600; color: #333; font-size: 0.9rem; letter-spacing: -0.3px; }
+        .val-text { font-weight: 600; color: #333; font-size: 0.9rem; letter-spacing: -0.3px; display: inline-flex; align-items: center; gap: 4px; }
         .type-badge { padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.05); display: inline-block; margin-right: 3px; }
         .shape-icon { height: 26px; width: auto; vertical-align: middle; }
 
@@ -91,6 +91,7 @@
         @media (max-width: 850px) {
             .grid-layout { grid-template-columns: 1fr; gap: 15px; }
             .col-left { border: none; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+            .col-mid { grid-template-columns: 1fr; }
             .col-right { border: none; border-top: 1px solid #eee; padding-top: 15px; }
         }
     </style>
@@ -277,6 +278,12 @@
         return map[shapeName.trim()] || null;
     }
 
+    // ✅ 색상 동그라미를 그리기 위한 함수 복구
+    function getColorCode(c) {
+        const map = {'빨강':'#ff5252', '파랑':'#2196f3', '노랑':'#fdd835', '초록':'#4caf50', '검정':'#333', '갈색':'#795548', '보라':'#9c27b0', '회색':'#9e9e9e', '하양':'#eee', '분홍':'#f48fb1', '담홍':'#f48fb1', 'Pink':'#f48fb1'};
+        return map[c] || '#ddd';
+    }
+
     const inputEl = document.getElementById('guessInput');
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
@@ -325,7 +332,8 @@
     document.addEventListener('click', e => { if (e.target !== inputEl) { autoList.innerHTML = ''; autoList.style.display = 'none'; } });
 
     function handleGuess() {
-        if(gameSolved) return; 
+        // ✅ 정답을 맞춰도 계속 입력할 수 있게 방어막 해제
+        // if(gameSolved) return; 
 
         const errorEl = document.getElementById('errorMsg');
         errorEl.style.display = 'none';
@@ -350,16 +358,22 @@
 
         const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
         const currentRank = rankIdx + 1;
-        tryCount++;
+        
+        // 정답을 맞힌 이후의 입력은 시도 횟수에 포함하지 않음
+        if (!gameSolved) {
+            tryCount++;
+            if (currentRank > 1 && currentRank < bestRank) { bestRank = currentRank; }
+        }
 
-        if (currentRank > 1 && currentRank < bestRank) { bestRank = currentRank; }
-
-        history.unshift({ ...pData, rank: currentRank, score: globalRankList[rankIdx].score, tryNo: tryCount });
+        history.unshift({ ...pData, rank: currentRank, score: globalRankList[rankIdx].score, tryNo: gameSolved ? '-' : tryCount });
         renderHistory(); 
         inputEl.value = "";
         autoList.style.display = 'none';
 
-        if (currentRank === 1) { handleWin(val); }
+        // 게임을 맞췄고, 첫 성공일 때만 폭죽 터뜨림
+        if (currentRank === 1 && !gameSolved) { 
+            handleWin(val); 
+        }
     }
 
     function handleWin(pokemonName) {
@@ -367,7 +381,7 @@
         streak++;
         localStorage.setItem('pokeSemantleStreak', streak);
 
-        document.getElementById('inputAreaDiv').style.display = 'none';
+        // ✅ 정답 이후에도 계속 검색 가능하므로 입력창은 숨기지 않음
         document.getElementById('successArea').style.display = 'block';
         
         document.getElementById('answerName').innerText = pokemonName;
@@ -419,18 +433,22 @@
         if(p.hasForms) boolTags.push("여러모습");
         const boolStr = boolTags.length > 0 ? boolTags.join(', ') : "없음";
 
-        // ✅ 순위별/점수별 게이지 색깔 진하기 조절
         const gaugeOpacity = p.rank === 1 ? 1 : Math.max(0.15, Math.min(0.8, p.score / 100));
+        
+        // ✅ 색상 동그라미 추출
+        const colorDot = getColorCode(p.color);
 
         el.innerHTML = `
             <div class="card-header">
                 <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:rgba(255, 82, 82, ${gaugeOpacity});"></div>
                 <div class="header-content">
-                    <span class="try-badge">${p.tryNo ? '#'+p.tryNo : '-'}</span>
+                    <span class="try-badge">${p.tryNo ? (p.tryNo === '-' ? '-' : '#'+p.tryNo) : '-'}</span>
                     <img src="${imgUrl}" class="mini-img" onerror="this.src='https://via.placeholder.com/40'">
                     <span class="header-name">${p.ko}</span>
-                    <span class="score-disp">${p.score.toFixed(2)}%</span>
-                    <span class="rank-disp">${p.rank}위</span>
+                    <div class="rank-score-wrapper">
+                        <span class="score-disp">${p.score.toFixed(2)}%</span>
+                        <span class="rank-disp">${p.rank}위</span>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -450,7 +468,13 @@
                             <div class="info-row"><span class="label-text">분류:</span><span class="val-text">${p.category || '-'}</span></div>
                             <div class="info-row"><span class="label-text">타입:</span><div>${typeHtml}</div></div>
                             <div class="info-row"><span class="label-text">체형:</span><span class="val-text">${shapeContent}</span></div>
-                            <div class="info-row"><span class="label-text">색상:</span><span class="val-text">${p.color || '-'}</span></div>
+                            <div class="info-row">
+                                <span class="label-text">색상:</span>
+                                <span class="val-text">
+                                    ${p.color || '-'} 
+                                    ${p.color ? `<span style="width:12px;height:12px;border-radius:50%;background:${colorDot};border:1px solid #ccc;margin-left:2px;"></span>` : ''}
+                                </span>
+                            </div>
                             <div class="info-row"><span class="label-text">크기:</span><span class="val-text">${p.h}m / ${p.w}kg</span></div>
                         </div>
                     </div>
@@ -468,6 +492,8 @@
             <body style="background:#f0f2f5"><div class="container" style="max-width:900px;margin:0 auto;padding:40px;">
             <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 TOP 100 순위표</h1><div class="history-list">${cards}</div></div>
             <script>document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('expanded'))<\/script></body></html>`);
+        // ✅ 문서를 닫아서 브라우저 탭 아이콘의 무한 로딩을 멈추게 함
+        win.document.close();
     }
 
     function getRadarChartSVG(s) {
