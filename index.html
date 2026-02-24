@@ -53,12 +53,15 @@
         .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid var(--border); cursor: pointer; }
         .card.expanded { box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: var(--primary); }
         .card-header { position: relative; height: 60px; display: flex; align-items: center; padding: 0 15px; background: #fff; overflow: hidden; }
-        .rank-gauge { position: absolute; top: 0; left: 0; bottom: 0; z-index: 0; transition: width 1s ease-out; opacity: 0.3; }
+        .rank-gauge { position: absolute; top: 0; left: 0; bottom: 0; z-index: 0; transition: width 1s ease-out; }
         .header-content { position: relative; z-index: 1; display: flex; align-items: center; width: 100%; gap: 15px; }
         .try-badge { font-size: 0.8rem; font-weight: bold; color: #888; width: 30px; }
         .mini-img { width: 40px; height: 40px; object-fit: contain; background: #f8f9fa; border-radius: 50%; border: 1px solid #ddd; }
         .header-name { flex: 1; font-weight: 800; font-size: 1.1rem; color: var(--accent); }
-        .rank-disp { font-size: 1.2rem; font-weight: 900; color: var(--primary); min-width: 60px; text-align: right; }
+        
+        /* 변경된 점수 및 순위 레이아웃 */
+        .score-disp { font-size: 0.95rem; color: #666; font-weight: 700; margin-right: 5px; }
+        .rank-disp { font-size: 1.2rem; font-weight: 900; color: var(--primary); min-width: 50px; text-align: right; }
 
         .card-body { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.4s ease; background: #fafafa; border-top: 1px solid #eee; }
         .card.expanded .card-body { max-height: 1000px; opacity: 1; padding: 20px; }
@@ -68,9 +71,12 @@
         .big-img-box { width: 140px; height: 140px; background: white; border-radius: 16px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; }
         .big-img { width: 130px; height: 130px; object-fit: contain; }
 
-        .col-mid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; align-content: center; }
-        .info-row { display: flex; align-items: center; gap: 4px; border-bottom: 1px dashed #e0e0e0; padding-bottom: 2px; }
-        .label-text { font-size: 0.8rem; font-weight: bold; color: var(--label); min-width: 45px; }
+        /* 카드 데이터 2열 배치 레이아웃 수정 */
+        .col-mid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-content: center; }
+        .info-column { display: flex; flex-direction: column; gap: 8px; }
+        .info-row { display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #e0e0e0; padding-bottom: 4px; }
+        
+        .label-text { font-size: 0.8rem; font-weight: bold; color: var(--label); min-width: 40px; }
         .val-text { font-weight: 600; color: #333; font-size: 0.9rem; letter-spacing: -0.3px; }
         .type-badge { padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.05); display: inline-block; margin-right: 3px; }
         .shape-icon { height: 26px; width: auto; vertical-align: middle; }
@@ -85,7 +91,6 @@
         @media (max-width: 850px) {
             .grid-layout { grid-template-columns: 1fr; gap: 15px; }
             .col-left { border: none; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-            .col-mid { grid-template-columns: 1fr; }
             .col-right { border: none; border-top: 1px solid #eee; padding-top: 15px; }
         }
     </style>
@@ -141,7 +146,6 @@
     let tryCount = 0;
     let expandedCards = new Set();
     
-    // 통계용 변수들
     let streak = parseInt(localStorage.getItem('pokeSemantleStreak')) || 0;
     let bestRank = Infinity;
     let gameSolved = false;
@@ -177,7 +181,6 @@
         db = lines.slice(1).filter(l => l.trim()).map(l => {
             const r = l.split(','); if (r.length < h.length) return null;
             
-            // 한글 인코딩 통일 (맥북 호환)
             let ko = get(r, 'name_ko'); 
             if (!ko) return null;
             ko = ko.normalize('NFC'); 
@@ -260,7 +263,6 @@
         return `https://img.pokemondb.net/sprites/home/normal/2x/${slug}.jpg`;
     }
 
-    /* --- 체형 이미지 1:1 매핑 (로컬 파일) --- */
     function getShapeImg(shapeName) {
         if(!shapeName) return null;
         const map = {
@@ -279,9 +281,8 @@
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
 
-    // 입력 감지 (자동완성 띄우기 & 에러메시지 숨기기)
     inputEl.addEventListener('input', function() {
-        document.getElementById('errorMsg').style.display = 'none'; // 타자 치면 에러 숨김
+        document.getElementById('errorMsg').style.display = 'none';
         
         const val = this.value.normalize('NFC'); 
         autoList.innerHTML = ''; 
@@ -300,9 +301,7 @@
         }
     });
 
-    // 방향키 및 엔터 감지 (맥북 버그 수정 포함)
     inputEl.addEventListener('keydown', function(e) {
-        // 맥북에서 한글 조합 중 엔터 두 번 먹히는 버그 완벽 차단
         if (e.isComposing || e.keyCode === 229) return; 
 
         let x = autoList.getElementsByTagName('div');
@@ -323,29 +322,25 @@
     }
     function removeActive(x) { for(let i=0; i<x.length; i++) x[i].classList.remove('active'); }
     
-    // 바탕화면 클릭 시 자동완성 닫기
     document.addEventListener('click', e => { if (e.target !== inputEl) { autoList.innerHTML = ''; autoList.style.display = 'none'; } });
 
-    // 확인 버튼 클릭 및 엔터 시 실행
     function handleGuess() {
-        if(gameSolved) return; // 이미 게임 끝났으면 무시
+        if(gameSolved) return; 
 
         const errorEl = document.getElementById('errorMsg');
-        errorEl.style.display = 'none'; // 초기화
+        errorEl.style.display = 'none';
 
         const val = inputEl.value.trim().normalize('NFC');
         if (!val) return;
 
         const pData = db.find(d => d.ko === val);
 
-        // 예외 1: 없는 이름
         if (!pData) {
             errorEl.innerText = "🚨 도감에 없는 포켓몬입니다. 이름을 확인해 주세요!";
             errorEl.style.display = 'block';
             return;
         }
 
-        // 예외 2: 이미 입력함
         if (history.find(h => h.ko === val)) {
             errorEl.innerText = "🚨 이미 확인해 본 포켓몬입니다!";
             errorEl.style.display = 'block';
@@ -353,44 +348,33 @@
             return;
         }
 
-        // 정상 처리
         const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
         const currentRank = rankIdx + 1;
         tryCount++;
 
-        // 최고 근접 순위 갱신 (정답인 1위는 제외)
-        if (currentRank > 1 && currentRank < bestRank) {
-            bestRank = currentRank;
-        }
+        if (currentRank > 1 && currentRank < bestRank) { bestRank = currentRank; }
 
         history.unshift({ ...pData, rank: currentRank, score: globalRankList[rankIdx].score, tryNo: tryCount });
         renderHistory(); 
         inputEl.value = "";
         autoList.style.display = 'none';
 
-        // 정답을 맞췄을 때
-        if (currentRank === 1) {
-            handleWin(val);
-        }
+        if (currentRank === 1) { handleWin(val); }
     }
 
-    // 🎉 승리 처리 함수
     function handleWin(pokemonName) {
         gameSolved = true;
         streak++;
-        localStorage.setItem('pokeSemantleStreak', streak); // 로컬 저장소에 연속 기록 세이브
+        localStorage.setItem('pokeSemantleStreak', streak);
 
-        // UI 토글
         document.getElementById('inputAreaDiv').style.display = 'none';
         document.getElementById('successArea').style.display = 'block';
         
-        // 데이터 채우기
         document.getElementById('answerName').innerText = pokemonName;
         document.getElementById('streakCount').innerText = streak;
         document.getElementById('tryCountDisplay').innerText = tryCount;
         document.getElementById('bestRankDisplay').innerText = bestRank === Infinity ? '-' : bestRank;
 
-        // 화려한 폭죽 이펙트
         if (typeof confetti === 'function') {
             const duration = 3000;
             const animationEnd = Date.now() + duration;
@@ -428,7 +412,6 @@
         const shapeContent = shapeImg ? `<img src="${shapeImg}" class="shape-icon" title="${p.shape}">` : (p.shape || '-');
         const radarSvg = getRadarChartSVG(p.stats);
         
-        // 기타 속성 텍스트
         let boolTags = [];
         if(p.isMega) boolTags.push("메가진화");
         if(p.isGmax) boolTags.push("거다이맥스");
@@ -436,33 +419,40 @@
         if(p.hasForms) boolTags.push("여러모습");
         const boolStr = boolTags.length > 0 ? boolTags.join(', ') : "없음";
 
+        // ✅ 순위별/점수별 게이지 색깔 진하기 조절
+        const gaugeOpacity = p.rank === 1 ? 1 : Math.max(0.15, Math.min(0.8, p.score / 100));
+
         el.innerHTML = `
             <div class="card-header">
-                <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:${p.rank === 1 ? '#ff5252' : 'rgba(255, 82, 82, 0.4)'};"></div>
+                <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:rgba(255, 82, 82, ${gaugeOpacity});"></div>
                 <div class="header-content">
                     <span class="try-badge">${p.tryNo ? '#'+p.tryNo : '-'}</span>
                     <img src="${imgUrl}" class="mini-img" onerror="this.src='https://via.placeholder.com/40'">
                     <span class="header-name">${p.ko}</span>
-                    <div style="text-align:right">
-                        <div style="font-size:0.8rem;color:#888">${p.score.toFixed(2)}%</div>
-                        <span class="rank-disp">${p.rank}위</span>
-                    </div>
+                    <span class="score-disp">${p.score.toFixed(2)}%</span>
+                    <span class="rank-disp">${p.rank}위</span>
                 </div>
             </div>
             <div class="card-body">
                 <div class="grid-layout">
                     <div class="col-left"><div class="big-img-box"><img src="${imgUrl}" class="big-img"></div></div>
                     <div class="col-mid">
-                        <div class="info-row"><span class="label-text">이름:</span><span class="val-text">${p.ko}</span></div>
-                        <div class="info-row"><span class="label-text">세대:</span><span class="val-text">${p.gen}세대</span></div>
-                        <div class="info-row"><span class="label-text">번호:</span><span class="val-text">${String(p.no).padStart(4,'0')}</span></div>
-                        <div class="info-row"><span class="label-text">분류:</span><span class="val-text">${p.category || '-'}</span></div>
-                        <div class="info-row"><span class="label-text">타입:</span><div>${typeHtml}</div></div>
-                        <div class="info-row"><span class="label-text">체형:</span><span class="val-text">${shapeContent}</span></div>
-                        <div class="info-row"><span class="label-text">구분:</span><span class="val-text">${p.status}</span></div>
-                        <div class="info-row"><span class="label-text">특성:</span><span class="val-text">${p.abilities.join(', ')}</span></div>
-                        <div class="info-row"><span class="label-text">숨특:</span><span class="val-text">${p.hidden || '없음'}</span></div>
-                        <div class="info-row"><span class="label-text">기타:</span><span class="val-text">${boolStr}</span></div>
+                        <div class="info-column">
+                            <div class="info-row"><span class="label-text">이름:</span><span class="val-text">${p.ko}</span></div>
+                            <div class="info-row"><span class="label-text">번호:</span><span class="val-text">No.${String(p.no).padStart(4,'0')}</span></div>
+                            <div class="info-row"><span class="label-text">구분:</span><span class="val-text">${p.status}포켓몬</span></div>
+                            <div class="info-row"><span class="label-text">특성:</span><span class="val-text">${p.abilities.join(', ')}</span></div>
+                            <div class="info-row"><span class="label-text">숨특:</span><span class="val-text">${p.hidden || '없음'}</span></div>
+                            <div class="info-row"><span class="label-text">기타:</span><span class="val-text">${boolStr}</span></div>
+                        </div>
+                        <div class="info-column">
+                            <div class="info-row"><span class="label-text">세대:</span><span class="val-text">${p.gen}세대</span></div>
+                            <div class="info-row"><span class="label-text">분류:</span><span class="val-text">${p.category || '-'}</span></div>
+                            <div class="info-row"><span class="label-text">타입:</span><div>${typeHtml}</div></div>
+                            <div class="info-row"><span class="label-text">체형:</span><span class="val-text">${shapeContent}</span></div>
+                            <div class="info-row"><span class="label-text">색상:</span><span class="val-text">${p.color || '-'}</span></div>
+                            <div class="info-row"><span class="label-text">크기:</span><span class="val-text">${p.h}m / ${p.w}kg</span></div>
+                        </div>
                     </div>
                     <div class="col-right"><div class="radar-chart-box">${radarSvg}</div></div>
                 </div>
@@ -470,7 +460,6 @@
         return el;
     }
 
-    // TOP 100 새 창 열기 (간격 좁게 수정됨)
     function openRankingTab() {
         const win = window.open('', '_blank');
         const styles = document.querySelector('style').innerHTML;
