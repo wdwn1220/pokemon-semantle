@@ -66,7 +66,7 @@
         .card-header { position: relative; height: 60px; display: flex; align-items: center; padding: 0 15px; background: #fff; overflow: hidden; }
         .rank-gauge { position: absolute; top: 0; left: 0; bottom: 0; z-index: 0; transition: width 1s ease-out; }
         .header-content { position: relative; z-index: 1; display: flex; align-items: center; width: 100%; gap: 15px; }
-        .try-badge { font-size: 0.8rem; font-weight: bold; color: #888; width: 30px; }
+        .try-badge { font-size: 0.8rem; font-weight: 900; color: #1f2937; background: #eef2f7; border: 1px solid #cfd8e3; border-radius: 8px; width: 38px; text-align: center; padding: 2px 0; }
         .mini-img { width: 40px; height: 40px; object-fit: contain; background: #f8f9fa; border-radius: 50%; border: 1px solid #ddd; }
         .header-name { flex: 1; font-weight: 800; font-size: 1.1rem; color: var(--accent); }
         
@@ -540,11 +540,11 @@
     function openRankingTab() {
         const win = window.open('', '_blank');
         const styles = document.querySelector('style').innerHTML;
-        const cards = globalRankList.slice(0, 100).map(p => createCard(p, false, false).outerHTML).join('');
-        // ✅ 대체할 코드 ( <title>🏆 TOP 100 순위표</title> 부분 추가 )
-        win.document.write(`<html><head><title>🏆 TOP 100 순위표</title><meta name="referrer" content="no-referrer"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;}</style></head>
+        const cards = globalRankList.map(p => createCard(p, false, false).outerHTML).join('');
+        // ✅ 대체할 코드 ( <title>🏆 전체 순위표</title> 부분 추가 )
+        win.document.write(`<html><head><title>🏆 전체 순위표</title><meta name="referrer" content="no-referrer"><link rel="icon" type="image/png" href="pokemon%20semantle%20icon.png"><link rel="apple-touch-icon" href="pokemon%20semantle%20icon.png"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;}</style></head>
             <body style="background:#f0f2f5"><div class="container" style="max-width:900px;margin:0 auto;padding:40px;">
-            <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 TOP 100 순위표</h1><div class="history-list">${cards}</div></div>
+            <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 전체 순위표</h1><div class="history-list">${cards}</div></div>
             <script>document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('expanded'))<\/script></body></html>`);
         // ✅ 문서를 닫아서 브라우저 탭 아이콘의 무한 로딩을 멈추게 함
         win.document.close();
