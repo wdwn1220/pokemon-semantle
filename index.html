@@ -61,7 +61,7 @@
         .list-divider::before { content:''; position: absolute; left: 0; top: 50%; width: 40%; height: 1px; background: #ddd; }
         .list-divider::after { content:''; position: absolute; right: 0; top: 50%; width: 40%; height: 1px; background: #ddd; }
 
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid var(--border); cursor: pointer; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border); cursor: pointer; }
         .card.expanded { box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: var(--primary); }
         .card-header { position: relative; height: 60px; display: flex; align-items: center; padding: 0 15px; background: #fff; overflow: hidden; }
         .rank-gauge { position: absolute; top: 0; left: 0; bottom: 0; z-index: 0; transition: width 1s ease-out; }
@@ -75,8 +75,8 @@
         .score-disp { font-size: 0.95rem; color: #555; font-weight: 700; }
         .rank-disp { font-size: 1.2rem; font-weight: 900; color: var(--primary); }
 
-        .card-body { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.4s ease; background: #fafafa; border-top: 1px solid #eee; }
-        .card.expanded .card-body { max-height: 1000px; opacity: 1; padding: 20px; }
+        .card-body { display: none; overflow: hidden; background: #fafafa; border-top: 1px solid #eee; }
+        .card.expanded .card-body { display: block; padding: 20px; }
 
         .grid-layout { display: grid; grid-template-columns: 160px 1fr 180px; gap: 15px; }
         .col-left { display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; padding-right: 15px; }
@@ -565,38 +565,11 @@
         if (!win) return;
 
         const styles = document.querySelector('style').innerHTML;
-        const simpleCards = globalRankList.map(p => {
-            const imgUrl = getImageUrl(p);
-            const typeText = p.type.length > 0 ? p.type.join(' / ') : '-';
-            const abilityText = p.abilities.length > 0 ? p.abilities.join(', ') : '-';
-            const gaugeOpacity = Math.max(0.15, 0.8 - ((p.rank - 1) / db.length) * 0.65);
-            const tryBadge = p.tryNo ? (p.tryNo === '-' ? '-' : '#' + p.tryNo) : '-';
-            return `
-                <div class="card">
-                    <div class="card-header">
-                        <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:rgba(255, 82, 82, ${gaugeOpacity});"></div>
-                        <div class="header-content">
-                            <span class="try-badge">${tryBadge}</span>
-                            <img src="${imgUrl}" class="mini-img" onerror="this.src='https://via.placeholder.com/40'">
-                            <span class="header-name">${p.ko}</span>
-                            <div class="rank-score-wrapper">
-                                <span class="score-disp">${p.score.toFixed(2)}%</span>
-                                <span class="rank-disp">${p.rank}위</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-row"><span class="label-text">세대:</span><span class="val-text">${p.gen}세대</span></div>
-                        <div class="info-row"><span class="label-text">타입:</span><span class="val-text">${typeText}</span></div>
-                        <div class="info-row"><span class="label-text">분류:</span><span class="val-text">${p.category || '-'}</span></div>
-                        <div class="info-row"><span class="label-text">특성:</span><span class="val-text">${abilityText}</span></div>
-                    </div>
-                </div>`;
-        }).join('');
+        const rankingCards = globalRankList.map(p => createCard(p, false, false).outerHTML).join('');
 
-        win.document.write(`<html><head><title>🏆 전체 순위표</title><meta name="referrer" content="no-referrer"><link rel="icon" type="image/png" href="pokemon%20semantle%20icon.png"><link rel="apple-touch-icon" href="pokemon%20semantle%20icon.png"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;} .card-body{padding:0 20px;} .card.expanded .card-body{padding:14px 20px;} .info-row{margin:8px 0;}</style></head>
+        win.document.write(`<html><head><title>🏆 전체 순위표</title><meta name="referrer" content="no-referrer"><link rel="icon" type="image/png" href="pokemon%20semantle%20icon.png"><link rel="apple-touch-icon" href="pokemon%20semantle%20icon.png"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;} .info-row{margin:8px 0;}</style></head>
             <body style="background:#f0f2f5"><div class="container" style="max-width:900px;margin:0 auto;padding:40px;">
-            <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 전체 순위표</h1><div class="history-list">${simpleCards}</div></div>
+            <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 전체 순위표</h1><div class="history-list">${rankingCards}</div></div>
             <script>document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('expanded'))<\/script></body></html>`);
         win.document.close();
     }
