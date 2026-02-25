@@ -745,7 +745,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 602,tynamo,저리어,5,일반,전기물고기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,전기,,0.2,0.3,1,부유,,,275,35,55,40,45,40,60,1,1,부정형,,물고기형,하양,
 603,eelektrik,저리릴,5,일반,전기물고기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,전기,,1.2,22,1,부유,,,405,65,85,70,75,70,40,1,1,부정형,,물고기형,파랑,
 604,eelektross,저리더프,5,일반,전기물고기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,전기,,2.1,80.5,1,부유,,,515,85,115,80,105,80,50,1,1,부정형,,물고기형,파랑,
-604,eelektross-mega,메가 저리더프,5,일반,전기물고기포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,전기,,3,180,1,부유,,,615,85,145,80,135,90,80,1,1,부정형,,물고기형,하양,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/060402.png
+604,eelektross-mega,메가 저리더프,5,일반,전기물고기포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,전기,,3,180,1,부유,,,615,85,145,80,135,90,80,1,1,부정형,,물고기형,파랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/060402.png
 605,elgyem,리그레,5,일반,브레인포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,에스퍼,,0.5,9,3,텔레파시,싱크로,애널라이즈,335,55,55,55,85,55,30,2,1,인간형,,이족꼬리형,파랑,
 606,beheeyem,벰크,5,일반,브레인포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,에스퍼,,1,34.5,3,텔레파시,싱크로,애널라이즈,485,75,75,75,125,95,40,2,1,인간형,,인간형,갈색,
 607,litwick,불켜미,5,일반,양초포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,고스트,불꽃,0.3,3.1,3,타오르는불꽃,불꽃몸,틈새포착,275,50,30,55,65,55,20,4,1,부정형,,기둥형,하양,
@@ -950,7 +950,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 766,passimian,내던숭이,7,일반,연계포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,격투,,2,82.8,2,리시버,,오기,490,100,120,90,40,60,80,1,1,육상,,이족꼬리형,하양,
 767,wimpod,꼬시레,7,일반,주행포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,물,0.5,12,1,도망태세,,,230,25,35,40,20,30,80,2,2,벌레,수중 3,다족형,회색,
 768,golisopod,갑주무사,7,일반,장갑포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,물,2,108,1,위기회피,,,530,75,125,140,60,90,40,2,2,벌레,수중 3,인간형,회색,
-768,golisopod-mega,메가 갑주무사,7,일반,장갑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,벌레,강철,2.3,148,1,위기회피,,,630,75,150,175,70,120,40,2,2,벌레,수중 3,인간형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/076802.png
+768,golisopod-mega,메가 갑주무사,7,일반,장갑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,벌레,강철,2.3,148,1,위기회피,,,630,75,150,175,70,120,40,2,2,벌레,수중 3,인간형,회색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/076802.png
 769,sandygast,모래꿍,7,일반,모래산포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,고스트,땅,0.5,70,2,꾸덕꾸덕굳기,,모래숨기,320,55,55,80,70,45,15,2,1,부정형,,뱀형,갈색,
 770,palossand,모래성이당,7,일반,모래성포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,고스트,땅,1.3,250,2,꾸덕꾸덕굳기,,모래숨기,480,85,75,110,100,75,35,2,1,부정형,,뱀형,갈색,
 771,pyukumuku,해무기,7,일반,해삼포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,0.3,1.2,2,내용물분출,,천진,410,55,60,130,30,130,5,3,1,수중 1,,뱀형,검정,
@@ -1243,4 +1243,5 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 1024,terapagos,테라파고스,9,전설,테라스탈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,0.2,6.5,1,테라체인지,,,450,90,65,85,65,85,60,1,1,알미발견,,사족형,파랑,
 1024,terapagos-terastal,테라파고스 (테라스탈폼),9,전설,테라스탈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,0.3,16,1,테라셸,,,600,95,95,110,105,110,85,1,1,알미발견,,머리형,파랑,
 1024,terapagos-stellar,테라파고스 (스텔라폼),9,전설,테라스탈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,1.7,77,1,제로포밍,,,700,160,105,110,130,110,85,1,1,알미발견,,머리형,파랑,
+
 1025,pecharunt,복숭악동,9,환상,지배포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,독,고스트,0.3,0.3,1,독조종,,,600,88,88,160,88,88,88,1,1,알미발견,,머리형,보라,
