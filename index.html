@@ -468,9 +468,12 @@
         }
     }
 
-    function createCard(p, isExpanded, isInteractive, lazyBody = false) {
+    function createCard(p, isExpanded, isInteractive, lazyBody = false, lazyImages = false) {
         const el = document.createElement('div'); el.className = `card ${isExpanded ? 'expanded' : ''}`;
         const imgUrl = getImageUrl(p);
+        const getImgAttrs = (size, fallback) => lazyImages
+            ? `src="https://via.placeholder.com/${size}?text=Loading" data-src="${imgUrl}" loading="lazy" decoding="async" onerror="this.src='${fallback}';"`
+            : `src="${imgUrl}" onerror="this.src='${fallback}';"`;
         const typeHtml = p.type.map(t => `<span class="type-badge" style="background:${getPastelColor(t)}; color:${getTypeColor(t)}">${t}</span>`).join('');
         const shapeImg = getShapeImg(p.shape);
         const shapeContent = shapeImg ? `<img src="${shapeImg}" class="shape-icon" title="${p.shape}">` : (p.shape || '-');
@@ -478,7 +481,7 @@
             const radarSvg = getRadarChartSVG(p.stats);
             return `
                 <div class="grid-layout">
-                    <div class="col-left"><div class="big-img-box"><img src="${imgUrl}" class="big-img" onerror="this.src='https://via.placeholder.com/220x220?text=No+Image';"></div></div>
+                    <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
                     <div class="col-mid">
                         <div class="info-column">
                             <div class="info-row"><span class="label-text">이름:</span><span class="val-text">${p.ko}</span></div>
@@ -544,7 +547,7 @@
                 <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:rgba(255, 82, 82, ${gaugeOpacity});"></div>
                 <div class="header-content">
                     <span class="try-badge">${p.tryNo ? (p.tryNo === '-' ? '-' : '#'+p.tryNo) : '-'}</span>
-                    <img src="${imgUrl}" class="mini-img" onerror="this.src='https://via.placeholder.com/40';">
+                    <img ${getImgAttrs('40', 'https://via.placeholder.com/40')} class="mini-img">
                     <span class="header-name">${p.ko}</span>
                     <div class="rank-score-wrapper">
                         <span class="score-disp">${p.score.toFixed(2)}%</span>
@@ -565,12 +568,34 @@
         if (!win) return;
 
         const styles = document.querySelector('style').innerHTML;
-        const rankingCards = globalRankList.map(p => createCard(p, false, false).outerHTML).join('');
+        const rankingCards = globalRankList.map(p => createCard(p, false, false, false, true).outerHTML).join('');
 
         win.document.write(`<html><head><title>🏆 전체 순위표</title><meta name="referrer" content="no-referrer"><base href="${window.location.href}"><link rel="icon" type="image/png" href="pokemon%20semantle%20icon.png"><link rel="apple-touch-icon" href="pokemon%20semantle%20icon.png"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;}</style></head>
             <body style="background:#f0f2f5"><div class="container" style="max-width:900px;margin:0 auto;padding:24px 40px;">
             <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 전체 순위표</h1><div class="history-list">${rankingCards}</div></div>
-            <script>document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('expanded'))<\/script></body></html>`);
+            <script>
+                function loadImage(img){
+                    if (!img || !img.dataset.src) return;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                const lazyImages = Array.from(document.querySelectorAll('img[data-src]'));
+                if ('IntersectionObserver' in window) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                loadImage(entry.target);
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { rootMargin: '300px 0px' });
+                    lazyImages.forEach((img) => observer.observe(img));
+                } else {
+                    lazyImages.forEach(loadImage);
+                }
+
+                document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('expanded'))
+            <\/script></body></html>`);
         win.document.close();
     }
 
