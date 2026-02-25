@@ -299,6 +299,10 @@
         return `https://img.pokemondb.net/sprites/home/normal/2x/${slug}.jpg`;
     }
 
+    function getFallbackImageUrl(p) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.no}.png`;
+    }
+
     function getShapeImg(shapeName) {
         if(!shapeName) return null;
         const map = {
@@ -471,6 +475,7 @@
     function createCard(p, isExpanded, isInteractive, lazyBody = false) {
         const el = document.createElement('div'); el.className = `card ${isExpanded ? 'expanded' : ''}`;
         const imgUrl = getImageUrl(p);
+        const fallbackImgUrl = getFallbackImageUrl(p);
         const typeHtml = p.type.map(t => `<span class="type-badge" style="background:${getPastelColor(t)}; color:${getTypeColor(t)}">${t}</span>`).join('');
         const shapeImg = getShapeImg(p.shape);
         const shapeContent = shapeImg ? `<img src="${shapeImg}" class="shape-icon" title="${p.shape}">` : (p.shape || '-');
@@ -478,7 +483,7 @@
             const radarSvg = getRadarChartSVG(p.stats);
             return `
                 <div class="grid-layout">
-                    <div class="col-left"><div class="big-img-box"><img src="${imgUrl}" class="big-img"></div></div>
+                    <div class="col-left"><div class="big-img-box"><img src="${imgUrl}" class="big-img" onerror="if(this.dataset.fallbackTried){this.src='https://via.placeholder.com/220x220?text=No+Image';return;} this.dataset.fallbackTried='1'; this.src='${fallbackImgUrl}';"></div></div>
                     <div class="col-mid">
                         <div class="info-column">
                             <div class="info-row"><span class="label-text">이름:</span><span class="val-text">${p.ko}</span></div>
@@ -544,7 +549,7 @@
                 <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:rgba(255, 82, 82, ${gaugeOpacity});"></div>
                 <div class="header-content">
                     <span class="try-badge">${p.tryNo ? (p.tryNo === '-' ? '-' : '#'+p.tryNo) : '-'}</span>
-                    <img src="${imgUrl}" class="mini-img" onerror="this.src='https://via.placeholder.com/40'">
+                    <img src="${imgUrl}" class="mini-img" onerror="if(this.dataset.fallbackTried){this.src='https://via.placeholder.com/40';return;} this.dataset.fallbackTried='1'; this.src='${fallbackImgUrl}';">
                     <span class="header-name">${p.ko}</span>
                     <div class="rank-score-wrapper">
                         <span class="score-disp">${p.score.toFixed(2)}%</span>
@@ -588,5 +593,4 @@
 </script>
 </body>
 </html>
-
 
