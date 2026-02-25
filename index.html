@@ -131,18 +131,18 @@
             <div class="success-stats-grid">
                 <div class="success-stat-card">
                     <h3 class="success-stat-title">📈 순위 기록</h3>
-                    <div class="success-stat-row"><span class="success-stat-label">이번 최고 순위</span><strong class="success-stat-value" id="bestRankDisplay">-</strong></div>
-                    <div class="success-stat-row"><span class="success-stat-label">역대 최하 최고순위</span><strong class="success-stat-value" id="worstBestRankDisplay">-</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">이번 게임 최고 순위</span><strong class="success-stat-value" id="bestRankDisplay">-</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">역대 최고 순위 중 최하 순위</span><strong class="success-stat-value" id="worstBestRankDisplay">-</strong></div>
                 </div>
                 <div class="success-stat-card">
                     <h3 class="success-stat-title">🎯 입력 기록</h3>
-                    <div class="success-stat-row"><span class="success-stat-label">이번 입력 횟수</span><strong class="success-stat-value" id="tryCountDisplay">0</strong></div>
-                    <div class="success-stat-row"><span class="success-stat-label">전체 평균 횟수</span><strong class="success-stat-value" id="avgTryDisplay">-</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">이번 게임 입력 횟수</span><strong class="success-stat-value" id="tryCountDisplay">0</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">역대 평균 입력 횟수</span><strong class="success-stat-value" id="avgTryDisplay">-</strong></div>
                 </div>
                 <div class="success-stat-card">
                     <h3 class="success-stat-title">🔥 연속 정답</h3>
-                    <div class="success-stat-row"><span class="success-stat-label">현재 연승</span><strong class="success-stat-value" id="streakCount">0</strong></div>
-                    <div class="success-stat-row"><span class="success-stat-label">최다 연승</span><strong class="success-stat-value" id="maxStreakDisplay">0</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">현재 연속 정답</span><strong class="success-stat-value" id="streakCount">0</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">역대 최다 연속 정답</span><strong class="success-stat-value" id="maxStreakDisplay">0</strong></div>
                 </div>
             </div>
             <div>
@@ -259,7 +259,7 @@
 
     function getVector(p) {
         let v = [];
-        for(let g=1; g<=9; g++) v.push(p.gen === g ? 2.0 : 0);
+        for(let g=1; g<=9; g++) v.push(p.gen === g ? 1.5 : 0);
         sets.status.forEach(s => v.push(p.status === s ? 2.0 : 0));
         sets.types.forEach(t => v.push(p.type.includes(t) ? 2.0 : 0));
         sets.categories.forEach(c => v.push(p.category === c ? 2.0 : 0));
@@ -564,4 +564,5 @@
 </script>
 </body>
 </html>
+
 
