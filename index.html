@@ -294,6 +294,7 @@
     }
 
     function getImageUrl(p) {
+        if (p.imagePath) return p.imagePath;
         const name = (p.name || '').toLowerCase();
         return `https://img.pokemondb.net/sprites/home/normal/${encodeURIComponent(name)}.png`;
     }
