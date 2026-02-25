@@ -331,7 +331,7 @@
         if (!val) { autoList.style.display='none'; return; }
         currentFocus = -1;
         
-        const matches = allKoNames.filter(n => n.includes(val)).slice(0, 8);
+        const matches = allKoNames.filter(n => n.includes(val));
         if (matches.length > 0) {
             autoList.style.display = 'block';
             matches.forEach(name => {
