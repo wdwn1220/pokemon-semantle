@@ -567,8 +567,8 @@
         const styles = document.querySelector('style').innerHTML;
         const rankingCards = globalRankList.map(p => createCard(p, false, false).outerHTML).join('');
 
-        win.document.write(`<html><head><title>🏆 전체 순위표</title><meta name="referrer" content="no-referrer"><link rel="icon" type="image/png" href="pokemon%20semantle%20icon.png"><link rel="apple-touch-icon" href="pokemon%20semantle%20icon.png"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;} .info-row{margin:8px 0;}</style></head>
-            <body style="background:#f0f2f5"><div class="container" style="max-width:900px;margin:0 auto;padding:40px;">
+        win.document.write(`<html><head><title>🏆 전체 순위표</title><meta name="referrer" content="no-referrer"><base href="${window.location.href}"><link rel="icon" type="image/png" href="pokemon%20semantle%20icon.png"><link rel="apple-touch-icon" href="pokemon%20semantle%20icon.png"><style>${styles} .history-list{gap:6px !important;} .card{margin-bottom:0 !important;}</style></head>
+            <body style="background:#f0f2f5"><div class="container" style="max-width:900px;margin:0 auto;padding:24px 40px;">
             <h1 style="text-align:center;color:#2c3e50;margin-bottom:20px;">🏆 전체 순위표</h1><div class="history-list">${rankingCards}</div></div>
             <script>document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('expanded'))<\/script></body></html>`);
         win.document.close();
