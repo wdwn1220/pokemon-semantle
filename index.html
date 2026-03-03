@@ -47,6 +47,10 @@
         #guessInput:focus { border-color: var(--primary); }
         button.submit-btn { padding: 0 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         button.submit-btn:hover { background: #1a252f; }
+        .mode-bar { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .mode-chip { padding: 8px 14px; border-radius: 999px; font-size: 0.9rem; font-weight: 800; background: #e7ecf3; color: #334155; }
+        .mode-btn { border: none; border-radius: 999px; padding: 8px 14px; font-size: 0.9rem; font-weight: 800; cursor: pointer; background: #1f2937; color: white; }
+        .mode-btn:hover { background: #111827; }
         
         /* 🚨 에러 메시지 */
         #errorMsg { color: #d32f2f; background: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; margin-bottom: 10px; text-align: center; display: none; animation: shake 0.4s; }
@@ -151,6 +155,11 @@
         </div>
 
         <div class="input-area" id="inputAreaDiv">
+            <div class="mode-bar">
+                <span class="mode-chip" id="modeStatus">📅 오늘의 모드</span>
+                <button class="mode-btn" id="modeToggleBtn" onclick="toggleGameMode()">♾️ 무한모드</button>
+                <button class="mode-btn" id="restartBtn" onclick="restartInfiniteGame()" style="display:none; background:#ef4444;">🔄 다시하기</button>
+            </div>
             <div id="errorMsg">에러 메시지 영역</div>
             
             <div class="input-wrapper">
@@ -169,6 +178,9 @@
     let targetData = null, targetVec = null, globalRankList = [], history = [];
     let tryCount = 0;
     let expandedCards = new Set();
+    let currentMode = 'daily';
+    const MODE_DAILY = 'daily';
+    const MODE_INFINITE = 'infinite';
     
     let streak = parseInt(localStorage.getItem('pokeSemantleStreak')) || 0;
     let maxStreak = parseInt(localStorage.getItem('pokeSemantleMaxStreak')) || 0;
@@ -178,6 +190,7 @@
     let worstBestRank = parseInt(localStorage.getItem('pokeSemantleWorstBestRank')) || 0;
     let bestRank = Infinity;
     let gameSolved = false;
+    let dailyPuzzleKey = '';
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
@@ -233,13 +246,6 @@
     }
 
     function initGame() {
-        const lastGameSolved = localStorage.getItem('pokeSemantleLastGameSolved');
-        if (lastGameSolved === 'false') {
-            streak = 0;
-            localStorage.setItem('pokeSemantleStreak', streak);
-        }
-        localStorage.setItem('pokeSemantleLastGameSolved', 'false');
-
         db.forEach(p => {
             p.type.forEach(t => sets.types.add(t));
             if (p.status) sets.status.add(p.status);
@@ -249,12 +255,136 @@
             p.abilities.forEach(a => sets.abilities.add(a));
             if (p.hidden) sets.abilities.add(p.hidden);
         });
-        targetData = db[Math.floor(Math.random() * db.length)];
-        targetVec = getVector(targetData);
-        calculateGlobalRanks();
+
+        const savedMode = localStorage.getItem('pokeSemantleMode');
+        currentMode = savedMode === MODE_INFINITE ? MODE_INFINITE : MODE_DAILY;
+        startGame(currentMode);
+
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('setupArea').style.display = 'none';
         document.getElementById('gameArea').style.display = 'block';
+    }
+
+    function getTodayKey() {
+        return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+    }
+
+    function getDailyTargetIndex(key, length) {
+        let hash = 0;
+        for (const ch of key) hash = ((hash * 31) + ch.charCodeAt(0)) >>> 0;
+        return hash % length;
+    }
+
+    function loadDailyProgress() {
+        const raw = localStorage.getItem(`pokeSemantleDailyProgress_${dailyPuzzleKey}`);
+        if (!raw) return null;
+        try { return JSON.parse(raw); } catch { return null; }
+    }
+
+    function saveDailyProgress() {
+        if (currentMode !== MODE_DAILY) return;
+        const payload = {
+            historyKo: history.map(h => h.ko),
+            tryCount,
+            gameSolved,
+            bestRank: bestRank === Infinity ? null : bestRank
+        };
+        localStorage.setItem(`pokeSemantleDailyProgress_${dailyPuzzleKey}`, JSON.stringify(payload));
+    }
+
+    function resetGameState() {
+        history = [];
+        tryCount = 0;
+        bestRank = Infinity;
+        gameSolved = false;
+        expandedCards.clear();
+        document.getElementById('successArea').style.display = 'none';
+        document.getElementById('errorMsg').style.display = 'none';
+        inputEl.value = '';
+        autoList.style.display = 'none';
+        renderHistory();
+    }
+
+    function startGame(mode) {
+        currentMode = mode;
+        localStorage.setItem('pokeSemantleMode', currentMode);
+        resetGameState();
+
+        if (mode === MODE_DAILY) {
+            dailyPuzzleKey = getTodayKey();
+            targetData = db[getDailyTargetIndex(dailyPuzzleKey, db.length)];
+            targetVec = getVector(targetData);
+            calculateGlobalRanks();
+            restoreDailyProgress();
+        } else {
+            targetData = db[Math.floor(Math.random() * db.length)];
+            targetVec = getVector(targetData);
+            calculateGlobalRanks();
+        }
+        updateModeUI();
+    }
+
+    function restoreDailyProgress() {
+        const progress = loadDailyProgress();
+        if (!progress || !Array.isArray(progress.historyKo)) return;
+
+        history = progress.historyKo.map((koName, idx) => {
+            const pData = db.find(d => d.ko === koName);
+            if (!pData) return null;
+            const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
+            if (rankIdx < 0) return null;
+            return {
+                ...pData,
+                rank: rankIdx + 1,
+                score: globalRankList[rankIdx].score,
+                tryNo: progress.historyKo.length - idx
+            };
+        }).filter(Boolean);
+
+        tryCount = progress.tryCount || progress.historyKo.length;
+        gameSolved = Boolean(progress.gameSolved);
+        bestRank = progress.bestRank ?? Infinity;
+
+        renderHistory();
+        if (gameSolved) {
+            showSolvedBanner(history[0]?.ko || targetData.ko);
+        }
+    }
+
+    function showSolvedBanner(pokemonName) {
+        document.getElementById('successArea').style.display = 'block';
+        document.getElementById('answerName').innerText = pokemonName;
+        document.getElementById('streakCount').innerText = streak;
+        document.getElementById('maxStreakDisplay').innerText = maxStreak;
+        document.getElementById('tryCountDisplay').innerText = `${tryCount}회`;
+        document.getElementById('avgTryDisplay').innerText = solvedGameCount > 0 ? `${(totalTrySum / solvedGameCount).toFixed(2)}회` : '-';
+        document.getElementById('bestRankDisplay').innerText = bestRank === Infinity ? '-' : `${bestRank}위`;
+        document.getElementById('worstBestRankDisplay').innerText = worstBestRank > 0 ? `${worstBestRank}위` : '-';
+    }
+
+    function updateModeUI() {
+        const modeStatus = document.getElementById('modeStatus');
+        const modeToggleBtn = document.getElementById('modeToggleBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        if (currentMode === MODE_DAILY) {
+            modeStatus.innerText = `📅 오늘의 모드 (${dailyPuzzleKey})`;
+            modeToggleBtn.innerText = '♾️ 무한모드';
+            restartBtn.style.display = 'none';
+        } else {
+            modeStatus.innerText = '♾️ 무한모드';
+            modeToggleBtn.innerText = '📅 오늘의 모드';
+            restartBtn.style.display = 'inline-block';
+        }
+    }
+
+    function toggleGameMode() {
+        const nextMode = currentMode === MODE_DAILY ? MODE_INFINITE : MODE_DAILY;
+        startGame(nextMode);
+    }
+
+    function restartInfiniteGame() {
+        if (currentMode !== MODE_INFINITE) return;
+        startGame(MODE_INFINITE);
     }
 
     function getVector(p) {
@@ -367,11 +497,14 @@
     document.addEventListener('click', e => { if (e.target !== inputEl) { autoList.innerHTML = ''; autoList.style.display = 'none'; } });
 
     function handleGuess() {
-        // ✅ 정답을 맞춰도 계속 입력할 수 있게 방어막 해제
-        // if(gameSolved) return; 
-
         const errorEl = document.getElementById('errorMsg');
         errorEl.style.display = 'none';
+
+        if (currentMode === MODE_DAILY && gameSolved) {
+            errorEl.innerText = '✅ 오늘의 문제는 이미 클리어했습니다! 무한모드에서 계속 플레이해 보세요.';
+            errorEl.style.display = 'block';
+            return;
+        }
 
         const val = inputEl.value.trim().normalize('NFC');
         if (!val) return;
@@ -404,6 +537,7 @@
         renderHistory(); 
         inputEl.value = "";
         autoList.style.display = 'none';
+        saveDailyProgress();
 
         // 게임을 맞췄고, 첫 성공일 때만 폭죽 터뜨림
         if (currentRank === 1 && !gameSolved) { 
@@ -413,32 +547,24 @@
 
     function handleWin(pokemonName) {
         gameSolved = true;
-        streak++;
-        maxStreak = Math.max(maxStreak, streak);
-        solvedGameCount++;
-        totalTrySum += tryCount;
+        if (currentMode === MODE_DAILY) {
+            streak++;
+            maxStreak = Math.max(maxStreak, streak);
+            solvedGameCount++;
+            totalTrySum += tryCount;
 
-        if (bestRank !== Infinity) {
-            worstBestRank = worstBestRank === 0 ? bestRank : Math.max(worstBestRank, bestRank);
+            if (bestRank !== Infinity) {
+                worstBestRank = worstBestRank === 0 ? bestRank : Math.max(worstBestRank, bestRank);
+            }
+
+            localStorage.setItem('pokeSemantleStreak', streak);
+            localStorage.setItem('pokeSemantleMaxStreak', maxStreak);
+            localStorage.setItem('pokeSemantleSolvedGameCount', solvedGameCount);
+            localStorage.setItem('pokeSemantleTotalTrySum', totalTrySum);
+            localStorage.setItem('pokeSemantleWorstBestRank', worstBestRank);
         }
-
-        localStorage.setItem('pokeSemantleStreak', streak);
-        localStorage.setItem('pokeSemantleMaxStreak', maxStreak);
-        localStorage.setItem('pokeSemantleSolvedGameCount', solvedGameCount);
-        localStorage.setItem('pokeSemantleTotalTrySum', totalTrySum);
-        localStorage.setItem('pokeSemantleWorstBestRank', worstBestRank);
-        localStorage.setItem('pokeSemantleLastGameSolved', 'true');
-
-        // ✅ 정답 이후에도 계속 검색 가능하므로 입력창은 숨기지 않음
-        document.getElementById('successArea').style.display = 'block';
-        
-        document.getElementById('answerName').innerText = pokemonName;
-        document.getElementById('streakCount').innerText = streak;
-        document.getElementById('maxStreakDisplay').innerText = maxStreak;
-        document.getElementById('tryCountDisplay').innerText = `${tryCount}회`;
-        document.getElementById('avgTryDisplay').innerText = solvedGameCount > 0 ? `${(totalTrySum / solvedGameCount).toFixed(2)}회` : '-';
-        document.getElementById('bestRankDisplay').innerText = bestRank === Infinity ? '-' : `${bestRank}위`;
-        document.getElementById('worstBestRankDisplay').innerText = worstBestRank > 0 ? `${worstBestRank}위` : '-';
+        saveDailyProgress();
+        showSolvedBanner(pokemonName);
 
         if (typeof confetti === 'function') {
             const duration = 3000;
