@@ -38,6 +38,7 @@
 
         @media (max-width: 760px) {
             .success-stats-grid { grid-template-columns: 1fr; }
+            .mode-bar { flex-wrap: wrap; top: 8px; }
         }
         
         /* 입력창 영역 */
@@ -47,10 +48,13 @@
         #guessInput:focus { border-color: var(--primary); }
         button.submit-btn { padding: 0 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         button.submit-btn:hover { background: #1a252f; }
-        .mode-bar { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .mode-bar { position: sticky; top: 12px; z-index: 120; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 14px; padding: 10px 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(6px); border: 1px solid #dbe2ea; }
         .mode-chip { padding: 8px 14px; border-radius: 999px; font-size: 0.9rem; font-weight: 800; background: #e7ecf3; color: #334155; }
-        .mode-btn { border: none; border-radius: 999px; padding: 8px 14px; font-size: 0.9rem; font-weight: 800; cursor: pointer; background: #1f2937; color: white; }
+        .mode-toggle-group { display: flex; gap: 8px; }
+        .mode-btn { border: 2px solid transparent; border-radius: 999px; padding: 8px 14px; font-size: 0.9rem; font-weight: 800; cursor: pointer; background: #1f2937; color: white; transition: 0.2s; }
         .mode-btn:hover { background: #111827; }
+        .mode-btn.active { background: #ff5252; border-color: #ffb4b4; color: #fff; box-shadow: 0 2px 10px rgba(255, 82, 82, 0.35); }
+        .mode-btn:not(.active) { opacity: 0.85; }
         
         /* 🚨 에러 메시지 */
         #errorMsg { color: #d32f2f; background: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; margin-bottom: 10px; text-align: center; display: none; animation: shake 0.4s; }
@@ -156,8 +160,11 @@
 
         <div class="input-area" id="inputAreaDiv">
             <div class="mode-bar">
-                <span class="mode-chip" id="modeStatus">📅 오늘의 모드</span>
-                <button class="mode-btn" id="modeToggleBtn" onclick="toggleGameMode()">♾️ 무한모드</button>
+                <span class="mode-chip" id="modeStatus">📅 현재 모드: 오늘의 모드</span>
+                <div class="mode-toggle-group">
+                    <button class="mode-btn" id="dailyModeBtn" onclick="switchGameMode(MODE_DAILY)">📅 오늘의 모드</button>
+                    <button class="mode-btn" id="infiniteModeBtn" onclick="switchGameMode(MODE_INFINITE)">♾️ 무한 모드</button>
+                </div>
                 <button class="mode-btn" id="restartBtn" onclick="restartInfiniteGame()" style="display:none; background:#ef4444;">🔄 다시하기</button>
             </div>
             <div id="errorMsg">에러 메시지 영역</div>
@@ -364,22 +371,26 @@
 
     function updateModeUI() {
         const modeStatus = document.getElementById('modeStatus');
-        const modeToggleBtn = document.getElementById('modeToggleBtn');
+        const dailyModeBtn = document.getElementById('dailyModeBtn');
+        const infiniteModeBtn = document.getElementById('infiniteModeBtn');
         const restartBtn = document.getElementById('restartBtn');
+        const isDailyMode = currentMode === MODE_DAILY;
+
+        dailyModeBtn.classList.toggle('active', isDailyMode);
+        infiniteModeBtn.classList.toggle('active', !isDailyMode);
+
         if (currentMode === MODE_DAILY) {
-            modeStatus.innerText = `📅 오늘의 모드 (${dailyPuzzleKey})`;
-            modeToggleBtn.innerText = '♾️ 무한모드';
+            modeStatus.innerText = `📅 현재 모드: 오늘의 모드 (${dailyPuzzleKey})`;
             restartBtn.style.display = 'none';
         } else {
-            modeStatus.innerText = '♾️ 무한모드';
-            modeToggleBtn.innerText = '📅 오늘의 모드';
+            modeStatus.innerText = '♾️ 현재 모드: 무한 모드';
             restartBtn.style.display = 'inline-block';
         }
     }
 
-    function toggleGameMode() {
-        const nextMode = currentMode === MODE_DAILY ? MODE_INFINITE : MODE_DAILY;
-        startGame(nextMode);
+    function switchGameMode(mode) {
+        if (mode === currentMode) return;
+        startGame(mode);
     }
 
     function restartInfiniteGame() {
