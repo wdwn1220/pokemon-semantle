@@ -105,12 +105,40 @@
         #autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 200; border-radius: 0 0 12px 12px; display: none; max-height: 250px; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 0.95rem; }
         .suggestion-item:hover, .suggestion-item.active { background: #f1f8e9; color: var(--accent); font-weight: bold; }
+
+        .side-toggle { position: fixed; right: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 74px; border-radius: 12px 0 0 12px; border: 1px solid #cbd5e1; border-right: none; background: #fff; color: #334155; box-shadow: -2px 2px 12px rgba(15, 23, 42, 0.12); cursor: pointer; z-index: 350; font-size: 1.2rem; font-weight: 700; transition: right 0.25s ease; }
+        .side-toggle.open { right: 360px; }
+        .side-panel { position: fixed; top: 0; right: -370px; width: 360px; height: 100vh; background: #ffffff; border-left: 1px solid #dbe2ea; box-shadow: -8px 0 26px rgba(15, 23, 42, 0.16); transition: right 0.25s ease; z-index: 340; display: flex; flex-direction: column; }
+        .side-panel.open { right: 0; }
+        body.sidebar-open .container { transform: translateX(-170px); }
+        .container { transition: transform 0.25s ease; }
+        .side-header { padding: 16px 18px 10px; border-bottom: 1px solid #eef2f7; }
+        .side-header h3 { margin: 0; font-size: 1.05rem; color: #1e293b; }
+        .side-body { padding: 14px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.86rem; background: #fff; color: #1f2937; box-sizing: border-box; }
+        .filter-section-title { margin: 2px 0 0; font-size: 0.78rem; color: #64748b; font-weight: 700; }
+        .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .filter-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+        .reset-filter-btn { border: none; border-radius: 8px; background: #e2e8f0; color: #1e293b; font-size: 0.8rem; font-weight: 700; padding: 7px 10px; cursor: pointer; }
+        .side-count { color: #64748b; font-size: 0.82rem; font-weight: 700; }
+        .side-list { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; max-height: calc(100vh - 520px); overflow-y: auto; }
+        .side-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.88rem; padding: 9px 11px; border-bottom: 1px solid #f1f5f9; }
+        .side-item:last-child { border-bottom: none; }
+        .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
+        .side-item-name { color: #0f172a; font-weight: 700; }
+        .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
         
         @media (max-width: 850px) {
             .grid-layout { grid-template-columns: 1fr; gap: 15px; }
             .col-left { border: none; padding-bottom: 15px; border-bottom: 1px solid #eee; }
             .col-mid { grid-template-columns: 1fr; }
             .col-right { border: none; border-top: 1px solid #eee; padding-top: 15px; }
+            .side-panel { width: 92vw; right: -92vw; }
+            .side-toggle.open { right: 92vw; }
+            body.sidebar-open .container { transform: none; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -182,6 +210,46 @@
     </div>
 </div>
 
+<button id="sideToggleBtn" class="side-toggle" onclick="togglePokedexSidebar()">◀</button>
+<aside id="pokedexSidebar" class="side-panel" aria-label="포켓몬 검색 사이드바">
+    <div class="side-header"><h3>📚 포켓몬 검색</h3></div>
+    <div class="side-body">
+        <input id="sideNameSearch" class="side-search" type="text" placeholder="이름 검색...">
+        <div class="filter-grid">
+            <select id="filterGen"></select>
+            <select id="filterStatus"></select>
+            <select id="filterType"></select>
+            <select id="filterType2"></select>
+            <select id="filterShape"></select>
+            <select id="filterColor"></select>
+            <select id="filterExtra"></select>
+            <select id="filterAbility"></select>
+        </div>
+        <p class="filter-section-title">키/몸무게</p>
+        <div class="range-grid">
+            <input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)">
+            <input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)">
+            <input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)">
+            <input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)">
+        </div>
+        <p class="filter-section-title">종족값 (최소값)</p>
+        <div class="stat-grid">
+            <input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합">
+            <input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP">
+            <input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격">
+            <input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어">
+            <input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공">
+            <input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방">
+            <input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드">
+        </div>
+        <div class="filter-actions">
+            <button id="resetFiltersBtn" class="reset-filter-btn" type="button">초기화</button>
+            <span id="sideResultCount" class="side-count">0마리</span>
+        </div>
+        <div id="sidePokemonList" class="side-list"></div>
+    </div>
+</aside>
+
 <script>
     let db = [], allKoNames = [];
     let targetData = null, targetVec = null, globalRankList = [], history = [];
@@ -200,6 +268,7 @@
     let bestRank = Infinity;
     let gameSolved = false;
     let dailyPuzzleKey = '';
+    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', ability: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
@@ -225,6 +294,7 @@
     };
 
     function parseData(txt) {
+        allKoNames = [];
         const lines = txt.split(/\r?\n/);
         const h = lines[0].split(',').map(x => x.trim().replace(/^\ufeff/, ''));
         const get = (row, col) => { const idx = h.indexOf(col); return idx > -1 ? row[idx]?.trim() : null; };
@@ -272,6 +342,162 @@
         document.getElementById('loadingArea').style.display = 'none';
         document.getElementById('setupArea').style.display = 'none';
         document.getElementById('gameArea').style.display = 'block';
+
+        initSidebarFilters();
+        renderSidebarList();
+    }
+
+    function initSidebarFilters() {
+        const options = {
+            filterGen: [1,2,3,4,5,6,7,8,9].map(v => ({ value: String(v), label: `${v}세대` })),
+            filterStatus: [...sets.status].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
+            filterType: [...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
+            filterType2: [...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
+            filterShape: [...sets.shapes].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
+            filterColor: [...sets.colors].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
+            filterExtra: [
+                { value: 'mega', label: '메가진화' },
+                { value: 'gmax', label: '거다이맥스' },
+                { value: 'region', label: '리전폼' },
+                { value: 'forms', label: '여러 모습' }
+            ],
+            filterAbility: [...sets.abilities].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))
+        };
+
+        const labels = {
+            filterGen: '세대',
+            filterStatus: '구분',
+            filterType: '타입1',
+            filterType2: '타입2',
+            filterShape: '체형',
+            filterColor: '색상',
+            filterExtra: '기타',
+            filterAbility: '특성'
+        };
+
+        Object.entries(options).forEach(([id, items]) => {
+            const select = document.getElementById(id);
+            if (!select) return;
+            select.innerHTML = `<option value="">전체 ${labels[id]}</option>` + items.map(item => `<option value="${item.value}">${item.label}</option>`).join('');
+            select.onchange = (e) => {
+                const key = id.replace('filter', '').toLowerCase();
+                sidebarFilters[key] = e.target.value;
+                renderSidebarList();
+            };
+        });
+
+        const textInputMap = {
+            sideNameSearch: 'name',
+            filterHeightMin: 'heightMin',
+            filterHeightMax: 'heightMax',
+            filterWeightMin: 'weightMin',
+            filterWeightMax: 'weightMax',
+            filterTotalMin: 'totalMin',
+            filterHpMin: 'hpMin',
+            filterAtkMin: 'atkMin',
+            filterDefMin: 'defMin',
+            filterSpaMin: 'spaMin',
+            filterSpdMin: 'spdMin',
+            filterSpeMin: 'speMin'
+        };
+
+        Object.entries(textInputMap).forEach(([id, key]) => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.oninput = (e) => {
+                sidebarFilters[key] = key === 'name' ? e.target.value.trim().toLowerCase() : e.target.value.trim();
+                renderSidebarList();
+            };
+        });
+
+        document.getElementById('resetFiltersBtn').onclick = () => {
+            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', ability: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+            Object.keys(textInputMap).forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+            Object.keys(labels).forEach(id => {
+                const select = document.getElementById(id);
+                if (select) select.value = '';
+            });
+            renderSidebarList();
+        };
+    }
+
+    function togglePokedexSidebar() {
+        const panel = document.getElementById('pokedexSidebar');
+        const button = document.getElementById('sideToggleBtn');
+        const isOpen = panel.classList.toggle('open');
+        button.classList.toggle('open', isOpen);
+        document.body.classList.toggle('sidebar-open', isOpen);
+        button.innerText = isOpen ? '▶' : '◀';
+    }
+
+    function toNum(value, fallback = null) {
+        if (value === '' || value === null || value === undefined) return fallback;
+        const n = parseFloat(value);
+        return Number.isNaN(n) ? fallback : n;
+    }
+
+    function renderSidebarList() {
+        const listEl = document.getElementById('sidePokemonList');
+        const resultCountEl = document.getElementById('sideResultCount');
+        if (!listEl || !resultCountEl) return;
+
+        const minH = toNum(sidebarFilters.heightMin);
+        const maxH = toNum(sidebarFilters.heightMax);
+        const minW = toNum(sidebarFilters.weightMin);
+        const maxW = toNum(sidebarFilters.weightMax);
+        const minTotal = toNum(sidebarFilters.totalMin, 0);
+        const minHp = toNum(sidebarFilters.hpMin, 0);
+        const minAtk = toNum(sidebarFilters.atkMin, 0);
+        const minDef = toNum(sidebarFilters.defMin, 0);
+        const minSpa = toNum(sidebarFilters.spaMin, 0);
+        const minSpd = toNum(sidebarFilters.spdMin, 0);
+        const minSpe = toNum(sidebarFilters.speMin, 0);
+
+        const filtered = db
+            .filter(p => !sidebarFilters.name || p.ko.toLowerCase().includes(sidebarFilters.name) || (p.name || '').toLowerCase().includes(sidebarFilters.name))
+            .filter(p => !sidebarFilters.gen || String(p.gen) === sidebarFilters.gen)
+            .filter(p => !sidebarFilters.status || p.status === sidebarFilters.status)
+            .filter(p => !sidebarFilters.type || p.type.includes(sidebarFilters.type))
+            .filter(p => !sidebarFilters.type2 || p.type.includes(sidebarFilters.type2))
+            .filter(p => !sidebarFilters.shape || p.shape === sidebarFilters.shape)
+            .filter(p => !sidebarFilters.color || p.color === sidebarFilters.color)
+            .filter(p => !sidebarFilters.ability || p.abilities.includes(sidebarFilters.ability) || p.hidden === sidebarFilters.ability)
+            .filter(p => minH === null || p.h >= minH)
+            .filter(p => maxH === null || p.h <= maxH)
+            .filter(p => minW === null || p.w >= minW)
+            .filter(p => maxW === null || p.w <= maxW)
+            .filter(p => p.stats.total >= minTotal)
+            .filter(p => p.stats.hp >= minHp)
+            .filter(p => p.stats.atk >= minAtk)
+            .filter(p => p.stats.def >= minDef)
+            .filter(p => p.stats.spa >= minSpa)
+            .filter(p => p.stats.spd >= minSpd)
+            .filter(p => p.stats.spe >= minSpe)
+            .filter(p => {
+                if (!sidebarFilters.extra) return true;
+                if (sidebarFilters.extra === 'mega') return p.isMega;
+                if (sidebarFilters.extra === 'gmax') return p.isGmax;
+                if (sidebarFilters.extra === 'region') return p.isRegion;
+                if (sidebarFilters.extra === 'forms') return p.hasForms;
+                return true;
+            })
+            .sort((a, b) => a.no - b.no || a.ko.localeCompare(b.ko, 'ko'));
+
+        resultCountEl.innerText = `${filtered.length}마리`;
+        if (filtered.length === 0) {
+            listEl.innerHTML = '<div class="side-empty">조건에 맞는 포켓몬이 없습니다.</div>';
+            return;
+        }
+
+        listEl.innerHTML = filtered.map(p => `
+            <div class="side-item">
+                <span class="side-item-no">No.${String(p.no).padStart(4, '0')}</span>
+                <span class="side-item-name">${p.ko}</span>
+            </div>
+        `).join('');
     }
 
     function getTodayKey() {
