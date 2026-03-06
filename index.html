@@ -118,6 +118,20 @@
         .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.86rem; background: #fff; color: #1f2937; box-sizing: border-box; }
         .filter-section-title { margin: 2px 0 0; font-size: 0.78rem; color: #64748b; font-weight: 700; }
+        .advanced-search-wrap { border: 1px solid #dbe2ea; border-radius: 10px; background: #f8fafc; }
+        .advanced-search-wrap > summary { cursor: pointer; padding: 10px 12px; font-size: 0.86rem; font-weight: 800; color: #334155; list-style: none; }
+        .advanced-search-wrap > summary::-webkit-details-marker { display: none; }
+        .advanced-search-wrap > summary::after { content: '▾'; float: right; transition: transform 0.2s ease; }
+        .advanced-search-wrap:not([open]) > summary::after { transform: rotate(-90deg); }
+        .advanced-body { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 10px; }
+        .advanced-sub { border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+        .advanced-sub > summary { cursor: pointer; padding: 8px 10px; font-size: 0.8rem; font-weight: 700; color: #475569; list-style: none; }
+        .advanced-sub > summary::-webkit-details-marker { display: none; }
+        .advanced-sub > summary::after { content: '▾'; float: right; transition: transform 0.2s ease; }
+        .advanced-sub:not([open]) > summary::after { transform: rotate(-90deg); }
+        .advanced-sub-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+        .input-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .input-grid-1 { display: grid; grid-template-columns: 1fr; gap: 8px; }
         .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .filter-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
@@ -139,6 +153,7 @@
             .side-toggle.open { right: 92vw; }
             body.sidebar-open .container { transform: none; }
             .stat-grid { grid-template-columns: 1fr 1fr; }
+            .input-grid-3 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -168,7 +183,6 @@
                     <button class="mode-btn" id="dailyModeBtn" onclick="switchGameMode(MODE_DAILY)">📅 오늘의 모드</button>
                     <button class="mode-btn" id="infiniteModeBtn" onclick="switchGameMode(MODE_INFINITE)">♾️ 무한 모드</button>
                 </div>
-                <button class="mode-btn" id="restartBtn" onclick="restartInfiniteGame()" style="display:none; background:#ef4444;">🔄 다시하기</button>
             </div>
         </div>
 
@@ -202,6 +216,7 @@
             <div class="input-wrapper">
                 <input type="text" id="guessInput" placeholder="포켓몬 이름 입력..." autocomplete="off">
                 <button class="submit-btn" onclick="handleGuess()">확인</button>
+                <button class="submit-btn" id="inlineRestartBtn" onclick="restartInfiniteGame()" style="display:none; background:#ef4444;">🔄 다시하기</button>
             </div>
             <div id="autocomplete-list"></div>
         </div>
@@ -223,25 +238,48 @@
             <select id="filterShape"></select>
             <select id="filterColor"></select>
             <select id="filterExtra"></select>
-            <select id="filterAbility"></select>
+            <select id="filterCategory"></select>
         </div>
-        <p class="filter-section-title">키/몸무게</p>
-        <div class="range-grid">
-            <input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)">
-            <input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)">
-            <input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)">
-            <input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)">
-        </div>
-        <p class="filter-section-title">종족값 (최소값)</p>
-        <div class="stat-grid">
-            <input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합">
-            <input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP">
-            <input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격">
-            <input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어">
-            <input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공">
-            <input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방">
-            <input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드">
-        </div>
+        <details class="advanced-search-wrap" id="advancedSearchPanel">
+            <summary>고급 검색 / 더보기</summary>
+            <div class="advanced-body">
+                <details class="advanced-sub">
+                    <summary>분류 검색</summary>
+                    <div class="advanced-sub-body input-grid-1">
+                        <input id="filterCategorySearch" class="range-input" type="text" placeholder="분류 검색...">
+                    </div>
+                </details>
+                <details class="advanced-sub">
+                    <summary>특성 검색</summary>
+                    <div class="advanced-sub-body input-grid-3">
+                        <input id="filterAbility1" class="range-input" type="text" placeholder="특성1 검색...">
+                        <input id="filterAbility2" class="range-input" type="text" placeholder="특성2 검색...">
+                        <input id="filterAbility3" class="range-input" type="text" placeholder="특성3 검색...">
+                    </div>
+                </details>
+                <details class="advanced-sub">
+                    <summary>키/몸무게</summary>
+                    <div class="advanced-sub-body range-grid">
+                        <input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)">
+                        <input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)">
+                        <input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)">
+                        <input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)">
+                    </div>
+                </details>
+                <details class="advanced-sub">
+                    <summary>종족값 (최소값)</summary>
+                    <div class="advanced-sub-body stat-grid">
+                        <input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합">
+                        <input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP">
+                        <input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격">
+                        <input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어">
+                        <input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공">
+                        <input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방">
+                        <input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드">
+                    </div>
+                </details>
+            </div>
+        </details>
         <div class="filter-actions">
             <button id="resetFiltersBtn" class="reset-filter-btn" type="button">초기화</button>
             <span id="sideResultCount" class="side-count">0마리</span>
@@ -268,7 +306,7 @@
     let bestRank = Infinity;
     let gameSolved = false;
     let dailyPuzzleKey = '';
-    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', ability: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', ability1: '', ability2: '', ability3: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
@@ -352,7 +390,7 @@
             filterGen: [1,2,3,4,5,6,7,8,9].map(v => ({ value: String(v), label: `${v}세대` })),
             filterStatus: [...sets.status].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterType: [...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
-            filterType2: [...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
+            filterType2: [{ value: '__none__', label: '없음(단일 타입)' }, ...[...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))],
             filterShape: [...sets.shapes].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterColor: [...sets.colors].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterExtra: [
@@ -361,7 +399,7 @@
                 { value: 'region', label: '리전폼' },
                 { value: 'forms', label: '여러 모습' }
             ],
-            filterAbility: [...sets.abilities].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))
+            filterCategory: [...sets.categories].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))
         };
 
         const labels = {
@@ -372,7 +410,7 @@
             filterShape: '체형',
             filterColor: '색상',
             filterExtra: '기타',
-            filterAbility: '특성'
+            filterCategory: '분류'
         };
 
         Object.entries(options).forEach(([id, items]) => {
@@ -388,6 +426,10 @@
 
         const textInputMap = {
             sideNameSearch: 'name',
+            filterCategorySearch: 'categorySearch',
+            filterAbility1: 'ability1',
+            filterAbility2: 'ability2',
+            filterAbility3: 'ability3',
             filterHeightMin: 'heightMin',
             filterHeightMax: 'heightMax',
             filterWeightMin: 'weightMin',
@@ -405,13 +447,14 @@
             const input = document.getElementById(id);
             if (!input) return;
             input.oninput = (e) => {
-                sidebarFilters[key] = key === 'name' ? e.target.value.trim().toLowerCase() : e.target.value.trim();
+                const value = e.target.value.trim();
+                sidebarFilters[key] = ['name', 'categorySearch', 'ability1', 'ability2', 'ability3'].includes(key) ? value.toLowerCase() : value;
                 renderSidebarList();
             };
         });
 
         document.getElementById('resetFiltersBtn').onclick = () => {
-            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', ability: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', ability1: '', ability2: '', ability3: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
             Object.keys(textInputMap).forEach(id => {
                 const input = document.getElementById(id);
                 if (input) input.value = '';
@@ -461,10 +504,18 @@
             .filter(p => !sidebarFilters.gen || String(p.gen) === sidebarFilters.gen)
             .filter(p => !sidebarFilters.status || p.status === sidebarFilters.status)
             .filter(p => !sidebarFilters.type || p.type.includes(sidebarFilters.type))
-            .filter(p => !sidebarFilters.type2 || p.type.includes(sidebarFilters.type2))
+            .filter(p => {
+                if (!sidebarFilters.type2) return true;
+                if (sidebarFilters.type2 === '__none__') return p.type.length === 1;
+                return p.type.includes(sidebarFilters.type2);
+            })
             .filter(p => !sidebarFilters.shape || p.shape === sidebarFilters.shape)
             .filter(p => !sidebarFilters.color || p.color === sidebarFilters.color)
-            .filter(p => !sidebarFilters.ability || p.abilities.includes(sidebarFilters.ability) || p.hidden === sidebarFilters.ability)
+            .filter(p => !sidebarFilters.category || p.category === sidebarFilters.category)
+            .filter(p => !sidebarFilters.categorySearch || (p.category || '').toLowerCase().includes(sidebarFilters.categorySearch))
+            .filter(p => !sidebarFilters.ability1 || (p.abilities[0] || '').toLowerCase().includes(sidebarFilters.ability1))
+            .filter(p => !sidebarFilters.ability2 || (p.abilities[1] || '').toLowerCase().includes(sidebarFilters.ability2))
+            .filter(p => !sidebarFilters.ability3 || (p.hidden || '').toLowerCase().includes(sidebarFilters.ability3))
             .filter(p => minH === null || p.h >= minH)
             .filter(p => maxH === null || p.h <= maxH)
             .filter(p => minW === null || p.w >= minW)
@@ -604,7 +655,6 @@
         const dailyDateLabel = document.getElementById('dailyDateLabel');
         const dailyModeBtn = document.getElementById('dailyModeBtn');
         const infiniteModeBtn = document.getElementById('infiniteModeBtn');
-        const restartBtn = document.getElementById('restartBtn');
         const isDailyMode = currentMode === MODE_DAILY;
 
         dailyModeBtn.classList.toggle('active', isDailyMode);
@@ -613,10 +663,10 @@
         if (currentMode === MODE_DAILY) {
             dailyDateLabel.style.display = 'block';
             dailyDateLabel.innerText = `오늘의 문제 날짜: ${dailyPuzzleKey}`;
-            restartBtn.style.display = 'none';
+            document.getElementById('inlineRestartBtn').style.display = 'none';
         } else {
             dailyDateLabel.style.display = 'none';
-            restartBtn.style.display = 'inline-block';
+            document.getElementById('inlineRestartBtn').style.display = 'inline-block';
         }
     }
 
@@ -625,8 +675,12 @@
         startGame(mode);
     }
 
-    function restartInfiniteGame() {
+    function restartInfiniteGame(forceImmediate = false) {
         if (currentMode !== MODE_INFINITE) return;
+        if (!forceImmediate && tryCount > 0 && !gameSolved) {
+            const shouldRestart = window.confirm('게임이 진행 중입니다. 정말 다시 시작할까요?');
+            if (!shouldRestart) return;
+        }
         startGame(MODE_INFINITE);
     }
 
@@ -742,6 +796,12 @@
     function handleGuess() {
         const errorEl = document.getElementById('errorMsg');
         errorEl.style.display = 'none';
+        const val = inputEl.value.trim().normalize('NFC');
+
+        if (currentMode === MODE_INFINITE && (!val || gameSolved)) {
+            restartInfiniteGame(true);
+            return;
+        }
 
         if (currentMode === MODE_DAILY && gameSolved) {
             errorEl.innerText = '✅ 오늘의 문제는 이미 클리어했습니다! 무한모드에서 계속 플레이해 보세요.';
@@ -749,7 +809,6 @@
             return;
         }
 
-        const val = inputEl.value.trim().normalize('NFC');
         if (!val) return;
 
         const pData = db.find(d => d.ko === val);
