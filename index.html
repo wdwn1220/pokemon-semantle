@@ -46,8 +46,9 @@
         .input-wrapper { display: flex; gap: 8px; }
         #guessInput { flex: 1; padding: 14px 20px; border: 2px solid var(--border); border-radius: 12px; font-size: 1.1rem; outline: none; transition: 0.2s; font-weight: bold; }
         #guessInput:focus { border-color: var(--primary); }
-        button.submit-btn { padding: 0 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        button.submit-btn { padding: 0 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
         button.submit-btn:hover { background: #1a252f; }
+        #inlineRestartBtn { background: var(--accent) !important; padding: 0 16px; font-size: 0.92rem; }
         .mode-bar { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 14px; }
         .daily-date { text-align: center; margin-bottom: 8px; color: #475569; font-size: 0.88rem; font-weight: 700; }
         .mode-toggle-group { display: flex; gap: 8px; }
@@ -130,6 +131,11 @@
         .advanced-sub > summary::after { content: '▾'; float: right; transition: transform 0.2s ease; }
         .advanced-sub:not([open]) > summary::after { transform: rotate(-90deg); }
         .advanced-sub-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+        .suggest-list { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 8px; font-size: 0.83rem; min-height: 94px; background: #fff; }
+        .ability-chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; min-height: 26px; }
+        .ability-chip { border: none; border-radius: 999px; background: #dbeafe; color: #1e40af; padding: 4px 9px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+        .ability-chip::after { content: ' ✕'; }
+        .ability-help { font-size: 0.76rem; color: #64748b; }
         .input-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .input-grid-1 { display: grid; grid-template-columns: 1fr; gap: 8px; }
         .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -216,7 +222,7 @@
             <div class="input-wrapper">
                 <input type="text" id="guessInput" placeholder="포켓몬 이름 입력..." autocomplete="off">
                 <button class="submit-btn" onclick="handleGuess()">확인</button>
-                <button class="submit-btn" id="inlineRestartBtn" onclick="restartInfiniteGame()" style="display:none; background:#ef4444;">🔄 다시하기</button>
+                <button class="submit-btn" id="inlineRestartBtn" onclick="restartInfiniteGame()" style="display:none;">🔄 다시하기</button>
             </div>
             <div id="autocomplete-list"></div>
         </div>
@@ -238,7 +244,6 @@
             <select id="filterShape"></select>
             <select id="filterColor"></select>
             <select id="filterExtra"></select>
-            <select id="filterCategory"></select>
         </div>
         <details class="advanced-search-wrap" id="advancedSearchPanel">
             <summary>고급 검색 / 더보기</summary>
@@ -247,14 +252,16 @@
                     <summary>분류 검색</summary>
                     <div class="advanced-sub-body input-grid-1">
                         <input id="filterCategorySearch" class="range-input" type="text" placeholder="분류 검색...">
+                        <select id="filterCategoryList" class="suggest-list" size="5"></select>
                     </div>
                 </details>
                 <details class="advanced-sub">
                     <summary>특성 검색</summary>
-                    <div class="advanced-sub-body input-grid-3">
-                        <input id="filterAbility1" class="range-input" type="text" placeholder="특성1 검색...">
-                        <input id="filterAbility2" class="range-input" type="text" placeholder="특성2 검색...">
-                        <input id="filterAbility3" class="range-input" type="text" placeholder="특성3 검색...">
+                    <div class="advanced-sub-body input-grid-1">
+                        <div id="selectedAbilities" class="ability-chip-wrap"></div>
+                        <input id="filterAbilityInput" class="range-input" type="text" placeholder="특성 입력 후 Enter 또는 목록에서 선택...">
+                        <select id="filterAbilityList" class="suggest-list" size="6"></select>
+                        <div class="ability-help">최대 3개까지 선택할 수 있으며, 선택한 특성을 클릭하면 제거됩니다.</div>
                     </div>
                 </details>
                 <details class="advanced-sub">
@@ -306,7 +313,7 @@
     let bestRank = Infinity;
     let gameSolved = false;
     let dailyPuzzleKey = '';
-    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', ability1: '', ability2: '', ability3: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
@@ -398,8 +405,7 @@
                 { value: 'gmax', label: '거다이맥스' },
                 { value: 'region', label: '리전폼' },
                 { value: 'forms', label: '여러 모습' }
-            ],
-            filterCategory: [...sets.categories].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))
+            ]
         };
 
         const labels = {
@@ -409,8 +415,7 @@
             filterType2: '타입2',
             filterShape: '체형',
             filterColor: '색상',
-            filterExtra: '기타',
-            filterCategory: '분류'
+            filterExtra: '기타'
         };
 
         Object.entries(options).forEach(([id, items]) => {
@@ -427,9 +432,6 @@
         const textInputMap = {
             sideNameSearch: 'name',
             filterCategorySearch: 'categorySearch',
-            filterAbility1: 'ability1',
-            filterAbility2: 'ability2',
-            filterAbility3: 'ability3',
             filterHeightMin: 'heightMin',
             filterHeightMax: 'heightMax',
             filterWeightMin: 'weightMin',
@@ -448,23 +450,135 @@
             if (!input) return;
             input.oninput = (e) => {
                 const value = e.target.value.trim();
-                sidebarFilters[key] = ['name', 'categorySearch', 'ability1', 'ability2', 'ability3'].includes(key) ? value.toLowerCase() : value;
+                sidebarFilters[key] = ['name', 'categorySearch'].includes(key) ? value.toLowerCase() : value;
+                if (key === 'categorySearch') {
+                    sidebarFilters.category = '';
+                    renderCategorySuggestions();
+                }
                 renderSidebarList();
             };
         });
 
+        initCategorySearchControls();
+        initAbilitySearchControls();
+
         document.getElementById('resetFiltersBtn').onclick = () => {
-            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', ability1: '', ability2: '', ability3: '', heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
             Object.keys(textInputMap).forEach(id => {
                 const input = document.getElementById(id);
                 if (input) input.value = '';
             });
+            const abilityInput = document.getElementById('filterAbilityInput');
+            if (abilityInput) abilityInput.value = '';
             Object.keys(labels).forEach(id => {
                 const select = document.getElementById(id);
                 if (select) select.value = '';
             });
+            renderCategorySuggestions();
+            renderSelectedAbilityChips();
+            renderAbilitySuggestions();
             renderSidebarList();
         };
+    }
+
+    function initCategorySearchControls() {
+        const categoryListEl = document.getElementById('filterCategoryList');
+        if (!categoryListEl) return;
+
+        categoryListEl.onchange = (e) => {
+            const selectedCategory = e.target.value;
+            if (!selectedCategory) return;
+            sidebarFilters.category = selectedCategory;
+            sidebarFilters.categorySearch = selectedCategory.toLowerCase();
+            document.getElementById('filterCategorySearch').value = selectedCategory;
+            renderCategorySuggestions();
+            renderSidebarList();
+        };
+
+        renderCategorySuggestions();
+    }
+
+    function renderCategorySuggestions() {
+        const categoryListEl = document.getElementById('filterCategoryList');
+        if (!categoryListEl) return;
+        const query = (sidebarFilters.categorySearch || '').trim();
+        const categories = [...sets.categories]
+            .sort((a, b) => a.localeCompare(b, 'ko'))
+            .filter(category => !query || category.toLowerCase().includes(query));
+
+        categoryListEl.innerHTML = categories.map(category => `<option value="${category}">${category}</option>`).join('');
+    }
+
+    function initAbilitySearchControls() {
+        const abilityInput = document.getElementById('filterAbilityInput');
+        const abilityListEl = document.getElementById('filterAbilityList');
+        if (!abilityInput || !abilityListEl) return;
+
+        abilityInput.oninput = renderAbilitySuggestions;
+        abilityInput.onkeydown = (e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            addAbilityFilter(abilityInput.value.trim());
+        };
+        abilityListEl.ondblclick = () => addAbilityFilter(abilityListEl.value);
+        abilityListEl.onchange = () => addAbilityFilter(abilityListEl.value);
+
+        renderSelectedAbilityChips();
+        renderAbilitySuggestions();
+    }
+
+    function renderAbilitySuggestions() {
+        const abilityInput = document.getElementById('filterAbilityInput');
+        const abilityListEl = document.getElementById('filterAbilityList');
+        if (!abilityInput || !abilityListEl) return;
+
+        const query = abilityInput.value.trim().toLowerCase();
+        const abilities = [...sets.abilities]
+            .sort((a, b) => a.localeCompare(b, 'ko'))
+            .filter(ability => !sidebarFilters.selectedAbilities.includes(ability))
+            .filter(ability => !query || ability.toLowerCase().includes(query));
+
+        abilityListEl.innerHTML = abilities.map(ability => `<option value="${ability}">${ability}</option>`).join('');
+    }
+
+    function addAbilityFilter(rawAbility) {
+        const abilityInput = document.getElementById('filterAbilityInput');
+        const abilityName = (rawAbility || '').trim();
+        if (!abilityName) return;
+        if (!sets.abilities.has(abilityName)) {
+            const matched = [...sets.abilities].find(ability => ability.toLowerCase() === abilityName.toLowerCase());
+            if (!matched) return;
+            return addAbilityFilter(matched);
+        }
+        if (sidebarFilters.selectedAbilities.includes(abilityName) || sidebarFilters.selectedAbilities.length >= 3) return;
+
+        sidebarFilters.selectedAbilities.push(abilityName);
+        if (abilityInput) abilityInput.value = '';
+        renderSelectedAbilityChips();
+        renderAbilitySuggestions();
+        renderSidebarList();
+    }
+
+    function removeAbilityFilter(abilityName) {
+        sidebarFilters.selectedAbilities = sidebarFilters.selectedAbilities.filter(ability => ability !== abilityName);
+        renderSelectedAbilityChips();
+        renderAbilitySuggestions();
+        renderSidebarList();
+    }
+
+    function renderSelectedAbilityChips() {
+        const chipsEl = document.getElementById('selectedAbilities');
+        if (!chipsEl) return;
+        chipsEl.innerHTML = '';
+
+        sidebarFilters.selectedAbilities.forEach(abilityName => {
+            const chipBtn = document.createElement('button');
+            chipBtn.type = 'button';
+            chipBtn.className = 'ability-chip';
+            chipBtn.innerText = abilityName;
+            chipBtn.onclick = () => removeAbilityFilter(abilityName);
+            chipsEl.appendChild(chipBtn);
+        });
     }
 
     function togglePokedexSidebar() {
@@ -513,9 +627,11 @@
             .filter(p => !sidebarFilters.color || p.color === sidebarFilters.color)
             .filter(p => !sidebarFilters.category || p.category === sidebarFilters.category)
             .filter(p => !sidebarFilters.categorySearch || (p.category || '').toLowerCase().includes(sidebarFilters.categorySearch))
-            .filter(p => !sidebarFilters.ability1 || (p.abilities[0] || '').toLowerCase().includes(sidebarFilters.ability1))
-            .filter(p => !sidebarFilters.ability2 || (p.abilities[1] || '').toLowerCase().includes(sidebarFilters.ability2))
-            .filter(p => !sidebarFilters.ability3 || (p.hidden || '').toLowerCase().includes(sidebarFilters.ability3))
+            .filter(p => {
+                if (!sidebarFilters.selectedAbilities.length) return true;
+                const pokemonAbilities = new Set([...(p.abilities || []), p.hidden].filter(Boolean));
+                return sidebarFilters.selectedAbilities.every(selected => pokemonAbilities.has(selected));
+            })
             .filter(p => minH === null || p.h >= minH)
             .filter(p => maxH === null || p.h <= maxH)
             .filter(p => minW === null || p.w >= minW)
@@ -660,12 +776,12 @@
         dailyModeBtn.classList.toggle('active', isDailyMode);
         infiniteModeBtn.classList.toggle('active', !isDailyMode);
 
+        dailyDateLabel.style.display = 'block';
+        dailyDateLabel.innerText = `오늘 날짜: ${getTodayKey()}`;
+
         if (currentMode === MODE_DAILY) {
-            dailyDateLabel.style.display = 'block';
-            dailyDateLabel.innerText = `오늘의 문제 날짜: ${dailyPuzzleKey}`;
             document.getElementById('inlineRestartBtn').style.display = 'none';
         } else {
-            dailyDateLabel.style.display = 'none';
             document.getElementById('inlineRestartBtn').style.display = 'inline-block';
         }
     }
