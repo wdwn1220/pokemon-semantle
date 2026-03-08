@@ -118,6 +118,8 @@
         .side-body { padding: 14px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.83rem; font-weight: 600; background: #fff; color: #1f2937; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        .filter-active-outline { border-color: #2563eb !important; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16); }
+        .advanced-search-wrap.has-active-advanced { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12); }
         .clearable-wrap { position: relative; }
         .clearable-wrap > input { padding-right: 28px; }
         .clearable-wrap > select { padding-right: 52px; }
@@ -162,6 +164,7 @@
         .side-list { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex: 1; min-height: 160px; overflow-y: auto; }
         .side-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.88rem; padding: 9px 11px; border-bottom: 1px solid #f1f5f9; }
         .side-item:last-child { border-bottom: none; }
+        .side-gen-divider { margin: 8px 0 2px; padding: 0 11px; font-size: 0.72rem; font-weight: 800; color: #64748b; letter-spacing: 0.01em; }
         .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
         .side-item-name { color: #0f172a; font-weight: 700; }
         .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
@@ -325,7 +328,7 @@
 </aside>
 
 <script>
-    let db = [], allKoNames = [];
+    let db = [], allKoNames = [], normalizedKoNames = [], koNameIndex = new Map();
     let targetData = null, targetVec = null, globalRankList = [], history = [];
     let tryCount = 0;
     let expandedCards = new Set();
@@ -377,6 +380,8 @@
 
     function parseData(txt) {
         allKoNames = [];
+        normalizedKoNames = [];
+        koNameIndex = new Map();
         const lines = txt.split(/\r?\n/);
         const h = lines[0].split(',').map(x => x.trim().replace(/^\ufeff/, ''));
         const get = (row, col) => { const idx = h.indexOf(col); return idx > -1 ? row[idx]?.trim() : null; };
@@ -389,7 +394,10 @@
             ko = ko.normalize('NFC'); 
             
             allKoNames.push(ko);
+            const normalizedKo = normalizeKoName(ko);
+            normalizedKoNames.push(normalizedKo);
             return {
+                normalizedKo: normalizedKo,
                 name: get(r, 'name_en') || get(r, 'name'), ko: ko, imagePath: get(r, 'image_path'),
                 no: parseInt(get(r, 'pokedex_number')) || 0, gen: parseInt(get(r, 'generation')) || 0,
                 status: get(r, 'status') || '일반', category: get(r, 'category'),
@@ -404,6 +412,10 @@
                 hasForms: get(r, 'has_forms') === 'TRUE'
             };
         }).filter(Boolean);
+
+        db.forEach(p => {
+            if (!koNameIndex.has(p.normalizedKo)) koNameIndex.set(p.normalizedKo, p);
+        });
     }
 
     function initGame() {
@@ -518,6 +530,50 @@
 
     function refreshAllClearButtons() {
         CLEARABLE_FILTER_IDS.forEach(updateClearButtonVisibility);
+    }
+
+    function hasActiveFilterValue(value) {
+        return String(value ?? '').trim() !== '';
+    }
+
+    function updateFilterActiveStyles() {
+        const setActiveById = (id, isActive) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle('filter-active-outline', isActive);
+            const wrap = el.closest('.clearable-wrap');
+            if (!wrap) return;
+            const customTrigger = wrap.querySelector('.custom-dropdown-trigger');
+            if (customTrigger) customTrigger.classList.toggle('filter-active-outline', isActive);
+        };
+
+        setActiveById('sideNameSearch', hasActiveFilterValue(sidebarFilters.name));
+        setActiveById('filterGen', hasActiveFilterValue(sidebarFilters.gen));
+        setActiveById('filterStatus', hasActiveFilterValue(sidebarFilters.status));
+        setActiveById('filterType', hasActiveFilterValue(sidebarFilters.type));
+        setActiveById('filterType2', hasActiveFilterValue(sidebarFilters.type2));
+        setActiveById('filterShape', hasActiveFilterValue(sidebarFilters.shape));
+        setActiveById('filterColor', hasActiveFilterValue(sidebarFilters.color));
+        setActiveById('filterExtra', hasActiveFilterValue(sidebarFilters.extra));
+
+        const hasCategoryActive = hasActiveFilterValue(sidebarFilters.categorySearch) || hasActiveFilterValue(sidebarFilters.category);
+        const hasAbilityActive = sidebarFilters.selectedAbilities.length > 0 || hasActiveFilterValue(document.getElementById('filterAbilityInput')?.value);
+        setActiveById('filterCategorySearch', hasCategoryActive);
+        setActiveById('filterCategoryList', hasCategoryActive);
+        setActiveById('filterAbilityInput', hasAbilityActive);
+        setActiveById('filterAbilityList', hasAbilityActive);
+
+        ['heightMin','heightMax','weightMin','weightMax','totalMin','hpMin','atkMin','defMin','spaMin','spdMin','speMin']
+            .forEach(key => setActiveById(`filter${key.charAt(0).toUpperCase()}${key.slice(1)}`, hasActiveFilterValue(sidebarFilters[key])));
+
+        const advancedPanel = document.getElementById('advancedSearchPanel');
+        if (advancedPanel) {
+            const hasAdvancedActive = hasCategoryActive
+                || sidebarFilters.selectedAbilities.length > 0
+                || ['heightMin','heightMax','weightMin','weightMax','totalMin','hpMin','atkMin','defMin','spaMin','spdMin','speMin']
+                    .some(key => hasActiveFilterValue(sidebarFilters[key]));
+            advancedPanel.classList.toggle('has-active-advanced', hasAdvancedActive && !advancedPanel.open);
+        }
     }
 
     function initClearButtons(textInputMap) {
@@ -652,6 +708,9 @@
             refreshAllClearButtons();
             renderSidebarList();
         };
+
+        const advancedPanel = document.getElementById('advancedSearchPanel');
+        if (advancedPanel) advancedPanel.addEventListener('toggle', updateFilterActiveStyles);
     }
 
     function initCategorySearchControls() {
@@ -775,6 +834,7 @@
         const listEl = document.getElementById('sidePokemonList');
         const resultCountEl = document.getElementById('sideResultCount');
         if (!listEl || !resultCountEl) return;
+        updateFilterActiveStyles();
 
         const minH = toNum(sidebarFilters.heightMin);
         const maxH = toNum(sidebarFilters.heightMax);
@@ -834,12 +894,18 @@
             return;
         }
 
-        listEl.innerHTML = filtered.map(p => `
+        let lastGen = null;
+        listEl.innerHTML = filtered.map(p => {
+            const showGenDivider = p.gen !== lastGen;
+            lastGen = p.gen;
+            return `
+            ${showGenDivider ? `<div class="side-gen-divider">${p.gen}세대</div>` : ''}
             <div class="side-item">
                 <span class="side-item-no">No.${String(p.no).padStart(4, '0')}</span>
                 <span class="side-item-name">${p.ko}</span>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     function getTodayKey() {
@@ -1124,6 +1190,10 @@
         return map[c] || '#ddd';
     }
 
+    function normalizeKoName(value) {
+        return String(value || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+    }
+
     const inputEl = document.getElementById('guessInput');
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
@@ -1131,17 +1201,18 @@
     inputEl.addEventListener('input', function() {
         document.getElementById('errorMsg').style.display = 'none';
         
-        const val = this.value.normalize('NFC'); 
+        const val = this.value.normalize('NFC');
+        const normalizedVal = normalizeKoName(val);
         autoList.innerHTML = ''; 
-        if (!val) { autoList.style.display='none'; return; }
+        if (!normalizedVal) { autoList.style.display='none'; return; }
         currentFocus = -1;
         
-        const matches = allKoNames.filter(n => n.includes(val));
+        const matches = allKoNames.filter((_, idx) => normalizedKoNames[idx].includes(normalizedVal));
         if (matches.length > 0) {
             autoList.style.display = 'block';
             matches.forEach(name => {
                 const div = document.createElement('div'); div.className = 'suggestion-item';
-                div.innerHTML = name.replace(new RegExp(`(${val})`, "i"), "<strong style='color:var(--primary)'>$1</strong>");
+                div.textContent = name;
                 div.onclick = () => { inputEl.value = name; autoList.style.display='none'; handleGuess(); };
                 autoList.appendChild(div);
             });
@@ -1175,6 +1246,7 @@
         const errorEl = document.getElementById('errorMsg');
         errorEl.style.display = 'none';
         const val = inputEl.value.trim().normalize('NFC');
+        const normalizedVal = normalizeKoName(val);
 
         if (currentMode === MODE_INFINITE && gameSolved) {
             errorEl.innerText = '✅ 무한 모드를 클리어했습니다! 다시하기 버튼으로 새 게임을 시작하세요.';
@@ -1188,9 +1260,9 @@
             return;
         }
 
-        if (!val) return;
+        if (!normalizedVal) return;
 
-        const pData = db.find(d => d.ko === val);
+        const pData = koNameIndex.get(normalizedVal);
 
         if (!pData) {
             errorEl.innerText = "🚨 도감에 없는 포켓몬입니다. 이름을 확인해 주세요!";
@@ -1198,7 +1270,7 @@
             return;
         }
 
-        if (history.find(h => h.ko === val)) {
+        if (history.find(h => h.name === pData.name)) {
             errorEl.innerText = "🚨 이미 확인해 본 포켓몬입니다!";
             errorEl.style.display = 'block';
             inputEl.value = "";
