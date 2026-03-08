@@ -29,7 +29,7 @@
         #successArea { display: none; background: #e8f5e9; border: 2px solid #4caf50; border-radius: 16px; padding: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(76,175,80,0.15); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         .success-title { color: #2e7d32; margin: 0 0 15px 0; font-size: 1.6rem; font-weight: 900; }
-        .success-stats-grid { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 12px; margin-top: 15px; }
+        .success-stats-grid { display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 12px; margin-top: 15px; }
         .success-stat-card { background: white; border-radius: 12px; border: 1px solid #c8e6c9; padding: 14px; text-align: left; box-shadow: 0 2px 8px rgba(76,175,80,0.08); }
         .success-stat-title { margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: #2e7d32; }
         .success-stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; margin-top: 6px; }
@@ -117,7 +117,7 @@
         .side-header h3 { margin: 0; font-size: 1.05rem; color: #1e293b; }
         .side-body { padding: 14px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.86rem; background: #fff; color: #1f2937; box-sizing: border-box; }
+        .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.83rem; font-weight: 600; background: #fff; color: #1f2937; box-sizing: border-box; }
         .filter-section-title { margin: 2px 0 0; font-size: 0.78rem; color: #64748b; font-weight: 700; }
         .advanced-search-wrap { border: 1px solid #dbe2ea; border-radius: 10px; background: #f8fafc; }
         .advanced-search-wrap > summary { cursor: pointer; padding: 10px 12px; font-size: 0.86rem; font-weight: 800; color: #334155; list-style: none; }
@@ -143,7 +143,7 @@
         .filter-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
         .reset-filter-btn { border: none; border-radius: 8px; background: #e2e8f0; color: #1e293b; font-size: 0.8rem; font-weight: 700; padding: 7px 10px; cursor: pointer; }
         .side-count { color: #64748b; font-size: 0.82rem; font-weight: 700; }
-        .side-list { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; max-height: calc(100vh - 520px); overflow-y: auto; }
+        .side-list { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex: 1; min-height: 160px; overflow-y: auto; }
         .side-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.88rem; padding: 9px 11px; border-bottom: 1px solid #f1f5f9; }
         .side-item:last-child { border-bottom: none; }
         .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
@@ -203,12 +203,20 @@
                 <div class="success-stat-card">
                     <h3 class="success-stat-title">🎯 시도</h3>
                     <div class="success-stat-row"><span class="success-stat-label">이번 시도 수</span><strong class="success-stat-value" id="tryCountDisplay">0</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">최소 시도 수</span><strong class="success-stat-value" id="minTryDisplay">-</strong></div>
                     <div class="success-stat-row"><span class="success-stat-label">평균 시도 수</span><strong class="success-stat-value" id="avgTryDisplay">-</strong></div>
+                </div>
+                <div class="success-stat-card">
+                    <h3 class="success-stat-title">⏱️ 시간</h3>
+                    <div class="success-stat-row"><span class="success-stat-label">이번 클리어 시간</span><strong class="success-stat-value" id="currentTimeDisplay">-</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">최단 시간</span><strong class="success-stat-value" id="bestTimeDisplay">-</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">평균 시간</span><strong class="success-stat-value" id="avgTimeDisplay">-</strong></div>
                 </div>
                 <div class="success-stat-card">
                     <h3 class="success-stat-title">🔥 연속</h3>
                     <div class="success-stat-row"><span class="success-stat-label">현재 연속</span><strong class="success-stat-value" id="streakCount">0</strong></div>
                     <div class="success-stat-row"><span class="success-stat-label">최다 연속</span><strong class="success-stat-value" id="maxStreakDisplay">0</strong></div>
+                    <div class="success-stat-row"><span class="success-stat-label">총 정답 횟수</span><strong class="success-stat-value" id="solvedCountDisplay">0</strong></div>
                 </div>
             </div>
             <div id="successRankSection">
@@ -243,10 +251,9 @@
             <select id="filterType2"></select>
             <select id="filterShape"></select>
             <select id="filterColor"></select>
-            <select id="filterExtra"></select>
         </div>
         <details class="advanced-search-wrap" id="advancedSearchPanel">
-            <summary>고급 검색 / 더보기</summary>
+            <summary>고급 검색</summary>
             <div class="advanced-body">
                 <details class="advanced-sub">
                     <summary>분류 검색</summary>
@@ -285,6 +292,12 @@
                         <input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드">
                     </div>
                 </details>
+                <details class="advanced-sub">
+                    <summary>기타 검색</summary>
+                    <div class="advanced-sub-body input-grid-1">
+                        <select id="filterExtra" class="range-input"></select>
+                    </div>
+                </details>
             </div>
         </details>
         <div class="filter-actions">
@@ -309,14 +322,20 @@
     if (streak > maxStreak) maxStreak = streak;
     let solvedGameCount = parseInt(localStorage.getItem('pokeSemantleSolvedGameCount')) || 0;
     let totalTrySum = parseInt(localStorage.getItem('pokeSemantleTotalTrySum')) || 0;
+    let minTryCount = parseInt(localStorage.getItem('pokeSemantleMinTryCount')) || 0;
+    let totalSolveTimeMs = parseInt(localStorage.getItem('pokeSemantleTotalSolveTimeMs')) || 0;
+    let bestSolveTimeMs = parseInt(localStorage.getItem('pokeSemantleBestSolveTimeMs')) || 0;
     let worstBestRank = parseInt(localStorage.getItem('pokeSemantleWorstBestRank')) || 0;
     let bestRank = Infinity;
     let gameSolved = false;
     let dailyPuzzleKey = '';
+    let gameStartAt = null;
+    let currentSolveTimeMs = 0;
     let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
+    const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
 
     window.onload = async function() {
         try {
@@ -689,16 +708,81 @@
             historyKo: history.map(h => h.ko),
             tryCount,
             gameSolved,
-            bestRank: bestRank === Infinity ? null : bestRank
+            bestRank: bestRank === Infinity ? null : bestRank,
+            gameStartAt,
+            currentSolveTimeMs
         };
         localStorage.setItem(`pokeSemantleDailyProgress_${dailyPuzzleKey}`, JSON.stringify(payload));
     }
 
+    function saveInfiniteProgress() {
+        if (currentMode !== MODE_INFINITE || !targetData) return;
+        const payload = {
+            targetName: targetData.name,
+            targetNo: targetData.no,
+            historyKo: history.map(h => h.ko),
+            tryCount,
+            gameSolved,
+            bestRank: bestRank === Infinity ? null : bestRank,
+            gameStartAt,
+            currentSolveTimeMs
+        };
+        localStorage.setItem(INFINITE_PROGRESS_KEY, JSON.stringify(payload));
+    }
+
+    function loadInfiniteProgress() {
+        const raw = localStorage.getItem(INFINITE_PROGRESS_KEY);
+        if (!raw) return null;
+        try { return JSON.parse(raw); } catch { return null; }
+    }
+
+    function clearInfiniteProgress() {
+        localStorage.removeItem(INFINITE_PROGRESS_KEY);
+    }
+
+    function restoreInfiniteProgress(progress) {
+        if (!progress || !Array.isArray(progress.historyKo)) return false;
+        const restoredTarget = db.find(d => d.name === progress.targetName && d.no === progress.targetNo);
+        if (!restoredTarget) return false;
+
+        targetData = restoredTarget;
+        targetVec = getVector(targetData);
+        calculateGlobalRanks();
+
+        history = progress.historyKo.map((koName, idx) => {
+            const pData = db.find(d => d.ko === koName);
+            if (!pData) return null;
+            const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
+            if (rankIdx < 0) return null;
+            return {
+                ...pData,
+                rank: rankIdx + 1,
+                score: globalRankList[rankIdx].score,
+                tryNo: progress.historyKo.length - idx
+            };
+        }).filter(Boolean);
+
+        tryCount = progress.tryCount || progress.historyKo.length;
+        gameSolved = Boolean(progress.gameSolved);
+        bestRank = progress.bestRank ?? Infinity;
+        gameStartAt = Number.isFinite(progress.gameStartAt) ? progress.gameStartAt : null;
+        currentSolveTimeMs = progress.currentSolveTimeMs || 0;
+
+        renderHistory();
+        if (gameSolved) {
+            showSolvedBanner(history[0]?.ko || targetData.ko);
+        }
+        return true;
+    }
+
     function resetGameState() {
+
         history = [];
         tryCount = 0;
         bestRank = Infinity;
         gameSolved = false;
+        gameStartAt = null;
+        currentSolveTimeMs = 0;
         expandedCards.clear();
         document.getElementById('successArea').style.display = 'none';
         document.getElementById('errorMsg').style.display = 'none';
@@ -707,7 +791,7 @@
         renderHistory();
     }
 
-    function startGame(mode) {
+    function startGame(mode, forceReset = false) {
         currentMode = mode;
         localStorage.setItem('pokeSemantleMode', currentMode);
         resetGameState();
@@ -718,10 +802,16 @@
             targetVec = getVector(targetData);
             calculateGlobalRanks();
             restoreDailyProgress();
+            saveDailyProgress();
         } else {
-            targetData = db[Math.floor(Math.random() * db.length)];
-            targetVec = getVector(targetData);
-            calculateGlobalRanks();
+            if (forceReset) clearInfiniteProgress();
+            const progress = forceReset ? null : loadInfiniteProgress();
+            if (!restoreInfiniteProgress(progress)) {
+                targetData = db[Math.floor(Math.random() * db.length)];
+                targetVec = getVector(targetData);
+                calculateGlobalRanks();
+                saveInfiniteProgress();
+            }
         }
         updateModeUI();
     }
@@ -746,11 +836,22 @@
         tryCount = progress.tryCount || progress.historyKo.length;
         gameSolved = Boolean(progress.gameSolved);
         bestRank = progress.bestRank ?? Infinity;
+        gameStartAt = Number.isFinite(progress.gameStartAt) ? progress.gameStartAt : null;
+        currentSolveTimeMs = progress.currentSolveTimeMs || 0;
 
         renderHistory();
         if (gameSolved) {
             showSolvedBanner(history[0]?.ko || targetData.ko);
         }
+    }
+
+
+    function formatDuration(ms) {
+        if (ms == null || ms < 0) return '-';
+        const totalSec = Math.round(ms / 1000);
+        const min = Math.floor(totalSec / 60);
+        const sec = totalSec % 60;
+        return `${min}분 ${String(sec).padStart(2, '0')}초`;
     }
 
     function showSolvedBanner(pokemonName) {
@@ -761,8 +862,13 @@
         document.getElementById('successRankSection').style.display = 'block';
         document.getElementById('streakCount').innerText = streak;
         document.getElementById('maxStreakDisplay').innerText = maxStreak;
+        document.getElementById('solvedCountDisplay').innerText = `${solvedGameCount}회`; 
         document.getElementById('tryCountDisplay').innerText = `${tryCount}회`;
+        document.getElementById('minTryDisplay').innerText = minTryCount > 0 ? `${minTryCount}회` : '-';
         document.getElementById('avgTryDisplay').innerText = solvedGameCount > 0 ? `${(totalTrySum / solvedGameCount).toFixed(2)}회` : '-';
+        document.getElementById('currentTimeDisplay').innerText = formatDuration(currentSolveTimeMs);
+        document.getElementById('bestTimeDisplay').innerText = formatDuration(bestSolveTimeMs);
+        document.getElementById('avgTimeDisplay').innerText = solvedGameCount > 0 ? formatDuration(totalSolveTimeMs / solvedGameCount) : '-';
         document.getElementById('bestRankDisplay').innerText = bestRank === Infinity ? '-' : `${bestRank}위`;
         document.getElementById('worstBestRankDisplay').innerText = worstBestRank > 0 ? `${worstBestRank}위` : '-';
     }
@@ -788,7 +894,7 @@
 
     function switchGameMode(mode) {
         if (mode === currentMode) return;
-        startGame(mode);
+        startGame(mode, false);
     }
 
     function restartInfiniteGame(forceImmediate = false) {
@@ -797,7 +903,7 @@
             const shouldRestart = window.confirm('게임이 진행 중입니다. 정말 다시 시작할까요?');
             if (!shouldRestart) return;
         }
-        startGame(MODE_INFINITE);
+        startGame(MODE_INFINITE, true);
     }
 
     function getVector(p) {
@@ -914,8 +1020,9 @@
         errorEl.style.display = 'none';
         const val = inputEl.value.trim().normalize('NFC');
 
-        if (currentMode === MODE_INFINITE && (!val || gameSolved)) {
-            restartInfiniteGame(true);
+        if (currentMode === MODE_INFINITE && gameSolved) {
+            errorEl.innerText = '✅ 무한 모드를 클리어했습니다! 다시하기 버튼으로 새 게임을 시작하세요.';
+            errorEl.style.display = 'block';
             return;
         }
 
@@ -947,6 +1054,7 @@
         
         // 정답을 맞힌 이후의 입력은 시도 횟수에 포함하지 않음
         if (!gameSolved) {
+            if (tryCount === 0 && gameStartAt == null) gameStartAt = Date.now();
             tryCount++;
             if (currentRank > 1 && currentRank < bestRank) { bestRank = currentRank; }
         }
@@ -956,6 +1064,7 @@
         inputEl.value = "";
         autoList.style.display = 'none';
         saveDailyProgress();
+        saveInfiniteProgress();
 
         // 게임을 맞췄고, 첫 성공일 때만 폭죽 터뜨림
         if (currentRank === 1 && !gameSolved) { 
@@ -970,6 +1079,10 @@
             maxStreak = Math.max(maxStreak, streak);
             solvedGameCount++;
             totalTrySum += tryCount;
+            minTryCount = minTryCount === 0 ? tryCount : Math.min(minTryCount, tryCount);
+            currentSolveTimeMs = gameStartAt == null ? 0 : (Date.now() - gameStartAt);
+            totalSolveTimeMs += currentSolveTimeMs;
+            bestSolveTimeMs = bestSolveTimeMs === 0 ? currentSolveTimeMs : Math.min(bestSolveTimeMs, currentSolveTimeMs);
 
             if (bestRank !== Infinity) {
                 worstBestRank = worstBestRank === 0 ? bestRank : Math.max(worstBestRank, bestRank);
@@ -979,9 +1092,13 @@
             localStorage.setItem('pokeSemantleMaxStreak', maxStreak);
             localStorage.setItem('pokeSemantleSolvedGameCount', solvedGameCount);
             localStorage.setItem('pokeSemantleTotalTrySum', totalTrySum);
+            localStorage.setItem('pokeSemantleMinTryCount', minTryCount);
+            localStorage.setItem('pokeSemantleTotalSolveTimeMs', totalSolveTimeMs);
+            localStorage.setItem('pokeSemantleBestSolveTimeMs', bestSolveTimeMs);
             localStorage.setItem('pokeSemantleWorstBestRank', worstBestRank);
         }
         saveDailyProgress();
+        saveInfiniteProgress();
         showSolvedBanner(pokemonName);
 
         if (typeof confetti === 'function') {
