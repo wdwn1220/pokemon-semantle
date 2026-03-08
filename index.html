@@ -106,6 +106,7 @@
         #autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 200; border-radius: 0 0 12px 12px; display: none; max-height: 250px; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 0.95rem; }
         .suggestion-item:hover, .suggestion-item.active { background: #f1f8e9; color: var(--accent); font-weight: bold; }
+        .suggestion-highlight { color: #d32f2f; font-weight: 900; }
 
         .side-toggle { position: fixed; right: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 74px; border-radius: 12px 0 0 12px; border: 1px solid #cbd5e1; border-right: none; background: #fff; color: #334155; box-shadow: -2px 2px 12px rgba(15, 23, 42, 0.12); cursor: pointer; z-index: 350; font-size: 1.2rem; font-weight: 700; transition: right 0.25s ease; }
         .side-toggle.open { right: 360px; }
@@ -120,6 +121,7 @@
         .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.83rem; font-weight: 600; background: #fff; color: #1f2937; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
         .filter-active-outline { border-color: #2563eb !important; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16); }
         .advanced-search-wrap.has-active-advanced { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12); }
+        .advanced-search-wrap.has-active-advanced > summary { box-shadow: inset 0 0 0 1px #2563eb; border-radius: 9px; color: #1d4ed8; }
         .clearable-wrap { position: relative; }
         .clearable-wrap > input { padding-right: 28px; }
         .clearable-wrap > select { padding-right: 52px; }
@@ -145,6 +147,7 @@
         .advanced-body { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 10px; }
         .advanced-sub { border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
         .advanced-sub > summary { cursor: pointer; padding: 8px 10px; font-size: 0.8rem; font-weight: 700; color: #475569; list-style: none; }
+        .advanced-sub.has-active-sub > summary { box-shadow: inset 0 0 0 1px #2563eb; border-radius: 8px; color: #1d4ed8; }
         .advanced-sub > summary::-webkit-details-marker { display: none; }
         .advanced-sub > summary::after { content: '▾'; float: right; transition: transform 0.2s ease; }
         .advanced-sub:not([open]) > summary::after { transform: rotate(-90deg); }
@@ -164,7 +167,7 @@
         .side-list { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex: 1; min-height: 160px; overflow-y: auto; }
         .side-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.88rem; padding: 9px 11px; border-bottom: 1px solid #f1f5f9; }
         .side-item:last-child { border-bottom: none; }
-        .side-gen-divider { margin: 8px 0 2px; padding: 0 11px; font-size: 0.72rem; font-weight: 800; color: #64748b; letter-spacing: 0.01em; }
+        .side-gen-divider { margin: 8px 0 2px; padding: 0 11px; font-size: 0.72rem; font-weight: 800; color: #64748b; letter-spacing: 0.01em; text-align: center; }
         .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
         .side-item-name { color: #0f172a; font-weight: 700; }
         .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
@@ -274,14 +277,14 @@
         <details class="advanced-search-wrap" id="advancedSearchPanel">
             <summary>고급 검색</summary>
             <div class="advanced-body">
-                <details class="advanced-sub">
+                <details class="advanced-sub" data-advanced-group="category">
                     <summary>분류</summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div class="clearable-wrap"><input id="filterCategorySearch" class="range-input" type="text" placeholder="분류 검색..."><button type="button" id="clearFilterCategorySearch" class="clear-input-btn" aria-label="분류 검색 초기화">✕</button></div>
                         <select id="filterCategoryList" class="suggest-list" size="5"></select>
                     </div>
                 </details>
-                <details class="advanced-sub">
+                <details class="advanced-sub" data-advanced-group="ability">
                     <summary>특성</summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div id="selectedAbilities" class="ability-chip-wrap"></div>
@@ -290,7 +293,7 @@
                         <div class="ability-help">최대 3개까지 선택할 수 있으며, 선택한 특성을 클릭하면 제거됩니다.</div>
                     </div>
                 </details>
-                <details class="advanced-sub">
+                <details class="advanced-sub" data-advanced-group="size">
                     <summary>키/몸무게</summary>
                     <div class="advanced-sub-body range-grid">
                         <div class="clearable-wrap"><input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)"><button type="button" id="clearFilterHeightMin" class="clear-input-btn" aria-label="키 최소 초기화">✕</button></div>
@@ -299,7 +302,7 @@
                         <div class="clearable-wrap"><input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)"><button type="button" id="clearFilterWeightMax" class="clear-input-btn" aria-label="무게 최대 초기화">✕</button></div>
                     </div>
                 </details>
-                <details class="advanced-sub">
+                <details class="advanced-sub" data-advanced-group="stats">
                     <summary>종족값 (최소값)</summary>
                     <div class="advanced-sub-body stat-grid">
                         <div class="clearable-wrap"><input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합"><button type="button" id="clearFilterTotalMin" class="clear-input-btn" aria-label="총합 초기화">✕</button></div>
@@ -311,7 +314,7 @@
                         <div class="clearable-wrap"><input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 초기화">✕</button></div>
                     </div>
                 </details>
-                <details class="advanced-sub">
+                <details class="advanced-sub" data-advanced-group="extra">
                     <summary>기타</summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div class="clearable-wrap"><select id="filterExtra" class="range-input customizable-select"></select><button type="button" id="clearFilterExtra" class="clear-input-btn" aria-label="기타 초기화">✕</button></div>
@@ -554,25 +557,29 @@
         setActiveById('filterType2', hasActiveFilterValue(sidebarFilters.type2));
         setActiveById('filterShape', hasActiveFilterValue(sidebarFilters.shape));
         setActiveById('filterColor', hasActiveFilterValue(sidebarFilters.color));
-        setActiveById('filterExtra', hasActiveFilterValue(sidebarFilters.extra));
 
         const hasCategoryActive = hasActiveFilterValue(sidebarFilters.categorySearch) || hasActiveFilterValue(sidebarFilters.category);
         const hasAbilityActive = sidebarFilters.selectedAbilities.length > 0 || hasActiveFilterValue(document.getElementById('filterAbilityInput')?.value);
-        setActiveById('filterCategorySearch', hasCategoryActive);
-        setActiveById('filterCategoryList', hasCategoryActive);
-        setActiveById('filterAbilityInput', hasAbilityActive);
-        setActiveById('filterAbilityList', hasAbilityActive);
-
-        ['heightMin','heightMax','weightMin','weightMax','totalMin','hpMin','atkMin','defMin','spaMin','spdMin','speMin']
-            .forEach(key => setActiveById(`filter${key.charAt(0).toUpperCase()}${key.slice(1)}`, hasActiveFilterValue(sidebarFilters[key])));
+        const hasSizeActive = ['heightMin','heightMax','weightMin','weightMax'].some(key => hasActiveFilterValue(sidebarFilters[key]));
+        const hasStatsActive = ['totalMin','hpMin','atkMin','defMin','spaMin','spdMin','speMin'].some(key => hasActiveFilterValue(sidebarFilters[key]));
+        const hasExtraActive = hasActiveFilterValue(sidebarFilters.extra);
 
         const advancedPanel = document.getElementById('advancedSearchPanel');
         if (advancedPanel) {
-            const hasAdvancedActive = hasCategoryActive
-                || sidebarFilters.selectedAbilities.length > 0
-                || ['heightMin','heightMax','weightMin','weightMax','totalMin','hpMin','atkMin','defMin','spaMin','spdMin','speMin']
-                    .some(key => hasActiveFilterValue(sidebarFilters[key]));
+            const hasAdvancedActive = hasCategoryActive || hasAbilityActive || hasSizeActive || hasStatsActive || hasExtraActive;
             advancedPanel.classList.toggle('has-active-advanced', hasAdvancedActive && !advancedPanel.open);
+
+            const advancedGroupActiveMap = {
+                category: hasCategoryActive,
+                ability: hasAbilityActive,
+                size: hasSizeActive,
+                stats: hasStatsActive,
+                extra: hasExtraActive
+            };
+            advancedPanel.querySelectorAll('.advanced-sub').forEach(sub => {
+                const key = sub.dataset.advancedGroup;
+                sub.classList.toggle('has-active-sub', Boolean(key && advancedGroupActiveMap[key]));
+            });
         }
     }
 
@@ -1191,7 +1198,7 @@
     }
 
     function normalizeKoName(value) {
-        return String(value || '').normalize('NFC').replace(/\s+/g, '').toLowerCase();
+        return String(value || '').normalize('NFC').trim().toLowerCase();
     }
 
     const inputEl = document.getElementById('guessInput');
@@ -1212,7 +1219,15 @@
             autoList.style.display = 'block';
             matches.forEach(name => {
                 const div = document.createElement('div'); div.className = 'suggestion-item';
-                div.textContent = name;
+                const normalizedName = normalizeKoName(name);
+                const matchStart = normalizedName.indexOf(normalizedVal);
+                if (matchStart >= 0) {
+                    const matchEnd = matchStart + normalizedVal.length;
+                    const safeName = name.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+                    div.innerHTML = `${safeName.slice(0, matchStart)}<span class="suggestion-highlight">${safeName.slice(matchStart, matchEnd)}</span>${safeName.slice(matchEnd)}`;
+                } else {
+                    div.textContent = name;
+                }
                 div.onclick = () => { inputEl.value = name; autoList.style.display='none'; handleGuess(); };
                 autoList.appendChild(div);
             });
