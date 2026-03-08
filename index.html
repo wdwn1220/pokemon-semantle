@@ -118,6 +118,12 @@
         .side-body { padding: 14px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .filter-grid select, .side-search, .range-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 0.83rem; font-weight: 600; background: #fff; color: #1f2937; box-sizing: border-box; }
+        .clearable-wrap { position: relative; }
+        .clearable-wrap > input { padding-right: 28px; }
+        .clearable-wrap > select { padding-right: 52px; }
+        .clear-input-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: #94a3b8; font-size: 0.95rem; font-weight: 900; padding: 0; line-height: 1; cursor: pointer; display: none; }
+        .clearable-wrap > select + .clear-input-btn { right: 26px; }
+        .clear-input-btn.show { display: block; }
         .filter-section-title { margin: 2px 0 0; font-size: 0.78rem; color: #64748b; font-weight: 700; }
         .advanced-search-wrap { border: 1px solid #dbe2ea; border-radius: 10px; background: #f8fafc; }
         .advanced-search-wrap > summary { cursor: pointer; padding: 10px 12px; font-size: 0.86rem; font-weight: 800; color: #334155; list-style: none; }
@@ -132,7 +138,7 @@
         .advanced-sub:not([open]) > summary::after { transform: rotate(-90deg); }
         .advanced-sub-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
         .suggest-list { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 8px; font-size: 0.83rem; min-height: 94px; background: #fff; }
-        .ability-chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; min-height: 26px; }
+        .ability-chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
         .ability-chip { border: none; border-radius: 999px; background: #dbeafe; color: #1e40af; padding: 4px 9px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
         .ability-chip::after { content: ' ✕'; }
         .ability-help { font-size: 0.76rem; color: #64748b; }
@@ -243,27 +249,27 @@
 <aside id="pokedexSidebar" class="side-panel" aria-label="포켓몬 검색 사이드바">
     <div class="side-header"><h3>📚 포켓몬 검색</h3></div>
     <div class="side-body">
-        <input id="sideNameSearch" class="side-search" type="text" placeholder="이름 검색...">
+        <div class="clearable-wrap"><input id="sideNameSearch" class="side-search" type="text" placeholder="이름 검색..."><button type="button" id="clearSideNameSearch" class="clear-input-btn" aria-label="이름 검색 초기화">✕</button></div>
         <div class="filter-grid">
-            <select id="filterGen"></select>
-            <select id="filterStatus"></select>
-            <select id="filterType"></select>
-            <select id="filterType2"></select>
-            <select id="filterShape"></select>
-            <select id="filterColor"></select>
+            <div class="clearable-wrap"><select id="filterGen"></select><button type="button" id="clearFilterGen" class="clear-input-btn" aria-label="세대 초기화">✕</button></div>
+            <div class="clearable-wrap"><select id="filterStatus"></select><button type="button" id="clearFilterStatus" class="clear-input-btn" aria-label="구분 초기화">✕</button></div>
+            <div class="clearable-wrap"><select id="filterType"></select><button type="button" id="clearFilterType" class="clear-input-btn" aria-label="타입1 초기화">✕</button></div>
+            <div class="clearable-wrap"><select id="filterType2"></select><button type="button" id="clearFilterType2" class="clear-input-btn" aria-label="타입2 초기화">✕</button></div>
+            <div class="clearable-wrap"><select id="filterShape"></select><button type="button" id="clearFilterShape" class="clear-input-btn" aria-label="체형 초기화">✕</button></div>
+            <div class="clearable-wrap"><select id="filterColor"></select><button type="button" id="clearFilterColor" class="clear-input-btn" aria-label="색상 초기화">✕</button></div>
         </div>
         <details class="advanced-search-wrap" id="advancedSearchPanel">
             <summary>고급 검색</summary>
             <div class="advanced-body">
                 <details class="advanced-sub">
-                    <summary>분류 검색</summary>
+                    <summary>분류</summary>
                     <div class="advanced-sub-body input-grid-1">
-                        <input id="filterCategorySearch" class="range-input" type="text" placeholder="분류 검색...">
+                        <div class="clearable-wrap"><input id="filterCategorySearch" class="range-input" type="text" placeholder="분류 검색..."><button type="button" id="clearFilterCategorySearch" class="clear-input-btn" aria-label="분류 검색 초기화">✕</button></div>
                         <select id="filterCategoryList" class="suggest-list" size="5"></select>
                     </div>
                 </details>
                 <details class="advanced-sub">
-                    <summary>특성 검색</summary>
+                    <summary>특성</summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div id="selectedAbilities" class="ability-chip-wrap"></div>
                         <input id="filterAbilityInput" class="range-input" type="text" placeholder="특성 입력 후 Enter 또는 목록에서 선택...">
@@ -274,28 +280,28 @@
                 <details class="advanced-sub">
                     <summary>키/몸무게</summary>
                     <div class="advanced-sub-body range-grid">
-                        <input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)">
-                        <input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)">
-                        <input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)">
-                        <input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)">
+                        <div class="clearable-wrap"><input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)"><button type="button" id="clearFilterHeightMin" class="clear-input-btn" aria-label="키 최소 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)"><button type="button" id="clearFilterHeightMax" class="clear-input-btn" aria-label="키 최대 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)"><button type="button" id="clearFilterWeightMin" class="clear-input-btn" aria-label="무게 최소 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)"><button type="button" id="clearFilterWeightMax" class="clear-input-btn" aria-label="무게 최대 초기화">✕</button></div>
                     </div>
                 </details>
                 <details class="advanced-sub">
                     <summary>종족값 (최소값)</summary>
                     <div class="advanced-sub-body stat-grid">
-                        <input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합">
-                        <input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP">
-                        <input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격">
-                        <input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어">
-                        <input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공">
-                        <input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방">
-                        <input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드">
+                        <div class="clearable-wrap"><input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합"><button type="button" id="clearFilterTotalMin" class="clear-input-btn" aria-label="총합 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP"><button type="button" id="clearFilterHpMin" class="clear-input-btn" aria-label="HP 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격"><button type="button" id="clearFilterAtkMin" class="clear-input-btn" aria-label="공격 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어"><button type="button" id="clearFilterDefMin" class="clear-input-btn" aria-label="방어 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공"><button type="button" id="clearFilterSpaMin" class="clear-input-btn" aria-label="특공 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방"><button type="button" id="clearFilterSpdMin" class="clear-input-btn" aria-label="특방 초기화">✕</button></div>
+                        <div class="clearable-wrap"><input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 초기화">✕</button></div>
                     </div>
                 </details>
                 <details class="advanced-sub">
-                    <summary>기타 검색</summary>
+                    <summary>기타</summary>
                     <div class="advanced-sub-body input-grid-1">
-                        <select id="filterExtra" class="range-input"></select>
+                        <div class="clearable-wrap"><select id="filterExtra" class="range-input"></select><button type="button" id="clearFilterExtra" class="clear-input-btn" aria-label="기타 초기화">✕</button></div>
                     </div>
                 </details>
             </div>
@@ -334,6 +340,7 @@
     let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
+    const CLEARABLE_FILTER_IDS = ['sideNameSearch','filterGen','filterStatus','filterType','filterType2','filterShape','filterColor','filterCategorySearch','filterHeightMin','filterHeightMax','filterWeightMin','filterWeightMax','filterTotalMin','filterHpMin','filterAtkMin','filterDefMin','filterSpaMin','filterSpdMin','filterSpeMin','filterExtra'];
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
     const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
 
@@ -411,6 +418,55 @@
         renderSidebarList();
     }
 
+
+    function updateClearButtonVisibility(inputId) {
+        const inputEl = document.getElementById(inputId);
+        const clearBtn = document.getElementById(`clear${inputId.charAt(0).toUpperCase()}${inputId.slice(1)}`);
+        if (!inputEl || !clearBtn) return;
+        const hasValue = String(inputEl.value || '').trim() !== '';
+        clearBtn.classList.toggle('show', hasValue);
+    }
+
+    function refreshAllClearButtons() {
+        CLEARABLE_FILTER_IDS.forEach(updateClearButtonVisibility);
+    }
+
+    function initClearButtons(textInputMap) {
+        const selectKeyMap = {
+            filterGen: 'gen', filterStatus: 'status', filterType: 'type', filterType2: 'type2',
+            filterShape: 'shape', filterColor: 'color', filterExtra: 'extra'
+        };
+
+        CLEARABLE_FILTER_IDS.forEach(inputId => {
+            const clearBtnId = `clear${inputId.charAt(0).toUpperCase()}${inputId.slice(1)}`;
+            const clearBtn = document.getElementById(clearBtnId);
+            const inputEl = document.getElementById(inputId);
+            if (!clearBtn || !inputEl) return;
+
+            clearBtn.onclick = () => {
+                inputEl.value = '';
+                const textFilterKey = textInputMap[inputId];
+                if (textFilterKey) {
+                    sidebarFilters[textFilterKey] = '';
+                    if (textFilterKey === 'categorySearch') {
+                        sidebarFilters.category = '';
+                        renderCategorySuggestions();
+                    }
+                }
+                const selectFilterKey = selectKeyMap[inputId];
+                if (selectFilterKey) {
+                    sidebarFilters[selectFilterKey] = '';
+                }
+                updateClearButtonVisibility(inputId);
+                renderSidebarList();
+            };
+
+            const eventName = inputEl.tagName === 'SELECT' ? 'change' : 'input';
+            inputEl.addEventListener(eventName, () => updateClearButtonVisibility(inputId));
+            updateClearButtonVisibility(inputId);
+        });
+    }
+
     function initSidebarFilters() {
         const options = {
             filterGen: [1,2,3,4,5,6,7,8,9].map(v => ({ value: String(v), label: `${v}세대` })),
@@ -480,6 +536,7 @@
 
         initCategorySearchControls();
         initAbilitySearchControls();
+        initClearButtons(textInputMap);
 
         document.getElementById('resetFiltersBtn').onclick = () => {
             sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
@@ -496,6 +553,7 @@
             renderCategorySuggestions();
             renderSelectedAbilityChips();
             renderAbilitySuggestions();
+            refreshAllClearButtons();
             renderSidebarList();
         };
     }
@@ -510,6 +568,7 @@
             sidebarFilters.category = selectedCategory;
             sidebarFilters.categorySearch = selectedCategory.toLowerCase();
             document.getElementById('filterCategorySearch').value = selectedCategory;
+            updateClearButtonVisibility('filterCategorySearch');
             renderCategorySuggestions();
             renderSidebarList();
         };
@@ -589,6 +648,7 @@
         const chipsEl = document.getElementById('selectedAbilities');
         if (!chipsEl) return;
         chipsEl.innerHTML = '';
+        chipsEl.style.display = sidebarFilters.selectedAbilities.length ? 'flex' : 'none';
 
         sidebarFilters.selectedAbilities.forEach(abilityName => {
             const chipBtn = document.createElement('button');
