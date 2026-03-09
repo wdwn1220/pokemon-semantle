@@ -110,14 +110,14 @@
 
         .side-toggle { position: fixed; right: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 74px; border-radius: 12px 0 0 12px; border: 1px solid #cbd5e1; border-right: none; background: #fff; color: #334155; box-shadow: -2px 2px 12px rgba(15, 23, 42, 0.12); cursor: pointer; z-index: 350; font-size: 1.2rem; font-weight: 700; transition: right 0.25s ease; }
         .side-toggle.open { right: 360px; }
-        .side-panel { position: fixed; top: 0; right: -370px; width: 360px; height: 100vh; background: #ffffff; border-left: 1px solid #dbe2ea; box-shadow: -8px 0 26px rgba(15, 23, 42, 0.16); transition: right 0.25s ease; z-index: 340; display: flex; flex-direction: column; }
+        .side-panel { position: fixed; top: 0; right: -370px; width: 360px; height: 100vh; background: #ffffff; border-left: 1px solid #dbe2ea; box-shadow: -8px 0 26px rgba(15, 23, 42, 0.16); transition: right 0.25s ease; z-index: 380; display: flex; flex-direction: column; }
         .side-panel.open { right: 0; }
         body.sidebar-open .container { transform: translateX(-170px); }
         .container { transition: transform 0.25s ease; }
         .side-header { padding: 16px 18px 10px; border-bottom: 1px solid #eef2f7; }
         .side-header h3 { margin: 0; font-size: 1.05rem; color: #1e293b; }
         .side-body { padding: 14px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .side-hover-preview-panel { position: absolute; left: -190px; top: 50%; transform: translateY(-50%); width: 160px; height: 160px; border-radius: 16px; border: 1px solid #dbe2ea; background: #fff; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18); display: none; align-items: center; justify-content: center; pointer-events: none; z-index: 360; }
+        .side-hover-preview-panel { position: absolute; left: -190px; top: 0; width: 160px; height: 160px; border-radius: 16px; border: 1px solid #dbe2ea; background: #fff; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18); display: none; align-items: center; justify-content: center; pointer-events: none; z-index: 390; }
         .side-hover-preview-panel.show { display: flex; }
         .side-hover-preview-panel img { width: 140px; height: 140px; object-fit: contain; }
         .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -871,9 +871,21 @@
         const listEl = document.getElementById('sidePokemonList');
         const panelEl = document.getElementById('sideHoverPreviewPanel');
         const imgEl = document.getElementById('sideHoverPreviewImg');
+        const sidebarEl = document.getElementById('pokedexSidebar');
         if (!listEl || !panelEl || !imgEl) return;
 
         const hidePreview = () => panelEl.classList.remove('show');
+        const previewMargin = 12;
+
+        const placePreviewNearItem = (item) => {
+            if (!item || !panelEl || !sidebarEl) return;
+            const itemRect = item.getBoundingClientRect();
+            const sidebarRect = sidebarEl.getBoundingClientRect();
+            const desiredTop = itemRect.top + (itemRect.height / 2) - (panelEl.offsetHeight / 2) - sidebarRect.top;
+            const maxTop = Math.max(previewMargin, sidebarRect.height - panelEl.offsetHeight - previewMargin);
+            const clampedTop = Math.min(Math.max(desiredTop, previewMargin), maxTop);
+            panelEl.style.top = `${clampedTop}px`;
+        };
 
         listEl.addEventListener('mouseover', (e) => {
             const item = e.target.closest('.side-item');
@@ -881,7 +893,14 @@
             const imgUrl = item.dataset.previewImage;
             if (!imgUrl) return;
             imgEl.src = imgUrl;
+            placePreviewNearItem(item);
             panelEl.classList.add('show');
+        });
+
+        listEl.addEventListener('mousemove', (e) => {
+            const item = e.target.closest('.side-item');
+            if (!item || !listEl.contains(item) || !panelEl.classList.contains('show')) return;
+            placePreviewNearItem(item);
         });
 
         listEl.addEventListener('mouseout', (e) => {
@@ -893,7 +912,7 @@
         });
 
         listEl.addEventListener('scroll', hidePreview, { passive: true });
-        document.getElementById('pokedexSidebar')?.addEventListener('mouseleave', hidePreview);
+        sidebarEl?.addEventListener('mouseleave', hidePreview);
     }
 
     function renderSidebarList() {
