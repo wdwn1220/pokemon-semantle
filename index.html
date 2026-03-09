@@ -127,14 +127,19 @@
         .clearable-wrap > select { padding-right: 52px; }
         .clearable-wrap.has-custom-select > select { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
         .custom-dropdown { position: relative; }
-        .custom-dropdown-trigger { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 32px 8px 10px; font-size: 0.83rem; font-weight: 600; font-family: 'Pretendard', sans-serif; background: #fff; color: #1f2937; text-align: left; cursor: pointer; line-height: 1.3; }
+        .custom-dropdown-trigger { width: 100%; min-height: 34px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 32px 7px 10px; font-size: 0.83rem; font-weight: 600; font-family: 'Pretendard', sans-serif; background: #fff; color: #1f2937; text-align: left; cursor: pointer; line-height: 1.2; box-sizing: border-box; display: flex; align-items: center; }
         .custom-dropdown-trigger::after { content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.75rem; pointer-events: none; }
         .custom-dropdown.open .custom-dropdown-trigger { border-color: #94a3b8; }
         .custom-dropdown-options { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px); max-height: 220px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12); z-index: 80; }
         .custom-dropdown.open .custom-dropdown-options { display: block; }
-        .custom-dropdown-option { padding: 7px 10px; font-size: 0.82rem; font-weight: 600; font-family: 'Pretendard', sans-serif; color: #1f2937; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .custom-dropdown-option { padding: 8px 10px; font-size: 0.82rem; font-weight: 600; font-family: 'Pretendard', sans-serif; color: #1f2937; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .custom-dropdown-option:hover, .custom-dropdown-option.active { background: #eff6ff; color: #1d4ed8; }
+        .dropdown-shape-label { display: inline-flex; align-items: center; gap: 8px; line-height: 1.2; }
+        .dropdown-shape-label > span { display: inline-block; padding-top: 1px; }
         .dropdown-shape-icon { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+        .dropdown-color-label { display: inline-flex; align-items: center; gap: 8px; line-height: 1.2; }
+        .dropdown-color-dot { width: 12px; height: 12px; border-radius: 999px; border: 1px solid rgba(15, 23, 42, 0.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45); flex-shrink: 0; }
+        .dropdown-type-badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; border: 1px solid rgba(15,23,42,0.08); line-height: 1.25; }
         .clear-input-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: #94a3b8; font-size: 0.95rem; font-weight: 900; padding: 0; line-height: 1; cursor: pointer; display: none; }
         .clearable-wrap > select + .clear-input-btn, .clearable-wrap.has-custom-select .clear-input-btn { right: 26px; }
         .clear-input-btn.show { display: block; }
@@ -448,7 +453,24 @@
     function getShapeLabelWithIcon(shapeName) {
         const shapeImg = getShapeImg(shapeName);
         if (!shapeImg) return shapeName;
-        return `<img src="${shapeImg}" class="dropdown-shape-icon" alt="${shapeName}"><span>${shapeName}</span>`;
+        return `<span class="dropdown-shape-label"><img src="${shapeImg}" class="dropdown-shape-icon" alt="${shapeName}"><span>${shapeName}</span></span>`;
+    }
+
+    function getColorLabelWithDot(colorName) {
+        const colorCode = getColorCode(colorName);
+        return `<span class="dropdown-color-label"><span class="dropdown-color-dot" style="background:${colorCode};"></span><span>${colorName}</span></span>`;
+    }
+
+    function getTypeLabelWithBadge(typeName) {
+        return `<span class="dropdown-type-badge" style="background:${getPastelColor(typeName)}; color:${getTypeColor(typeName)};">${typeName}</span>`;
+    }
+
+    function getDropdownOptionLabel(selectId, label, value) {
+        if (!value) return label;
+        if (selectId === 'filterShape') return getShapeLabelWithIcon(label);
+        if (selectId === 'filterColor') return getColorLabelWithDot(label);
+        if ((selectId === 'filterType' || selectId === 'filterType2') && value !== '__none__') return getTypeLabelWithBadge(label);
+        return label;
     }
 
     function syncCustomDropdownLabel(selectId) {
@@ -457,7 +479,7 @@
         const selectedOption = customDropdown.select.options[customDropdown.select.selectedIndex];
         const value = selectedOption?.value ?? '';
         const label = selectedOption?.textContent ?? '';
-        customDropdown.trigger.innerHTML = customDropdown.select.id === 'filterShape' && value ? getShapeLabelWithIcon(label) : label;
+        customDropdown.trigger.innerHTML = getDropdownOptionLabel(customDropdown.select.id, label, value);
         customDropdown.options.querySelectorAll('.custom-dropdown-option').forEach(optionEl => {
             optionEl.classList.toggle('active', optionEl.dataset.value === value);
         });
@@ -488,7 +510,7 @@
                 const optionEl = document.createElement('div');
                 optionEl.className = 'custom-dropdown-option';
                 optionEl.dataset.value = option.value;
-                optionEl.innerHTML = selectEl.id === 'filterShape' && option.value ? getShapeLabelWithIcon(option.textContent) : option.textContent;
+                optionEl.innerHTML = getDropdownOptionLabel(selectEl.id, option.textContent, option.value);
                 optionEl.onclick = () => {
                     selectEl.value = option.value;
                     selectEl.dispatchEvent(new Event('change', { bubbles: true }));
@@ -683,7 +705,7 @@
             if (!input) return;
             input.oninput = (e) => {
                 const value = e.target.value.trim();
-                sidebarFilters[key] = ['name', 'categorySearch'].includes(key) ? value.toLowerCase() : value;
+                sidebarFilters[key] = key === 'name' ? normalizeKoName(value) : (key === 'categorySearch' ? value.toLowerCase() : value);
                 if (key === 'categorySearch') {
                     sidebarFilters.category = '';
                     renderCategorySuggestions();
@@ -856,7 +878,10 @@
         const minSpe = toNum(sidebarFilters.speMin, 0);
 
         const filtered = db
-            .filter(p => !sidebarFilters.name || p.ko.toLowerCase().includes(sidebarFilters.name) || (p.name || '').toLowerCase().includes(sidebarFilters.name))
+            .filter(p => {
+                if (!sidebarFilters.name) return true;
+                return isLooseKoreanNameMatch(sidebarFilters.name, p.ko) || (p.name || '').toLowerCase().includes(sidebarFilters.name);
+            })
             .filter(p => !sidebarFilters.gen || String(p.gen) === sidebarFilters.gen)
             .filter(p => !sidebarFilters.status || p.status === sidebarFilters.status)
             .filter(p => !sidebarFilters.type || p.type.includes(sidebarFilters.type))
@@ -1201,6 +1226,133 @@
         return String(value || '').normalize('NFC').trim().toLowerCase();
     }
 
+    function stripHangulFinalConsonant(value) {
+        return Array.from(String(value || '')).map(ch => {
+            const code = ch.charCodeAt(0);
+            if (code < 0xAC00 || code > 0xD7A3) return ch;
+            const syllableIndex = code - 0xAC00;
+            const withoutFinal = Math.floor(syllableIndex / 28) * 28;
+            return String.fromCharCode(withoutFinal + 0xAC00);
+        }).join('');
+    }
+
+    const HANGUL_CHOSEONG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+    function toChoseongString(value) {
+        return Array.from(String(value || '')).map(ch => {
+            const code = ch.charCodeAt(0);
+            if (code >= 0xAC00 && code <= 0xD7A3) {
+                const choseongIndex = Math.floor((code - 0xAC00) / 588);
+                return HANGUL_CHOSEONG[choseongIndex] || ch;
+            }
+            return ch;
+        }).join('');
+    }
+
+    function boundedLevenshtein(a, b, maxDistance = 1) {
+        if (a === b) return 0;
+        if (Math.abs(a.length - b.length) > maxDistance) return maxDistance + 1;
+
+        const prev = Array(b.length + 1).fill(0);
+        const curr = Array(b.length + 1).fill(0);
+        for (let j = 0; j <= b.length; j++) prev[j] = j;
+
+        for (let i = 1; i <= a.length; i++) {
+            curr[0] = i;
+            let rowMin = curr[0];
+            for (let j = 1; j <= b.length; j++) {
+                const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+                rowMin = Math.min(rowMin, curr[j]);
+            }
+            if (rowMin > maxDistance) return maxDistance + 1;
+            for (let j = 0; j <= b.length; j++) prev[j] = curr[j];
+        }
+
+        return prev[b.length];
+    }
+
+    function isSingleEditMatch(input, target) {
+        if (!input || !target) return false;
+        return boundedLevenshtein(input, target, 1) <= 1;
+    }
+
+    function isLooseKoreanNameMatch(query, candidate) {
+        if (!query) return true;
+        const normalizedQuery = normalizeKoName(query);
+        const normalizedCandidate = normalizeKoName(candidate);
+
+        if (!normalizedCandidate) return false;
+        if (normalizedCandidate.startsWith(normalizedQuery) || normalizedCandidate.includes(normalizedQuery)) return true;
+
+        const looseQuery = stripHangulFinalConsonant(normalizedQuery);
+        const looseCandidate = stripHangulFinalConsonant(normalizedCandidate);
+        if (looseCandidate.startsWith(looseQuery) || looseCandidate.includes(looseQuery)) return true;
+
+        if (normalizedQuery.length >= 2 && (isSingleEditMatch(normalizedQuery, normalizedCandidate) || isSingleEditMatch(looseQuery, looseCandidate))) return true;
+
+        const choseongQuery = toChoseongString(normalizedQuery);
+        const choseongCandidate = toChoseongString(normalizedCandidate);
+        if (choseongCandidate.startsWith(choseongQuery) || choseongCandidate.includes(choseongQuery)) return true;
+
+        if (normalizedQuery.length >= 2 && isSingleEditMatch(choseongQuery, choseongCandidate)) return true;
+
+        return false;
+    }
+
+    function buildAutocompleteNames(normalizedVal) {
+        const looseVal = stripHangulFinalConsonant(normalizedVal);
+        const choseongVal = toChoseongString(normalizedVal);
+
+        const startsWithMatches = [];
+        const includesMatches = [];
+        const looseStartsWithMatches = [];
+        const looseIncludesMatches = [];
+        const typoMatches = [];
+        const choseongMatches = [];
+
+        allKoNames.forEach((name, idx) => {
+            const normalizedName = normalizedKoNames[idx];
+            if (normalizedName.startsWith(normalizedVal)) {
+                startsWithMatches.push(name);
+                return;
+            }
+            if (normalizedName.includes(normalizedVal)) {
+                includesMatches.push(name);
+                return;
+            }
+
+            const looseName = stripHangulFinalConsonant(normalizedName);
+            if (looseName.startsWith(looseVal)) {
+                looseStartsWithMatches.push(name);
+                return;
+            }
+            if (looseName.includes(looseVal)) {
+                looseIncludesMatches.push(name);
+                return;
+            }
+
+            if (isSingleEditMatch(normalizedVal, normalizedName) || isSingleEditMatch(looseVal, looseName)) {
+                typoMatches.push(name);
+                return;
+            }
+
+            const choseongName = toChoseongString(normalizedName);
+            if (choseongName.startsWith(choseongVal) || choseongName.includes(choseongVal) || isSingleEditMatch(choseongVal, choseongName)) {
+                choseongMatches.push(name);
+            }
+        });
+
+        return [
+            ...startsWithMatches,
+            ...includesMatches,
+            ...looseStartsWithMatches,
+            ...looseIncludesMatches,
+            ...typoMatches,
+            ...choseongMatches
+        ].slice(0, 25);
+    }
+
     const inputEl = document.getElementById('guessInput');
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
@@ -1214,7 +1366,7 @@
         if (!normalizedVal) { autoList.style.display='none'; return; }
         currentFocus = -1;
         
-        const matches = allKoNames.filter((_, idx) => normalizedKoNames[idx].includes(normalizedVal));
+        const matches = buildAutocompleteNames(normalizedVal);
         if (matches.length > 0) {
             autoList.style.display = 'block';
             matches.forEach(name => {
