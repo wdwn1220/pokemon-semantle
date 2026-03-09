@@ -55,6 +55,8 @@
         .mode-btn { border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 14px; font-size: 0.9rem; font-weight: 700; cursor: pointer; background: #fff; color: #334155; white-space: nowrap; transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
         .mode-btn:hover { background: #f8fafc; }
         .mode-btn.active { background: #ff5252; border-color: #ff5252; color: #fff; box-shadow: none; }
+        .danger-btn { border: 1px solid #fecaca; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; background: #fff1f2; color: #b91c1c; white-space: nowrap; transition: background 0.2s ease, border-color 0.2s ease; }
+        .danger-btn:hover { background: #ffe4e6; border-color: #fca5a5; }
         
         /* 🚨 에러 메시지 */
         #errorMsg { color: #d32f2f; background: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; margin-bottom: 10px; text-align: center; display: none; animation: shake 0.4s; }
@@ -220,6 +222,7 @@
                     <button class="mode-btn" id="dailyModeBtn" onclick="switchGameMode(MODE_DAILY)">📅 오늘의 모드</button>
                     <button class="mode-btn" id="infiniteModeBtn" onclick="switchGameMode(MODE_INFINITE)">♾️ 무한 모드</button>
                 </div>
+                <button class="danger-btn" id="clearRecordsBtn" type="button" style="display:none;">🗑️ 기록 삭제</button>
             </div>
         </div>
 
@@ -369,6 +372,7 @@
     const CLEARABLE_FILTER_IDS = ['sideNameSearch','filterGen','filterStatus','filterType','filterType2','filterShape','filterColor','filterCategorySearch','filterHeightMin','filterHeightMax','filterWeightMin','filterWeightMax','filterTotalMin','filterHpMin','filterAtkMin','filterDefMin','filterSpaMin','filterSpdMin','filterSpeMin','filterExtra'];
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
     const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
+    const SHOW_CLEAR_RECORDS_BUTTON = true;
     const customDropdownMap = new Map();
 
     window.onload = async function() {
@@ -451,8 +455,43 @@
         document.getElementById('setupArea').style.display = 'none';
         document.getElementById('gameArea').style.display = 'block';
 
+        initRecordControls();
         initSidebarFilters();
         renderSidebarList();
+    }
+
+    function initRecordControls() {
+        const clearBtn = document.getElementById('clearRecordsBtn');
+        if (!clearBtn) return;
+
+        clearBtn.style.display = SHOW_CLEAR_RECORDS_BUTTON ? 'inline-flex' : 'none';
+        clearBtn.onclick = () => {
+            const shouldClear = confirm('정말로 저장된 기록을 모두 삭제할까요? (진행 기록, 연속 기록, 통계 포함)');
+            if (!shouldClear) return;
+            clearAllGameRecords();
+            alert('저장된 기록을 삭제했어요. 새로고침 후 새 게임을 시작합니다.');
+            location.reload();
+        };
+    }
+
+    function clearAllGameRecords() {
+        const keysToClear = [
+            'pokeSemantleMode',
+            INFINITE_PROGRESS_KEY,
+            'pokeSemantleStreak',
+            'pokeSemantleMaxStreak',
+            'pokeSemantleSolvedGameCount',
+            'pokeSemantleTotalTrySum',
+            'pokeSemantleMinTryCount',
+            'pokeSemantleTotalSolveTimeMs',
+            'pokeSemantleBestSolveTimeMs',
+            'pokeSemantleWorstBestRank'
+        ];
+
+        keysToClear.forEach(key => localStorage.removeItem(key));
+
+        const dailyKeys = Object.keys(localStorage).filter(key => key.startsWith('pokeSemantleDailyProgress_'));
+        dailyKeys.forEach(key => localStorage.removeItem(key));
     }
 
 
