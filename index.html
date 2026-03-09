@@ -399,7 +399,7 @@
         const h = lines[0].split(',').map(x => x.trim().replace(/^\ufeff/, ''));
         const get = (row, col) => { const idx = h.indexOf(col); return idx > -1 ? row[idx]?.trim() : null; };
         
-        db = lines.slice(1).filter(l => l.trim()).map(l => {
+        db = lines.slice(1).filter(l => l.trim()).map((l, csvOrder) => {
             const r = l.split(','); if (r.length < h.length) return null;
             
             let ko = get(r, 'name_ko'); 
@@ -411,6 +411,7 @@
             normalizedKoNames.push(normalizedKo);
             return {
                 normalizedKo: normalizedKo,
+                csvOrder,
                 name: get(r, 'name_en') || get(r, 'name'), ko: ko, imagePath: get(r, 'image_path'),
                 no: parseInt(get(r, 'pokedex_number')) || 0, gen: parseInt(get(r, 'generation')) || 0,
                 status: get(r, 'status') || '일반', category: get(r, 'category'),
@@ -974,7 +975,7 @@
                 if (sidebarFilters.extra === 'forms') return p.hasForms;
                 return true;
             })
-            .sort((a, b) => a.no - b.no || a.ko.localeCompare(b.ko, 'ko'));
+            .sort((a, b) => a.no - b.no || a.csvOrder - b.csvOrder);
 
         resultCountEl.innerText = `${filtered.length}마리`;
         if (filtered.length === 0) {
