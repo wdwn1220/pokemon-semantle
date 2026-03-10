@@ -71,9 +71,9 @@
         .list-divider::before { content:''; position: absolute; left: 0; top: 50%; width: 40%; height: 1px; background: #ddd; }
         .list-divider::after { content:''; position: absolute; right: 0; top: 50%; width: 40%; height: 1px; background: #ddd; }
 
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border); cursor: pointer; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border); cursor: default; }
         .card.expanded { box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: var(--primary); }
-        .card-header { position: relative; min-height: 60px; display: flex; align-items: center; padding: 8px 15px; background: #fff; overflow: hidden; }
+        .card-header { position: relative; min-height: 60px; display: flex; align-items: center; padding: 8px 15px; background: #fff; overflow: hidden; cursor: pointer; }
         .rank-gauge { position: absolute; top: 0; left: 0; bottom: 0; z-index: 0; transition: width 1s ease-out; }
         .header-content { position: relative; z-index: 1; display: flex; align-items: center; width: 100%; gap: 15px; line-height: 1.2; }
         .try-badge { font-size: 0.8rem; font-weight: 900; color: #1f2937; background: #eef2f7; border: 1px solid #cfd8e3; border-radius: 8px; width: 38px; text-align: center; padding: 2px 0; line-height: 1.2; }
@@ -1666,6 +1666,18 @@
         updateClearButtonVisibility(selectId);
     }
 
+    function applyCardType2Filter(rawValue) {
+        const value = (rawValue || '').trim();
+        if (!value) return;
+
+        const type2SelectEl = document.getElementById('filterType2');
+        if (!type2SelectEl) return;
+
+        type2SelectEl.value = value;
+        type2SelectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        updateClearButtonVisibility('filterType2');
+    }
+
     function createCard(p, isExpanded, isInteractive, lazyBody = false, lazyImages = false) {
         const el = document.createElement('div'); el.className = `card ${isExpanded ? 'expanded' : ''}`;
         const imgUrl = getImageUrl(p);
@@ -1737,6 +1749,14 @@
                 } else {
                     expandedCards.delete(p.ko);
                 }
+            };
+
+            el.oncontextmenu = (event) => {
+                const typeBadge = event.target.closest('.type-badge');
+                if (!typeBadge) return;
+
+                event.preventDefault();
+                applyCardType2Filter(typeBadge.textContent);
             };
         }
         
