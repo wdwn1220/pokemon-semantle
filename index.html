@@ -100,7 +100,7 @@
         .label-text { font-size: 0.8rem; font-weight: bold; color: var(--label); min-width: 40px; }
         .val-text { font-weight: 600; color: #333; font-size: 0.9rem; letter-spacing: -0.3px; display: inline-flex; align-items: center; gap: 4px; }
         .type-badge { padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.05); display: inline-block; margin-right: 3px; }
-        .card-filter-trigger { }
+        .card-filter-trigger { cursor: pointer; }
         .shape-icon { height: 26px; width: auto; vertical-align: middle; }
 
         .col-right { display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid #eee; padding-left: 10px; }
@@ -173,6 +173,12 @@
         .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .stat-range-item { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .range-slider-pair { position: relative; height: 24px; margin-top: 2px; }
+        .range-slider-pair input[type="range"] { position: absolute; inset: 0; width: 100%; margin: 0; pointer-events: none; background: none; -webkit-appearance: none; appearance: none; }
+        .range-slider-pair input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: #cbd5e1; }
+        .range-slider-pair input[type="range"]::-moz-range-track { height: 4px; border-radius: 999px; background: #cbd5e1; }
+        .range-slider-pair input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #ff5252; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18); margin-top: -5px; pointer-events: auto; cursor: pointer; }
+        .range-slider-pair input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #ff5252; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18); pointer-events: auto; cursor: pointer; }
         .filter-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
         .reset-filter-btn { border: none; border-radius: 8px; background: #e2e8f0; color: #1e293b; font-size: 0.8rem; font-weight: 700; padding: 7px 10px; cursor: pointer; }
         .side-count { color: #64748b; font-size: 0.82rem; font-weight: 700; }
@@ -313,8 +319,10 @@
                     <div class="advanced-sub-body range-grid">
                         <div class="clearable-wrap"><input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)"><button type="button" id="clearFilterHeightMin" class="clear-input-btn" aria-label="키 최소 초기화">✕</button></div>
                         <div class="clearable-wrap"><input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)"><button type="button" id="clearFilterHeightMax" class="clear-input-btn" aria-label="키 최대 초기화">✕</button></div>
+                        <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="height" data-step="0.1"><input id="filterHeightMinSlider" type="range" min="0" max="20" step="0.1" value="0" aria-label="키 최소 슬라이더"><input id="filterHeightMaxSlider" type="range" min="0" max="20" step="0.1" value="20" aria-label="키 최대 슬라이더"></div>
                         <div class="clearable-wrap"><input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)"><button type="button" id="clearFilterWeightMin" class="clear-input-btn" aria-label="무게 최소 초기화">✕</button></div>
                         <div class="clearable-wrap"><input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)"><button type="button" id="clearFilterWeightMax" class="clear-input-btn" aria-label="무게 최대 초기화">✕</button></div>
+                        <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="weight" data-step="0.1"><input id="filterWeightMinSlider" type="range" min="0" max="999.9" step="0.1" value="0" aria-label="무게 최소 슬라이더"><input id="filterWeightMaxSlider" type="range" min="0" max="999.9" step="0.1" value="999.9" aria-label="무게 최대 슬라이더"></div>
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="stats">
@@ -323,26 +331,32 @@
                         <div class="stat-range-item">
                             <div class="clearable-wrap"><input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP 최소"><button type="button" id="clearFilterHpMin" class="clear-input-btn" aria-label="HP 최소 초기화">✕</button></div>
                             <div class="clearable-wrap"><input id="filterHpMax" class="range-input" type="number" min="0" step="1" placeholder="HP 최대"><button type="button" id="clearFilterHpMax" class="clear-input-btn" aria-label="HP 최대 초기화">✕</button></div>
+                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="hp"><input id="filterHpMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="HP 최소 슬라이더"><input id="filterHpMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="HP 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
                             <div class="clearable-wrap"><input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격 최소"><button type="button" id="clearFilterAtkMin" class="clear-input-btn" aria-label="공격 최소 초기화">✕</button></div>
                             <div class="clearable-wrap"><input id="filterAtkMax" class="range-input" type="number" min="0" step="1" placeholder="공격 최대"><button type="button" id="clearFilterAtkMax" class="clear-input-btn" aria-label="공격 최대 초기화">✕</button></div>
+                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="atk"><input id="filterAtkMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="공격 최소 슬라이더"><input id="filterAtkMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="공격 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
                             <div class="clearable-wrap"><input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어 최소"><button type="button" id="clearFilterDefMin" class="clear-input-btn" aria-label="방어 최소 초기화">✕</button></div>
                             <div class="clearable-wrap"><input id="filterDefMax" class="range-input" type="number" min="0" step="1" placeholder="방어 최대"><button type="button" id="clearFilterDefMax" class="clear-input-btn" aria-label="방어 최대 초기화">✕</button></div>
+                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="def"><input id="filterDefMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="방어 최소 슬라이더"><input id="filterDefMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="방어 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
                             <div class="clearable-wrap"><input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공 최소"><button type="button" id="clearFilterSpaMin" class="clear-input-btn" aria-label="특공 최소 초기화">✕</button></div>
                             <div class="clearable-wrap"><input id="filterSpaMax" class="range-input" type="number" min="0" step="1" placeholder="특공 최대"><button type="button" id="clearFilterSpaMax" class="clear-input-btn" aria-label="특공 최대 초기화">✕</button></div>
+                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="spa"><input id="filterSpaMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="특공 최소 슬라이더"><input id="filterSpaMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="특공 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
                             <div class="clearable-wrap"><input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방 최소"><button type="button" id="clearFilterSpdMin" class="clear-input-btn" aria-label="특방 최소 초기화">✕</button></div>
                             <div class="clearable-wrap"><input id="filterSpdMax" class="range-input" type="number" min="0" step="1" placeholder="특방 최대"><button type="button" id="clearFilterSpdMax" class="clear-input-btn" aria-label="특방 최대 초기화">✕</button></div>
+                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="spd"><input id="filterSpdMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="특방 최소 슬라이더"><input id="filterSpdMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="특방 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
                             <div class="clearable-wrap"><input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드 최소"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 최소 초기화">✕</button></div>
                             <div class="clearable-wrap"><input id="filterSpeMax" class="range-input" type="number" min="0" step="1" placeholder="스피드 최대"><button type="button" id="clearFilterSpeMax" class="clear-input-btn" aria-label="스피드 최대 초기화">✕</button></div>
+                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="spe"><input id="filterSpeMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="스피드 최소 슬라이더"><input id="filterSpeMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="스피드 최대 슬라이더"></div>
                         </div>
                     </div>
                 </details>
@@ -697,6 +711,8 @@
                 }
                 if (inputEl.tagName === 'SELECT') {
                     inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+                } else {
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
                 }
                 updateClearButtonVisibility(inputId);
                 renderSidebarList();
@@ -706,6 +722,112 @@
             inputEl.addEventListener(eventName, () => updateClearButtonVisibility(inputId));
             updateClearButtonVisibility(inputId);
         });
+    }
+
+    function toSliderNum(value, fallback) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function initDualRangeControl({ key, minInputId, maxInputId, minSliderId, maxSliderId, minBound, maxBound, step = 1 }) {
+        const minInput = document.getElementById(minInputId);
+        const maxInput = document.getElementById(maxInputId);
+        const minSlider = document.getElementById(minSliderId);
+        const maxSlider = document.getElementById(maxSliderId);
+        if (!minInput || !maxInput || !minSlider || !maxSlider) return;
+
+        minSlider.min = String(minBound);
+        minSlider.max = String(maxBound);
+        minSlider.step = String(step);
+        maxSlider.min = String(minBound);
+        maxSlider.max = String(maxBound);
+        maxSlider.step = String(step);
+
+        const dec = String(step).includes('.') ? String(step).split('.')[1].length : 0;
+        const normalize = (num) => Number(num.toFixed(dec));
+
+        const syncFromInputs = () => {
+            const currentMin = toSliderNum(sidebarFilters[`${key}Min`] === '' ? minBound : sidebarFilters[`${key}Min`], minBound);
+            const currentMax = toSliderNum(sidebarFilters[`${key}Max`] === '' ? maxBound : sidebarFilters[`${key}Max`], maxBound);
+            const safeMin = Math.max(minBound, Math.min(currentMin, currentMax));
+            const safeMax = Math.min(maxBound, Math.max(currentMax, safeMin));
+            minSlider.value = String(normalize(safeMin));
+            maxSlider.value = String(normalize(safeMax));
+        };
+
+        const syncFromSliders = () => {
+            let minVal = toSliderNum(minSlider.value, minBound);
+            let maxVal = toSliderNum(maxSlider.value, maxBound);
+            if (minVal > maxVal) {
+                if (document.activeElement === minSlider) {
+                    maxVal = minVal;
+                    maxSlider.value = String(minVal);
+                } else {
+                    minVal = maxVal;
+                    minSlider.value = String(maxVal);
+                }
+            }
+            const nextMin = normalize(minVal);
+            const nextMax = normalize(maxVal);
+            sidebarFilters[`${key}Min`] = nextMin <= minBound ? '' : String(nextMin);
+            sidebarFilters[`${key}Max`] = nextMax >= maxBound ? '' : String(nextMax);
+            minInput.value = sidebarFilters[`${key}Min`];
+            maxInput.value = sidebarFilters[`${key}Max`];
+            updateClearButtonVisibility(minInputId);
+            updateClearButtonVisibility(maxInputId);
+            renderSidebarList();
+        };
+
+        minSlider.addEventListener('input', syncFromSliders);
+        maxSlider.addEventListener('input', syncFromSliders);
+
+        minInput.addEventListener('input', syncFromInputs);
+        maxInput.addEventListener('input', syncFromInputs);
+
+        syncFromInputs();
+    }
+
+    function initDualRangeControls() {
+        const statControls = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].map(key => ({
+            key,
+            minInputId: `filter${key.charAt(0).toUpperCase()}${key.slice(1)}Min`,
+            maxInputId: `filter${key.charAt(0).toUpperCase()}${key.slice(1)}Max`,
+            minSliderId: `filter${key.charAt(0).toUpperCase()}${key.slice(1)}MinSlider`,
+            maxSliderId: `filter${key.charAt(0).toUpperCase()}${key.slice(1)}MaxSlider`,
+            minBound: 1,
+            maxBound: 255,
+            step: 1
+        }));
+
+        const heightValues = db.map(p => Number(p.h)).filter(Number.isFinite);
+        const weightValues = db.map(p => Number(p.w)).filter(Number.isFinite);
+        const maxHeight = heightValues.length ? Math.max(...heightValues) : 20;
+        const maxWeight = weightValues.length ? Math.max(...weightValues) : 999.9;
+
+        const extraControls = [
+            {
+                key: 'height',
+                minInputId: 'filterHeightMin',
+                maxInputId: 'filterHeightMax',
+                minSliderId: 'filterHeightMinSlider',
+                maxSliderId: 'filterHeightMaxSlider',
+                minBound: 0,
+                maxBound: Math.ceil(maxHeight * 10) / 10,
+                step: 0.1
+            },
+            {
+                key: 'weight',
+                minInputId: 'filterWeightMin',
+                maxInputId: 'filterWeightMax',
+                minSliderId: 'filterWeightMinSlider',
+                maxSliderId: 'filterWeightMaxSlider',
+                minBound: 0,
+                maxBound: Math.ceil(maxWeight * 10) / 10,
+                step: 0.1
+            }
+        ];
+
+        [...statControls, ...extraControls].forEach(initDualRangeControl);
     }
 
     function initSidebarFilters() {
@@ -787,13 +909,17 @@
         initCategorySearchControls();
         initAbilitySearchControls();
         initClearButtons(textInputMap);
+        initDualRangeControls();
         initSidebarHoverPreview();
 
         document.getElementById('resetFiltersBtn').onclick = () => {
             sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', hpMin: '', hpMax: '', atkMin: '', atkMax: '', defMin: '', defMax: '', spaMin: '', spaMax: '', spdMin: '', spdMax: '', speMin: '', speMax: '' };
             Object.keys(textInputMap).forEach(id => {
                 const input = document.getElementById(id);
-                if (input) input.value = '';
+                if (input) {
+                    input.value = '';
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
             });
             const abilityInput = document.getElementById('filterAbilityInput');
             if (abilityInput) abilityInput.value = '';
@@ -1686,18 +1812,26 @@
             return;
         }
 
-        if (filterType === 'size') {
+        if (filterType === 'size' || filterType === 'size-height' || filterType === 'size-weight') {
             const [rawH, rawW] = value.split('|');
             const h = (rawH || '').trim();
             const w = (rawW || '').trim();
-            if (!h || !w) return;
             const hMinInput = document.getElementById('filterHeightMin');
             const wMinInput = document.getElementById('filterWeightMin');
-            const isSame = sidebarFilters.heightMin === h && sidebarFilters.weightMin === w;
-            sidebarFilters.heightMin = isSame ? '' : h;
-            sidebarFilters.weightMin = isSame ? '' : w;
-            if (hMinInput) { hMinInput.value = sidebarFilters.heightMin; updateClearButtonVisibility('filterHeightMin'); }
-            if (wMinInput) { wMinInput.value = sidebarFilters.weightMin; updateClearButtonVisibility('filterWeightMin'); }
+            if ((filterType === 'size' || filterType === 'size-height') && h && hMinInput) {
+                const isSameH = sidebarFilters.heightMin === h;
+                sidebarFilters.heightMin = isSameH ? '' : h;
+                hMinInput.value = sidebarFilters.heightMin;
+                hMinInput.dispatchEvent(new Event('input', { bubbles: true }));
+                updateClearButtonVisibility('filterHeightMin');
+            }
+            if ((filterType === 'size' || filterType === 'size-weight') && w && wMinInput) {
+                const isSameW = sidebarFilters.weightMin === w;
+                sidebarFilters.weightMin = isSameW ? '' : w;
+                wMinInput.value = sidebarFilters.weightMin;
+                wMinInput.dispatchEvent(new Event('input', { bubbles: true }));
+                updateClearButtonVisibility('filterWeightMin');
+            }
             renderSidebarList();
             return;
         }
@@ -1756,20 +1890,28 @@
         updateClearButtonVisibility('filterType2');
     }
 
-    function applyCardSizeMaxFilter(rawValue) {
+    function applyCardSizeMaxFilter(rawValue, filterType = 'size') {
         const value = (rawValue || '').trim();
         if (!value) return;
         const [rawH, rawW] = value.split('|');
         const h = (rawH || '').trim();
         const w = (rawW || '').trim();
-        if (!h || !w) return;
         const hMaxInput = document.getElementById('filterHeightMax');
         const wMaxInput = document.getElementById('filterWeightMax');
-        const isSame = sidebarFilters.heightMax === h && sidebarFilters.weightMax === w;
-        sidebarFilters.heightMax = isSame ? '' : h;
-        sidebarFilters.weightMax = isSame ? '' : w;
-        if (hMaxInput) { hMaxInput.value = sidebarFilters.heightMax; updateClearButtonVisibility('filterHeightMax'); }
-        if (wMaxInput) { wMaxInput.value = sidebarFilters.weightMax; updateClearButtonVisibility('filterWeightMax'); }
+        if ((filterType === 'size' || filterType === 'size-height') && h && hMaxInput) {
+            const isSameH = sidebarFilters.heightMax === h;
+            sidebarFilters.heightMax = isSameH ? '' : h;
+            hMaxInput.value = sidebarFilters.heightMax;
+            hMaxInput.dispatchEvent(new Event('input', { bubbles: true }));
+            updateClearButtonVisibility('filterHeightMax');
+        }
+        if ((filterType === 'size' || filterType === 'size-weight') && w && wMaxInput) {
+            const isSameW = sidebarFilters.weightMax === w;
+            sidebarFilters.weightMax = isSameW ? '' : w;
+            wMaxInput.value = sidebarFilters.weightMax;
+            wMaxInput.dispatchEvent(new Event('input', { bubbles: true }));
+            updateClearButtonVisibility('filterWeightMax');
+        }
         renderSidebarList();
     }
 
@@ -1810,7 +1952,7 @@
                                     ${p.color ? `<span style="width:12px;height:12px;border-radius:50%;background:${colorDot};border:1px solid #ccc;margin-left:2px;"></span>` : ''}
                                 </span>
                             </div>
-                            <div class="info-row"><span class="label-text">크기:</span><span class="val-text card-filter-trigger" data-filter-type="size" data-filter-value="${p.h}|${p.w}" title="좌클릭: 최소, 우클릭: 최대">${p.h}m / ${p.w}kg</span></div>
+                            <div class="info-row"><span class="label-text">크기:</span><span class="val-text"><span class="card-filter-trigger" data-filter-type="size-height" data-filter-value="${p.h}|${p.w}" title="좌클릭: 키 최소 / 우클릭: 키 최대">${p.h}m</span> / <span class="card-filter-trigger" data-filter-type="size-weight" data-filter-value="${p.h}|${p.w}" title="좌클릭: 몸무게 최소 / 우클릭: 몸무게 최대">${p.w}kg</span></span></div>
                         </div>
                     </div>
                     <div class="col-right"><div class="radar-chart-box">${radarSvg}</div></div>
@@ -1849,10 +1991,10 @@
 
             el.oncontextmenu = (event) => {
                 const filterTrigger = event.target.closest('.card-filter-trigger');
-                if (filterTrigger && filterTrigger.dataset.filterType === 'size') {
+                if (filterTrigger && (filterTrigger.dataset.filterType === 'size-height' || filterTrigger.dataset.filterType === 'size-weight')) {
                     event.preventDefault();
                     openPokedexSidebar();
-                    applyCardSizeMaxFilter(filterTrigger.dataset.filterValue);
+                    applyCardSizeMaxFilter(filterTrigger.dataset.filterValue, filterTrigger.dataset.filterType);
                     return;
                 }
 
