@@ -1633,10 +1633,10 @@
             const radarSvg = getRadarChartSVG(p.stats);
             return `
                 <div class="grid-layout">
-                    <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
+                    <div class="col-left"><div class="big-img-box card-search-trigger"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
                     <div class="col-mid">
                         <div class="info-column">
-                            <div class="info-row"><span class="label-text">이름:</span><span class="val-text">${p.ko}</span></div>
+                            <div class="info-row"><span class="label-text">이름:</span><span class="val-text card-search-trigger">${p.ko}</span></div>
                             <div class="info-row"><span class="label-text">번호:</span><span class="val-text">No.${String(p.no).padStart(4,'0')}</span></div>
                             <div class="info-row"><span class="label-text">구분:</span><span class="val-text">${p.status}포켓몬</span></div>
                             <div class="info-row"><span class="label-text">특성:</span><span class="val-text">${p.abilities.join(', ')}</span></div>
@@ -1663,7 +1663,16 @@
         };
 
         if (isInteractive) {
-            el.onclick = () => {
+            el.onclick = (event) => {
+                if (event.target.closest('.card-search-trigger')) {
+                    const inputEl = document.getElementById('guessInput');
+                    if (inputEl) {
+                        inputEl.value = p.ko;
+                        handleGuess();
+                    }
+                    return;
+                }
+
                 const expanded = el.classList.toggle('expanded');
                 if (expanded) {
                     expandedCards.add(p.ko);
@@ -1699,8 +1708,8 @@
                 <div class="rank-gauge" style="width:${Math.max(5, ((db.length - p.rank) / db.length) * 100)}%; background:rgba(255, 82, 82, ${gaugeOpacity});"></div>
                 <div class="header-content">
                     <span class="try-badge">${p.tryNo ? (p.tryNo === '-' ? '-' : '#'+p.tryNo) : '-'}</span>
-                    <img ${getImgAttrs('40', 'https://via.placeholder.com/40')} class="mini-img">
-                    <span class="header-name">${p.ko}</span>
+                    <img ${getImgAttrs('40', 'https://via.placeholder.com/40')} class="mini-img card-search-trigger">
+                    <span class="header-name card-search-trigger">${p.ko}</span>
                     <div class="rank-score-wrapper">
                         <span class="score-disp">${p.score.toFixed(2)}%</span>
                         <span class="rank-disp">${p.rank}위</span>
