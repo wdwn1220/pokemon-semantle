@@ -100,7 +100,7 @@
         .label-text { font-size: 0.8rem; font-weight: bold; color: var(--label); min-width: 40px; }
         .val-text { font-weight: 600; color: #333; font-size: 0.9rem; letter-spacing: -0.3px; display: inline-flex; align-items: center; gap: 4px; }
         .type-badge { padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.05); display: inline-block; margin-right: 3px; }
-        .card-filter-trigger { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+        .card-filter-trigger { }
         .shape-icon { height: 26px; width: auto; vertical-align: middle; }
 
         .col-right { display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid #eee; padding-left: 10px; }
@@ -171,7 +171,8 @@
         .input-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .input-grid-1 { display: grid; grid-template-columns: 1fr; gap: 8px; }
         .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .stat-range-item { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .filter-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
         .reset-filter-btn { border: none; border-radius: 8px; background: #e2e8f0; color: #1e293b; font-size: 0.8rem; font-weight: 700; padding: 7px 10px; cursor: pointer; }
         .side-count { color: #64748b; font-size: 0.82rem; font-weight: 700; }
@@ -317,15 +318,32 @@
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="stats">
-                    <summary>종족값 (최소값)</summary>
+                    <summary>종족값 (최소/최대)</summary>
                     <div class="advanced-sub-body stat-grid">
-                        <div class="clearable-wrap"><input id="filterTotalMin" class="range-input" type="number" min="0" step="1" placeholder="총합"><button type="button" id="clearFilterTotalMin" class="clear-input-btn" aria-label="총합 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP"><button type="button" id="clearFilterHpMin" class="clear-input-btn" aria-label="HP 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격"><button type="button" id="clearFilterAtkMin" class="clear-input-btn" aria-label="공격 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어"><button type="button" id="clearFilterDefMin" class="clear-input-btn" aria-label="방어 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공"><button type="button" id="clearFilterSpaMin" class="clear-input-btn" aria-label="특공 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방"><button type="button" id="clearFilterSpdMin" class="clear-input-btn" aria-label="특방 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 초기화">✕</button></div>
+                        <div class="stat-range-item">
+                            <div class="clearable-wrap"><input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP 최소"><button type="button" id="clearFilterHpMin" class="clear-input-btn" aria-label="HP 최소 초기화">✕</button></div>
+                            <div class="clearable-wrap"><input id="filterHpMax" class="range-input" type="number" min="0" step="1" placeholder="HP 최대"><button type="button" id="clearFilterHpMax" class="clear-input-btn" aria-label="HP 최대 초기화">✕</button></div>
+                        </div>
+                        <div class="stat-range-item">
+                            <div class="clearable-wrap"><input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격 최소"><button type="button" id="clearFilterAtkMin" class="clear-input-btn" aria-label="공격 최소 초기화">✕</button></div>
+                            <div class="clearable-wrap"><input id="filterAtkMax" class="range-input" type="number" min="0" step="1" placeholder="공격 최대"><button type="button" id="clearFilterAtkMax" class="clear-input-btn" aria-label="공격 최대 초기화">✕</button></div>
+                        </div>
+                        <div class="stat-range-item">
+                            <div class="clearable-wrap"><input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어 최소"><button type="button" id="clearFilterDefMin" class="clear-input-btn" aria-label="방어 최소 초기화">✕</button></div>
+                            <div class="clearable-wrap"><input id="filterDefMax" class="range-input" type="number" min="0" step="1" placeholder="방어 최대"><button type="button" id="clearFilterDefMax" class="clear-input-btn" aria-label="방어 최대 초기화">✕</button></div>
+                        </div>
+                        <div class="stat-range-item">
+                            <div class="clearable-wrap"><input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공 최소"><button type="button" id="clearFilterSpaMin" class="clear-input-btn" aria-label="특공 최소 초기화">✕</button></div>
+                            <div class="clearable-wrap"><input id="filterSpaMax" class="range-input" type="number" min="0" step="1" placeholder="특공 최대"><button type="button" id="clearFilterSpaMax" class="clear-input-btn" aria-label="특공 최대 초기화">✕</button></div>
+                        </div>
+                        <div class="stat-range-item">
+                            <div class="clearable-wrap"><input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방 최소"><button type="button" id="clearFilterSpdMin" class="clear-input-btn" aria-label="특방 최소 초기화">✕</button></div>
+                            <div class="clearable-wrap"><input id="filterSpdMax" class="range-input" type="number" min="0" step="1" placeholder="특방 최대"><button type="button" id="clearFilterSpdMax" class="clear-input-btn" aria-label="특방 최대 초기화">✕</button></div>
+                        </div>
+                        <div class="stat-range-item">
+                            <div class="clearable-wrap"><input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드 최소"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 최소 초기화">✕</button></div>
+                            <div class="clearable-wrap"><input id="filterSpeMax" class="range-input" type="number" min="0" step="1" placeholder="스피드 최대"><button type="button" id="clearFilterSpeMax" class="clear-input-btn" aria-label="스피드 최대 초기화">✕</button></div>
+                        </div>
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="extra">
@@ -367,10 +385,10 @@
     let dailyPuzzleKey = '';
     let gameStartAt = null;
     let currentSolveTimeMs = 0;
-    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+    let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', hpMin: '', hpMax: '', atkMin: '', atkMax: '', defMin: '', defMax: '', spaMin: '', spaMax: '', spdMin: '', spdMax: '', speMin: '', speMax: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
-    const CLEARABLE_FILTER_IDS = ['sideNameSearch','filterGen','filterStatus','filterType','filterType2','filterShape','filterColor','filterCategorySearch','filterHeightMin','filterHeightMax','filterWeightMin','filterWeightMax','filterTotalMin','filterHpMin','filterAtkMin','filterDefMin','filterSpaMin','filterSpdMin','filterSpeMin','filterExtra'];
+    const CLEARABLE_FILTER_IDS = ['sideNameSearch','filterGen','filterStatus','filterType','filterType2','filterShape','filterColor','filterCategorySearch','filterHeightMin','filterHeightMax','filterWeightMin','filterWeightMax','filterHpMin','filterHpMax','filterAtkMin','filterAtkMax','filterDefMin','filterDefMax','filterSpaMin','filterSpaMax','filterSpdMin','filterSpdMax','filterSpeMin','filterSpeMax','filterExtra'];
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
     const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
     const SHOW_CLEAR_RECORDS_BUTTON = false;
@@ -629,7 +647,7 @@
         const hasCategoryActive = hasActiveFilterValue(sidebarFilters.categorySearch) || hasActiveFilterValue(sidebarFilters.category);
         const hasAbilityActive = sidebarFilters.selectedAbilities.length > 0 || hasActiveFilterValue(document.getElementById('filterAbilityInput')?.value);
         const hasSizeActive = ['heightMin','heightMax','weightMin','weightMax'].some(key => hasActiveFilterValue(sidebarFilters[key]));
-        const hasStatsActive = ['totalMin','hpMin','atkMin','defMin','spaMin','spdMin','speMin'].some(key => hasActiveFilterValue(sidebarFilters[key]));
+        const hasStatsActive = ['hpMin','hpMax','atkMin','atkMax','defMin','defMax','spaMin','spaMax','spdMin','spdMax','speMin','speMax'].some(key => hasActiveFilterValue(sidebarFilters[key]));
         const hasExtraActive = hasActiveFilterValue(sidebarFilters.extra);
 
         const advancedPanel = document.getElementById('advancedSearchPanel');
@@ -699,6 +717,7 @@
             filterShape: [...sets.shapes].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterColor: [...sets.colors].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterExtra: [
+                { value: '__none__', label: '없음' },
                 { value: 'mega', label: '메가진화' },
                 { value: 'gmax', label: '거다이맥스' },
                 { value: 'region', label: '리전폼' },
@@ -737,13 +756,18 @@
             filterHeightMax: 'heightMax',
             filterWeightMin: 'weightMin',
             filterWeightMax: 'weightMax',
-            filterTotalMin: 'totalMin',
             filterHpMin: 'hpMin',
+            filterHpMax: 'hpMax',
             filterAtkMin: 'atkMin',
+            filterAtkMax: 'atkMax',
             filterDefMin: 'defMin',
+            filterDefMax: 'defMax',
             filterSpaMin: 'spaMin',
+            filterSpaMax: 'spaMax',
             filterSpdMin: 'spdMin',
-            filterSpeMin: 'speMin'
+            filterSpdMax: 'spdMax',
+            filterSpeMin: 'speMin',
+            filterSpeMax: 'speMax'
         };
 
         Object.entries(textInputMap).forEach(([id, key]) => {
@@ -766,7 +790,7 @@
         initSidebarHoverPreview();
 
         document.getElementById('resetFiltersBtn').onclick = () => {
-            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', totalMin: '', hpMin: '', atkMin: '', defMin: '', spaMin: '', spdMin: '', speMin: '' };
+            sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', hpMin: '', hpMax: '', atkMin: '', atkMax: '', defMin: '', defMax: '', spaMin: '', spaMax: '', spdMin: '', spdMax: '', speMin: '', speMax: '' };
             Object.keys(textInputMap).forEach(id => {
                 const input = document.getElementById(id);
                 if (input) input.value = '';
@@ -901,6 +925,16 @@
         if (!isOpen) document.getElementById('sideHoverPreviewPanel')?.classList.remove('show');
     }
 
+    function openPokedexSidebar() {
+        const panel = document.getElementById('pokedexSidebar');
+        const button = document.getElementById('sideToggleBtn');
+        if (!panel || !button || panel.classList.contains('open')) return;
+        panel.classList.add('open');
+        button.classList.add('open');
+        document.body.classList.add('sidebar-open');
+        button.innerText = '▶';
+    }
+
     function toNum(value, fallback = null) {
         if (value === '' || value === null || value === undefined) return fallback;
         const n = parseFloat(value);
@@ -966,13 +1000,18 @@
         const maxH = toNum(sidebarFilters.heightMax);
         const minW = toNum(sidebarFilters.weightMin);
         const maxW = toNum(sidebarFilters.weightMax);
-        const minTotal = toNum(sidebarFilters.totalMin, 0);
         const minHp = toNum(sidebarFilters.hpMin, 0);
+        const maxHp = toNum(sidebarFilters.hpMax);
         const minAtk = toNum(sidebarFilters.atkMin, 0);
+        const maxAtk = toNum(sidebarFilters.atkMax);
         const minDef = toNum(sidebarFilters.defMin, 0);
+        const maxDef = toNum(sidebarFilters.defMax);
         const minSpa = toNum(sidebarFilters.spaMin, 0);
+        const maxSpa = toNum(sidebarFilters.spaMax);
         const minSpd = toNum(sidebarFilters.spdMin, 0);
+        const maxSpd = toNum(sidebarFilters.spdMax);
         const minSpe = toNum(sidebarFilters.speMin, 0);
+        const maxSpe = toNum(sidebarFilters.speMax);
 
         const filtered = db
             .filter(p => {
@@ -1000,15 +1039,15 @@
             .filter(p => maxH === null || p.h <= maxH)
             .filter(p => minW === null || p.w >= minW)
             .filter(p => maxW === null || p.w <= maxW)
-            .filter(p => p.stats.total >= minTotal)
-            .filter(p => p.stats.hp >= minHp)
-            .filter(p => p.stats.atk >= minAtk)
-            .filter(p => p.stats.def >= minDef)
-            .filter(p => p.stats.spa >= minSpa)
-            .filter(p => p.stats.spd >= minSpd)
-            .filter(p => p.stats.spe >= minSpe)
+            .filter(p => p.stats.hp >= minHp && (maxHp === null || p.stats.hp <= maxHp))
+            .filter(p => p.stats.atk >= minAtk && (maxAtk === null || p.stats.atk <= maxAtk))
+            .filter(p => p.stats.def >= minDef && (maxDef === null || p.stats.def <= maxDef))
+            .filter(p => p.stats.spa >= minSpa && (maxSpa === null || p.stats.spa <= maxSpa))
+            .filter(p => p.stats.spd >= minSpd && (maxSpd === null || p.stats.spd <= maxSpd))
+            .filter(p => p.stats.spe >= minSpe && (maxSpe === null || p.stats.spe <= maxSpe))
             .filter(p => {
                 if (!sidebarFilters.extra) return true;
+                if (sidebarFilters.extra === '__none__') return !p.isMega && !p.isGmax && !p.isRegion && !p.hasForms;
                 if (sidebarFilters.extra === 'mega') return p.isMega;
                 if (sidebarFilters.extra === 'gmax') return p.isGmax;
                 if (sidebarFilters.extra === 'region') return p.isRegion;
@@ -1630,15 +1669,46 @@
             status: 'filterStatus',
             type: 'filterType',
             shape: 'filterShape',
-            color: 'filterColor'
+            color: 'filterColor',
+            extra: 'filterExtra'
         };
 
+        if (filterType === 'name') {
+            const nameInput = document.getElementById('sideNameSearch');
+            const normalized = normalizeKoName(value);
+            const isSame = sidebarFilters.name === normalized;
+            sidebarFilters.name = isSame ? '' : normalized;
+            if (nameInput) {
+                nameInput.value = isSame ? '' : value;
+                updateClearButtonVisibility('sideNameSearch');
+            }
+            renderSidebarList();
+            return;
+        }
+
+        if (filterType === 'size') {
+            const [rawH, rawW] = value.split('|');
+            const h = (rawH || '').trim();
+            const w = (rawW || '').trim();
+            if (!h || !w) return;
+            const hMinInput = document.getElementById('filterHeightMin');
+            const wMinInput = document.getElementById('filterWeightMin');
+            const isSame = sidebarFilters.heightMin === h && sidebarFilters.weightMin === w;
+            sidebarFilters.heightMin = isSame ? '' : h;
+            sidebarFilters.weightMin = isSame ? '' : w;
+            if (hMinInput) { hMinInput.value = sidebarFilters.heightMin; updateClearButtonVisibility('filterHeightMin'); }
+            if (wMinInput) { wMinInput.value = sidebarFilters.weightMin; updateClearButtonVisibility('filterWeightMin'); }
+            renderSidebarList();
+            return;
+        }
+
         if (filterType === 'category') {
-            sidebarFilters.category = value;
-            sidebarFilters.categorySearch = value.toLowerCase();
+            const isSame = sidebarFilters.category === value;
+            sidebarFilters.category = isSame ? '' : value;
+            sidebarFilters.categorySearch = isSame ? '' : value.toLowerCase();
             const categoryInput = document.getElementById('filterCategorySearch');
             if (categoryInput) {
-                categoryInput.value = value;
+                categoryInput.value = isSame ? '' : value;
                 updateClearButtonVisibility('filterCategorySearch');
             }
             renderCategorySuggestions();
@@ -1647,12 +1717,20 @@
         }
 
         if (filterType === 'ability') {
-            addAbilityFilter(value);
+            if (sidebarFilters.selectedAbilities.includes(value)) {
+                removeAbilityFilter(value);
+            } else {
+                addAbilityFilter(value);
+            }
             return;
         }
 
         if (filterType === 'hidden') {
-            addAbilityFilter(value);
+            if (sidebarFilters.selectedAbilities.includes(value)) {
+                removeAbilityFilter(value);
+            } else {
+                addAbilityFilter(value);
+            }
             return;
         }
 
@@ -1661,7 +1739,7 @@
         const selectEl = document.getElementById(selectId);
         if (!selectEl) return;
 
-        selectEl.value = value;
+        selectEl.value = selectEl.value === value ? '' : value;
         selectEl.dispatchEvent(new Event('change', { bubbles: true }));
         updateClearButtonVisibility(selectId);
     }
@@ -1673,9 +1751,26 @@
         const type2SelectEl = document.getElementById('filterType2');
         if (!type2SelectEl) return;
 
-        type2SelectEl.value = value;
+        type2SelectEl.value = type2SelectEl.value === value ? '' : value;
         type2SelectEl.dispatchEvent(new Event('change', { bubbles: true }));
         updateClearButtonVisibility('filterType2');
+    }
+
+    function applyCardSizeMaxFilter(rawValue) {
+        const value = (rawValue || '').trim();
+        if (!value) return;
+        const [rawH, rawW] = value.split('|');
+        const h = (rawH || '').trim();
+        const w = (rawW || '').trim();
+        if (!h || !w) return;
+        const hMaxInput = document.getElementById('filterHeightMax');
+        const wMaxInput = document.getElementById('filterWeightMax');
+        const isSame = sidebarFilters.heightMax === h && sidebarFilters.weightMax === w;
+        sidebarFilters.heightMax = isSame ? '' : h;
+        sidebarFilters.weightMax = isSame ? '' : w;
+        if (hMaxInput) { hMaxInput.value = sidebarFilters.heightMax; updateClearButtonVisibility('filterHeightMax'); }
+        if (wMaxInput) { wMaxInput.value = sidebarFilters.weightMax; updateClearButtonVisibility('filterWeightMax'); }
+        renderSidebarList();
     }
 
     function createCard(p, isExpanded, isInteractive, lazyBody = false, lazyImages = false) {
@@ -1696,12 +1791,12 @@
                     <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
                     <div class="col-mid">
                         <div class="info-column">
-                            <div class="info-row"><span class="label-text">이름:</span><span class="val-text">${p.ko}</span></div>
+                            <div class="info-row"><span class="label-text">이름:</span><span class="val-text card-filter-trigger" data-filter-type="name" data-filter-value="${p.ko}">${p.ko}</span></div>
                             <div class="info-row"><span class="label-text">번호:</span><span class="val-text">No.${String(p.no).padStart(4,'0')}</span></div>
                             <div class="info-row"><span class="label-text">구분:</span><span class="val-text card-filter-trigger" data-filter-type="status" data-filter-value="${p.status}">${p.status}포켓몬</span></div>
                             <div class="info-row"><span class="label-text">특성:</span><span class="val-text">${p.abilities.map(ability => `<span class='card-filter-trigger' data-filter-type='ability' data-filter-value='${ability}'>${ability}</span>`).join(', ')}</span></div>
                             <div class="info-row"><span class="label-text">숨특:</span><span class="val-text">${p.hidden ? `<span class='card-filter-trigger' data-filter-type='hidden' data-filter-value='${p.hidden}'>${p.hidden}</span>` : '없음'}</span></div>
-                            <div class="info-row"><span class="label-text">기타:</span><span class="val-text">${boolStr}</span></div>
+                            <div class="info-row"><span class="label-text">기타:</span><span class="val-text">${boolHtml}</span></div>
                         </div>
                         <div class="info-column">
                             <div class="info-row"><span class="label-text">세대:</span><span class="val-text card-filter-trigger" data-filter-type="gen" data-filter-value="${String(p.gen)}">${p.gen}세대</span></div>
@@ -1715,7 +1810,7 @@
                                     ${p.color ? `<span style="width:12px;height:12px;border-radius:50%;background:${colorDot};border:1px solid #ccc;margin-left:2px;"></span>` : ''}
                                 </span>
                             </div>
-                            <div class="info-row"><span class="label-text">크기:</span><span class="val-text">${p.h}m / ${p.w}kg</span></div>
+                            <div class="info-row"><span class="label-text">크기:</span><span class="val-text card-filter-trigger" data-filter-type="size" data-filter-value="${p.h}|${p.w}" title="좌클릭: 최소, 우클릭: 최대">${p.h}m / ${p.w}kg</span></div>
                         </div>
                     </div>
                     <div class="col-right"><div class="radar-chart-box">${radarSvg}</div></div>
@@ -1726,6 +1821,7 @@
             el.onclick = (event) => {
                 const filterTrigger = event.target.closest('.card-filter-trigger');
                 if (filterTrigger) {
+                    openPokedexSidebar();
                     applyCardFilter(filterTrigger.dataset.filterType, filterTrigger.dataset.filterValue);
                     return;
                 }
@@ -1752,20 +1848,31 @@
             };
 
             el.oncontextmenu = (event) => {
+                const filterTrigger = event.target.closest('.card-filter-trigger');
+                if (filterTrigger && filterTrigger.dataset.filterType === 'size') {
+                    event.preventDefault();
+                    openPokedexSidebar();
+                    applyCardSizeMaxFilter(filterTrigger.dataset.filterValue);
+                    return;
+                }
+
                 const typeBadge = event.target.closest('.type-badge');
                 if (!typeBadge) return;
 
                 event.preventDefault();
+                openPokedexSidebar();
                 applyCardType2Filter(typeBadge.textContent);
             };
         }
         
         let boolTags = [];
-        if(p.isMega) boolTags.push("메가진화");
-        if(p.isGmax) boolTags.push("거다이맥스");
-        if(p.isRegion) boolTags.push("리전폼");
-        if(p.hasForms) boolTags.push("여러모습");
-        const boolStr = boolTags.length > 0 ? boolTags.join(', ') : "없음";
+        if(p.isMega) boolTags.push({ label: '메가진화', value: 'mega' });
+        if(p.isGmax) boolTags.push({ label: '거다이맥스', value: 'gmax' });
+        if(p.isRegion) boolTags.push({ label: '리전폼', value: 'region' });
+        if(p.hasForms) boolTags.push({ label: '여러모습', value: 'forms' });
+        const boolHtml = boolTags.length > 0
+            ? boolTags.map(tag => `<span class="card-filter-trigger" data-filter-type="extra" data-filter-value="${tag.value}">${tag.label}</span>`).join(', ')
+            : `<span class="card-filter-trigger" data-filter-type="extra" data-filter-value="__none__">없음</span>`;
 
         // ✅ 대체할 코드
         // 1위는 0.8 농도. 순위가 내려갈수록 선형적으로 천천히 연해지도록(최소 0.15) 수정
