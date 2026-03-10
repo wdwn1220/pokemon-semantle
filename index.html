@@ -170,11 +170,17 @@
         .ability-help { font-size: 0.76rem; color: #64748b; }
         .input-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .input-grid-1 { display: grid; grid-template-columns: 1fr; gap: 8px; }
-        .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .stat-range-item { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .range-slider-pair { position: relative; height: 24px; margin-top: 2px; }
-        .range-slider-pair input[type="range"] { position: absolute; inset: 0; width: 100%; margin: 0; pointer-events: none; background: none; -webkit-appearance: none; appearance: none; }
+        .range-grid { display: flex; flex-direction: column; gap: 10px; }
+        .range-row, .stat-range-item { display: flex; flex-direction: column; gap: 6px; }
+        .range-row-head { display: grid; grid-template-columns: 38px 1fr 1fr; gap: 6px; align-items: center; }
+        .range-row-label { font-size: 0.78rem; color: #475569; font-weight: 700; }
+        .compact-input { border: none; border-bottom: 1px solid #cbd5e1; border-radius: 0; padding: 3px 18px 3px 0; background: transparent; font-size: 0.78rem; }
+        .compact-input:focus { outline: none; border-bottom-color: #2563eb; }
+        .stat-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .range-slider-pair { position: relative; height: 24px; margin-top: 1px; }
+        .range-slider-pair input[type="range"] { position: absolute; inset: 0; left: 8px; width: calc(100% - 16px); margin: 0; pointer-events: none; background: none; -webkit-appearance: none; appearance: none; }
+        .range-slider-pair input[type="range"]:first-child { z-index: 3; }
+        .range-slider-pair input[type="range"]:last-child { z-index: 2; }
         .range-slider-pair input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: #cbd5e1; }
         .range-slider-pair input[type="range"]::-moz-range-track { height: 4px; border-radius: 999px; background: #cbd5e1; }
         .range-slider-pair input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #ff5252; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18); margin-top: -5px; pointer-events: auto; cursor: pointer; }
@@ -199,7 +205,9 @@
             .side-toggle.open { right: 92vw; }
             .side-hover-preview-panel { display: none !important; }
             body.sidebar-open .container { transform: none; }
-            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .range-row-head { grid-template-columns: 34px 1fr 1fr; }
+            .range-row-label { font-size: 0.75rem; }
+            .compact-input { font-size: 0.75rem; }
             .input-grid-3 { grid-template-columns: 1fr; }
         }
     </style>
@@ -317,46 +325,74 @@
                 <details class="advanced-sub" data-advanced-group="size">
                     <summary>키/몸무게</summary>
                     <div class="advanced-sub-body range-grid">
-                        <div class="clearable-wrap"><input id="filterHeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="키 최소(m)"><button type="button" id="clearFilterHeightMin" class="clear-input-btn" aria-label="키 최소 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterHeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="키 최대(m)"><button type="button" id="clearFilterHeightMax" class="clear-input-btn" aria-label="키 최대 초기화">✕</button></div>
-                        <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="height" data-step="0.1"><input id="filterHeightMinSlider" type="range" min="0" max="20" step="0.1" value="0" aria-label="키 최소 슬라이더"><input id="filterHeightMaxSlider" type="range" min="0" max="20" step="0.1" value="20" aria-label="키 최대 슬라이더"></div>
-                        <div class="clearable-wrap"><input id="filterWeightMin" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최소(kg)"><button type="button" id="clearFilterWeightMin" class="clear-input-btn" aria-label="무게 최소 초기화">✕</button></div>
-                        <div class="clearable-wrap"><input id="filterWeightMax" class="range-input" type="number" min="0" step="0.1" placeholder="무게 최대(kg)"><button type="button" id="clearFilterWeightMax" class="clear-input-btn" aria-label="무게 최대 초기화">✕</button></div>
-                        <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="weight" data-step="0.1"><input id="filterWeightMinSlider" type="range" min="0" max="999.9" step="0.1" value="0" aria-label="무게 최소 슬라이더"><input id="filterWeightMaxSlider" type="range" min="0" max="999.9" step="0.1" value="999.9" aria-label="무게 최대 슬라이더"></div>
+                        <div class="range-row">
+                            <div class="range-row-head">
+                                <span class="range-row-label">키</span>
+                                <div class="clearable-wrap"><input id="filterHeightMin" class="range-input compact-input" type="number" min="0" step="0.1" placeholder="최소(m)"><button type="button" id="clearFilterHeightMin" class="clear-input-btn" aria-label="키 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterHeightMax" class="range-input compact-input" type="number" min="0" step="0.1" placeholder="최대(m)"><button type="button" id="clearFilterHeightMax" class="clear-input-btn" aria-label="키 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="height" data-step="0.1"><input id="filterHeightMinSlider" type="range" min="0" max="20" step="0.1" value="0" aria-label="키 최소 슬라이더"><input id="filterHeightMaxSlider" type="range" min="0" max="20" step="0.1" value="20" aria-label="키 최대 슬라이더"></div>
+                        </div>
+                        <div class="range-row">
+                            <div class="range-row-head">
+                                <span class="range-row-label">무게</span>
+                                <div class="clearable-wrap"><input id="filterWeightMin" class="range-input compact-input" type="number" min="0" step="0.1" placeholder="최소(kg)"><button type="button" id="clearFilterWeightMin" class="clear-input-btn" aria-label="무게 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterWeightMax" class="range-input compact-input" type="number" min="0" step="0.1" placeholder="최대(kg)"><button type="button" id="clearFilterWeightMax" class="clear-input-btn" aria-label="무게 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="weight" data-step="0.1"><input id="filterWeightMinSlider" type="range" min="0" max="999.9" step="0.1" value="0" aria-label="무게 최소 슬라이더"><input id="filterWeightMaxSlider" type="range" min="0" max="999.9" step="0.1" value="999.9" aria-label="무게 최대 슬라이더"></div>
+                        </div>
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="stats">
                     <summary>종족값 (최소/최대)</summary>
                     <div class="advanced-sub-body stat-grid">
                         <div class="stat-range-item">
-                            <div class="clearable-wrap"><input id="filterHpMin" class="range-input" type="number" min="0" step="1" placeholder="HP 최소"><button type="button" id="clearFilterHpMin" class="clear-input-btn" aria-label="HP 최소 초기화">✕</button></div>
-                            <div class="clearable-wrap"><input id="filterHpMax" class="range-input" type="number" min="0" step="1" placeholder="HP 최대"><button type="button" id="clearFilterHpMax" class="clear-input-btn" aria-label="HP 최대 초기화">✕</button></div>
-                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="hp"><input id="filterHpMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="HP 최소 슬라이더"><input id="filterHpMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="HP 최대 슬라이더"></div>
+                            <div class="range-row-head">
+                                <span class="range-row-label">HP</span>
+                                <div class="clearable-wrap"><input id="filterHpMin" class="range-input compact-input" type="number" min="0" step="1" placeholder="최소"><button type="button" id="clearFilterHpMin" class="clear-input-btn" aria-label="HP 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterHpMax" class="range-input compact-input" type="number" min="0" step="1" placeholder="최대"><button type="button" id="clearFilterHpMax" class="clear-input-btn" aria-label="HP 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="hp"><input id="filterHpMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="HP 최소 슬라이더"><input id="filterHpMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="HP 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
-                            <div class="clearable-wrap"><input id="filterAtkMin" class="range-input" type="number" min="0" step="1" placeholder="공격 최소"><button type="button" id="clearFilterAtkMin" class="clear-input-btn" aria-label="공격 최소 초기화">✕</button></div>
-                            <div class="clearable-wrap"><input id="filterAtkMax" class="range-input" type="number" min="0" step="1" placeholder="공격 최대"><button type="button" id="clearFilterAtkMax" class="clear-input-btn" aria-label="공격 최대 초기화">✕</button></div>
-                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="atk"><input id="filterAtkMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="공격 최소 슬라이더"><input id="filterAtkMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="공격 최대 슬라이더"></div>
+                            <div class="range-row-head">
+                                <span class="range-row-label">공격</span>
+                                <div class="clearable-wrap"><input id="filterAtkMin" class="range-input compact-input" type="number" min="0" step="1" placeholder="최소"><button type="button" id="clearFilterAtkMin" class="clear-input-btn" aria-label="공격 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterAtkMax" class="range-input compact-input" type="number" min="0" step="1" placeholder="최대"><button type="button" id="clearFilterAtkMax" class="clear-input-btn" aria-label="공격 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="atk"><input id="filterAtkMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="공격 최소 슬라이더"><input id="filterAtkMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="공격 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
-                            <div class="clearable-wrap"><input id="filterDefMin" class="range-input" type="number" min="0" step="1" placeholder="방어 최소"><button type="button" id="clearFilterDefMin" class="clear-input-btn" aria-label="방어 최소 초기화">✕</button></div>
-                            <div class="clearable-wrap"><input id="filterDefMax" class="range-input" type="number" min="0" step="1" placeholder="방어 최대"><button type="button" id="clearFilterDefMax" class="clear-input-btn" aria-label="방어 최대 초기화">✕</button></div>
-                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="def"><input id="filterDefMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="방어 최소 슬라이더"><input id="filterDefMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="방어 최대 슬라이더"></div>
+                            <div class="range-row-head">
+                                <span class="range-row-label">방어</span>
+                                <div class="clearable-wrap"><input id="filterDefMin" class="range-input compact-input" type="number" min="0" step="1" placeholder="최소"><button type="button" id="clearFilterDefMin" class="clear-input-btn" aria-label="방어 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterDefMax" class="range-input compact-input" type="number" min="0" step="1" placeholder="최대"><button type="button" id="clearFilterDefMax" class="clear-input-btn" aria-label="방어 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="def"><input id="filterDefMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="방어 최소 슬라이더"><input id="filterDefMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="방어 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
-                            <div class="clearable-wrap"><input id="filterSpaMin" class="range-input" type="number" min="0" step="1" placeholder="특공 최소"><button type="button" id="clearFilterSpaMin" class="clear-input-btn" aria-label="특공 최소 초기화">✕</button></div>
-                            <div class="clearable-wrap"><input id="filterSpaMax" class="range-input" type="number" min="0" step="1" placeholder="특공 최대"><button type="button" id="clearFilterSpaMax" class="clear-input-btn" aria-label="특공 최대 초기화">✕</button></div>
-                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="spa"><input id="filterSpaMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="특공 최소 슬라이더"><input id="filterSpaMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="특공 최대 슬라이더"></div>
+                            <div class="range-row-head">
+                                <span class="range-row-label">특공</span>
+                                <div class="clearable-wrap"><input id="filterSpaMin" class="range-input compact-input" type="number" min="0" step="1" placeholder="최소"><button type="button" id="clearFilterSpaMin" class="clear-input-btn" aria-label="특공 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterSpaMax" class="range-input compact-input" type="number" min="0" step="1" placeholder="최대"><button type="button" id="clearFilterSpaMax" class="clear-input-btn" aria-label="특공 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="spa"><input id="filterSpaMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="특공 최소 슬라이더"><input id="filterSpaMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="특공 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
-                            <div class="clearable-wrap"><input id="filterSpdMin" class="range-input" type="number" min="0" step="1" placeholder="특방 최소"><button type="button" id="clearFilterSpdMin" class="clear-input-btn" aria-label="특방 최소 초기화">✕</button></div>
-                            <div class="clearable-wrap"><input id="filterSpdMax" class="range-input" type="number" min="0" step="1" placeholder="특방 최대"><button type="button" id="clearFilterSpdMax" class="clear-input-btn" aria-label="특방 최대 초기화">✕</button></div>
-                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="spd"><input id="filterSpdMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="특방 최소 슬라이더"><input id="filterSpdMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="특방 최대 슬라이더"></div>
+                            <div class="range-row-head">
+                                <span class="range-row-label">특방</span>
+                                <div class="clearable-wrap"><input id="filterSpdMin" class="range-input compact-input" type="number" min="0" step="1" placeholder="최소"><button type="button" id="clearFilterSpdMin" class="clear-input-btn" aria-label="특방 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterSpdMax" class="range-input compact-input" type="number" min="0" step="1" placeholder="최대"><button type="button" id="clearFilterSpdMax" class="clear-input-btn" aria-label="특방 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="spd"><input id="filterSpdMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="특방 최소 슬라이더"><input id="filterSpdMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="특방 최대 슬라이더"></div>
                         </div>
                         <div class="stat-range-item">
-                            <div class="clearable-wrap"><input id="filterSpeMin" class="range-input" type="number" min="0" step="1" placeholder="스피드 최소"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 최소 초기화">✕</button></div>
-                            <div class="clearable-wrap"><input id="filterSpeMax" class="range-input" type="number" min="0" step="1" placeholder="스피드 최대"><button type="button" id="clearFilterSpeMax" class="clear-input-btn" aria-label="스피드 최대 초기화">✕</button></div>
-                            <div class="range-slider-pair" style="grid-column: 1 / -1;" data-range-control="spe"><input id="filterSpeMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="스피드 최소 슬라이더"><input id="filterSpeMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="스피드 최대 슬라이더"></div>
+                            <div class="range-row-head">
+                                <span class="range-row-label">스피드</span>
+                                <div class="clearable-wrap"><input id="filterSpeMin" class="range-input compact-input" type="number" min="0" step="1" placeholder="최소"><button type="button" id="clearFilterSpeMin" class="clear-input-btn" aria-label="스피드 최소 초기화">✕</button></div>
+                                <div class="clearable-wrap"><input id="filterSpeMax" class="range-input compact-input" type="number" min="0" step="1" placeholder="최대"><button type="button" id="clearFilterSpeMax" class="clear-input-btn" aria-label="스피드 최대 초기화">✕</button></div>
+                            </div>
+                            <div class="range-slider-pair" data-range-control="spe"><input id="filterSpeMinSlider" type="range" min="1" max="255" step="1" value="1" aria-label="스피드 최소 슬라이더"><input id="filterSpeMaxSlider" type="range" min="1" max="255" step="1" value="255" aria-label="스피드 최대 슬라이더"></div>
                         </div>
                     </div>
                 </details>
