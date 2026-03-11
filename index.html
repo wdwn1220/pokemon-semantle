@@ -130,7 +130,7 @@
         .advanced-search-wrap.has-active-advanced > summary { box-shadow: inset 0 0 0 1px #2563eb; border-radius: 9px; color: #1d4ed8; }
         .clearable-wrap { position: relative; }
         .clearable-wrap > input { padding-right: 28px; }
-        .clearable-wrap > input[type="number"] { padding-right: 52px; }
+        .clearable-wrap > input[type="number"] { padding-right: 58px; }
         .clearable-wrap > select { padding-right: 52px; }
         .clearable-wrap.has-custom-select > select { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
         .custom-dropdown { position: relative; }
@@ -148,22 +148,22 @@
         .dropdown-color-dot { width: 12px; height: 12px; border-radius: 999px; border: 1px solid rgba(15, 23, 42, 0.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45); flex-shrink: 0; }
         .dropdown-type-badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; border: 1px solid rgba(15,23,42,0.08); line-height: 1.25; }
         .clear-input-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: #94a3b8; font-size: 0.95rem; font-weight: 900; padding: 0; line-height: 1; cursor: pointer; display: none; }
-        .clearable-wrap > input[type="number"] + .clear-input-btn { right: 30px; }
+        .clearable-wrap > input[type="number"] + .clear-input-btn { right: 34px; }
         .clearable-wrap > select + .clear-input-btn, .clearable-wrap.has-custom-select .clear-input-btn { right: 26px; }
         .clear-input-btn.show { display: block; }
         .filter-section-title { margin: 2px 0 0; font-size: 0.78rem; color: #64748b; font-weight: 700; }
         .advanced-search-wrap { border: 1px solid #dbe2ea; border-radius: 10px; background: #f8fafc; }
         .advanced-search-wrap > summary { position: relative; cursor: pointer; padding: 10px 44px 10px 12px; font-size: 0.86rem; font-weight: 800; color: #334155; list-style: none; }
         .advanced-search-wrap > summary::-webkit-details-marker { display: none; }
-        .advanced-search-wrap > summary::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); transition: transform 0.2s ease; }
-        .advanced-search-wrap:not([open]) > summary::after { transform: rotate(-90deg); }
+        .advanced-search-wrap > summary::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%) rotate(0deg); transition: transform 0.2s ease; }
+        .advanced-search-wrap[open] > summary::after { transform: translateY(-50%) rotate(180deg); }
         .advanced-body { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 10px; }
         .advanced-sub { border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
         .advanced-sub > summary { position: relative; cursor: pointer; padding: 8px 40px 8px 10px; font-size: 0.8rem; font-weight: 700; color: #475569; list-style: none; }
         .advanced-sub.has-active-sub > summary { box-shadow: inset 0 0 0 1px #2563eb; border-radius: 8px; color: #1d4ed8; }
         .advanced-sub > summary::-webkit-details-marker { display: none; }
-        .advanced-sub > summary::after { content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); transition: transform 0.2s ease; }
-        .advanced-sub:not([open]) > summary::after { transform: rotate(-90deg); }
+        .advanced-sub > summary::after { content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%) rotate(0deg); transition: transform 0.2s ease; }
+        .advanced-sub[open] > summary::after { transform: translateY(-50%) rotate(180deg); }
         .summary-clear-btn { position: absolute; right: 26px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; border: none; border-radius: 999px; background: #e2e8f0; color: #64748b; font-size: 0.74rem; font-weight: 900; line-height: 1; cursor: pointer; display: none; align-items: center; justify-content: center; }
         .summary-clear-btn.show { display: inline-flex; }
         .summary-clear-btn:hover { background: #cbd5e1; color: #334155; }
@@ -202,7 +202,6 @@
         .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
         .side-item-name { color: #0f172a; font-weight: 700; }
         .side-item.guessed .side-item-name { color: #94a3b8; }
-        .side-item.pending .side-item-name { color: #cbd5e1; }
         .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
         
         @media (max-width: 850px) {
@@ -592,7 +591,7 @@
         if (!value) return label;
         if (selectId === 'filterShape') return getShapeLabelWithIcon(label);
         if (selectId === 'filterColor') return getColorLabelWithDot(label);
-        if ((selectId === 'filterType' || selectId === 'filterType2') && value !== '__none__') return getTypeLabelWithBadge(label);
+        if (selectId === 'filterType' || selectId === 'filterType2') return getTypeLabelWithBadge(label);
         return label;
     }
 
@@ -1250,8 +1249,6 @@
         const resultCountEl = document.getElementById('sideResultCount');
         if (!listEl || !resultCountEl) return;
         updateFilterActiveStyles();
-        const liveInputNormalized = normalizeKoName(document.getElementById('guessInput')?.value || '');
-
         const minH = toNum(sidebarFilters.heightMin);
         const maxH = toNum(sidebarFilters.heightMax);
         const minW = toNum(sidebarFilters.weightMin);
@@ -1326,9 +1323,7 @@
         listEl.innerHTML = filtered.map(p => {
             const showGenDivider = p.gen !== lastGen;
             lastGen = p.gen;
-            const sideItemClass = history.some(h => h.ko === p.ko)
-                ? 'guessed'
-                : (liveInputNormalized && normalizeKoName(p.ko) === liveInputNormalized ? 'pending' : '');
+            const sideItemClass = history.some(h => h.ko === p.ko) ? 'guessed' : '';
             return `
             ${showGenDivider ? `<div class="side-gen-divider">${p.gen}세대</div>` : ''}
             <div class="side-item ${sideItemClass}" data-preview-image="${getImageUrl(p)}">
