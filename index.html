@@ -130,6 +130,7 @@
         .advanced-search-wrap.has-active-advanced > summary { box-shadow: inset 0 0 0 1px #2563eb; border-radius: 9px; color: #1d4ed8; }
         .clearable-wrap { position: relative; }
         .clearable-wrap > input { padding-right: 28px; }
+        .clearable-wrap > input[type="number"] { padding-right: 52px; }
         .clearable-wrap > select { padding-right: 52px; }
         .clearable-wrap.has-custom-select > select { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
         .custom-dropdown { position: relative; }
@@ -147,21 +148,25 @@
         .dropdown-color-dot { width: 12px; height: 12px; border-radius: 999px; border: 1px solid rgba(15, 23, 42, 0.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45); flex-shrink: 0; }
         .dropdown-type-badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; border: 1px solid rgba(15,23,42,0.08); line-height: 1.25; }
         .clear-input-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: #94a3b8; font-size: 0.95rem; font-weight: 900; padding: 0; line-height: 1; cursor: pointer; display: none; }
+        .clearable-wrap > input[type="number"] + .clear-input-btn { right: 30px; }
         .clearable-wrap > select + .clear-input-btn, .clearable-wrap.has-custom-select .clear-input-btn { right: 26px; }
         .clear-input-btn.show { display: block; }
         .filter-section-title { margin: 2px 0 0; font-size: 0.78rem; color: #64748b; font-weight: 700; }
         .advanced-search-wrap { border: 1px solid #dbe2ea; border-radius: 10px; background: #f8fafc; }
-        .advanced-search-wrap > summary { cursor: pointer; padding: 10px 12px; font-size: 0.86rem; font-weight: 800; color: #334155; list-style: none; }
+        .advanced-search-wrap > summary { position: relative; cursor: pointer; padding: 10px 44px 10px 12px; font-size: 0.86rem; font-weight: 800; color: #334155; list-style: none; }
         .advanced-search-wrap > summary::-webkit-details-marker { display: none; }
-        .advanced-search-wrap > summary::after { content: '▾'; float: right; transition: transform 0.2s ease; }
+        .advanced-search-wrap > summary::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); transition: transform 0.2s ease; }
         .advanced-search-wrap:not([open]) > summary::after { transform: rotate(-90deg); }
         .advanced-body { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 10px; }
         .advanced-sub { border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
-        .advanced-sub > summary { cursor: pointer; padding: 8px 10px; font-size: 0.8rem; font-weight: 700; color: #475569; list-style: none; }
+        .advanced-sub > summary { position: relative; cursor: pointer; padding: 8px 40px 8px 10px; font-size: 0.8rem; font-weight: 700; color: #475569; list-style: none; }
         .advanced-sub.has-active-sub > summary { box-shadow: inset 0 0 0 1px #2563eb; border-radius: 8px; color: #1d4ed8; }
         .advanced-sub > summary::-webkit-details-marker { display: none; }
-        .advanced-sub > summary::after { content: '▾'; float: right; transition: transform 0.2s ease; }
+        .advanced-sub > summary::after { content: '▾'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); transition: transform 0.2s ease; }
         .advanced-sub:not([open]) > summary::after { transform: rotate(-90deg); }
+        .summary-clear-btn { position: absolute; right: 26px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; border: none; border-radius: 999px; background: #e2e8f0; color: #64748b; font-size: 0.74rem; font-weight: 900; line-height: 1; cursor: pointer; display: none; align-items: center; justify-content: center; }
+        .summary-clear-btn.show { display: inline-flex; }
+        .summary-clear-btn:hover { background: #cbd5e1; color: #334155; }
         .advanced-sub-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
         .suggest-list { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 8px; font-size: 0.83rem; min-height: 94px; background: #fff; }
         .ability-chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -197,6 +202,7 @@
         .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
         .side-item-name { color: #0f172a; font-weight: 700; }
         .side-item.guessed .side-item-name { color: #94a3b8; }
+        .side-item.pending .side-item-name { color: #cbd5e1; }
         .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
         
         @media (max-width: 850px) {
@@ -307,17 +313,17 @@
             <div class="clearable-wrap"><select id="filterColor" class="customizable-select"></select><button type="button" id="clearFilterColor" class="clear-input-btn" aria-label="색상 초기화">✕</button></div>
         </div>
         <details class="advanced-search-wrap" id="advancedSearchPanel">
-            <summary>고급 검색</summary>
+            <summary>고급 검색<button type="button" id="clearAdvancedSummary" class="summary-clear-btn" aria-label="고급 검색 필터 초기화">✕</button></summary>
             <div class="advanced-body">
                 <details class="advanced-sub" data-advanced-group="category">
-                    <summary>분류</summary>
+                    <summary>분류<button type="button" id="clearAdvancedCategory" class="summary-clear-btn" aria-label="분류 필터 초기화">✕</button></summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div class="clearable-wrap"><input id="filterCategorySearch" class="range-input" type="text" placeholder="분류 검색..."><button type="button" id="clearFilterCategorySearch" class="clear-input-btn" aria-label="분류 검색 초기화">✕</button></div>
                         <select id="filterCategoryList" class="suggest-list" size="5"></select>
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="ability">
-                    <summary>특성</summary>
+                    <summary>특성<button type="button" id="clearAdvancedAbility" class="summary-clear-btn" aria-label="특성 필터 초기화">✕</button></summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div id="selectedAbilities" class="ability-chip-wrap"></div>
                         <input id="filterAbilityInput" class="range-input" type="text" placeholder="특성 입력 후 Enter 또는 목록에서 선택...">
@@ -326,7 +332,7 @@
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="size">
-                    <summary>키/몸무게</summary>
+                    <summary>키/몸무게<button type="button" id="clearAdvancedSize" class="summary-clear-btn" aria-label="키/몸무게 필터 초기화">✕</button></summary>
                     <div class="advanced-sub-body range-grid">
                         <div class="range-row">
                             <div class="range-row-head">
@@ -347,7 +353,7 @@
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="stats">
-                    <summary>종족값 (최소/최대)</summary>
+                    <summary>종족값 (최소/최대)<button type="button" id="clearAdvancedStats" class="summary-clear-btn" aria-label="종족값 필터 초기화">✕</button></summary>
                     <div class="advanced-sub-body stat-grid">
                         <div class="stat-range-item">
                             <div class="range-row-head">
@@ -400,7 +406,7 @@
                     </div>
                 </details>
                 <details class="advanced-sub" data-advanced-group="extra">
-                    <summary>기타</summary>
+                    <summary>기타<button type="button" id="clearAdvancedExtra" class="summary-clear-btn" aria-label="기타 필터 초기화">✕</button></summary>
                     <div class="advanced-sub-body input-grid-1">
                         <div class="clearable-wrap"><select id="filterExtra" class="range-input customizable-select"></select><button type="button" id="clearFilterExtra" class="clear-input-btn" aria-label="기타 초기화">✕</button></div>
                     </div>
@@ -688,6 +694,11 @@
             const customTrigger = wrap.querySelector('.custom-dropdown-trigger');
             if (customTrigger) customTrigger.classList.toggle('filter-active-outline', isActive);
         };
+        const setSummaryClearVisibility = (id, isActive) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.classList.toggle('show', Boolean(isActive));
+        };
 
         setActiveById('sideNameSearch', hasActiveFilterValue(sidebarFilters.name));
         setActiveById('filterGen', hasActiveFilterValue(sidebarFilters.gen));
@@ -707,6 +718,12 @@
         if (advancedPanel) {
             const hasAdvancedActive = hasCategoryActive || hasAbilityActive || hasSizeActive || hasStatsActive || hasExtraActive;
             advancedPanel.classList.toggle('has-active-advanced', hasAdvancedActive && !advancedPanel.open);
+            setSummaryClearVisibility('clearAdvancedSummary', hasAdvancedActive);
+            setSummaryClearVisibility('clearAdvancedCategory', hasCategoryActive);
+            setSummaryClearVisibility('clearAdvancedAbility', hasAbilityActive);
+            setSummaryClearVisibility('clearAdvancedSize', hasSizeActive);
+            setSummaryClearVisibility('clearAdvancedStats', hasStatsActive);
+            setSummaryClearVisibility('clearAdvancedExtra', hasExtraActive);
 
             const advancedGroupActiveMap = {
                 category: hasCategoryActive,
@@ -722,6 +739,40 @@
         }
     }
 
+
+    function initAdvancedSummaryClearButtons() {
+        const clearButtonActionMap = {
+            clearAdvancedSummary: ['clearFilterCategorySearch','clearFilterExtra','clearFilterHeightMin','clearFilterHeightMax','clearFilterWeightMin','clearFilterWeightMax','clearFilterHpMin','clearFilterHpMax','clearFilterAtkMin','clearFilterAtkMax','clearFilterDefMin','clearFilterDefMax','clearFilterSpaMin','clearFilterSpaMax','clearFilterSpdMin','clearFilterSpdMax','clearFilterSpeMin','clearFilterSpeMax'],
+            clearAdvancedCategory: ['clearFilterCategorySearch'],
+            clearAdvancedAbility: [],
+            clearAdvancedSize: ['clearFilterHeightMin','clearFilterHeightMax','clearFilterWeightMin','clearFilterWeightMax'],
+            clearAdvancedStats: ['clearFilterHpMin','clearFilterHpMax','clearFilterAtkMin','clearFilterAtkMax','clearFilterDefMin','clearFilterDefMax','clearFilterSpaMin','clearFilterSpaMax','clearFilterSpdMin','clearFilterSpdMax','clearFilterSpeMin','clearFilterSpeMax'],
+            clearAdvancedExtra: ['clearFilterExtra']
+        };
+
+        Object.entries(clearButtonActionMap).forEach(([btnId, clearIds]) => {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (btnId === 'clearAdvancedSummary' || btnId === 'clearAdvancedAbility') {
+                    sidebarFilters.selectedAbilities = [];
+                    const abilityInput = document.getElementById('filterAbilityInput');
+                    if (abilityInput) abilityInput.value = '';
+                    renderSelectedAbilityChips();
+                    renderAbilitySuggestions();
+                    if (btnId === 'clearAdvancedAbility') {
+                        renderSidebarList();
+                        return;
+                    }
+                }
+
+                clearIds.forEach(id => document.getElementById(id)?.click());
+            });
+        });
+    }
     function initClearButtons(textInputMap) {
         const selectKeyMap = {
             filterGen: 'gen', filterStatus: 'status', filterType: 'type', filterType2: 'type2',
@@ -986,6 +1037,7 @@
         initCategorySearchControls();
         initAbilitySearchControls();
         initClearButtons(textInputMap);
+        initAdvancedSummaryClearButtons();
         initDualRangeControls();
         initSidebarHoverPreview();
 
@@ -1198,6 +1250,7 @@
         const resultCountEl = document.getElementById('sideResultCount');
         if (!listEl || !resultCountEl) return;
         updateFilterActiveStyles();
+        const liveInputNormalized = normalizeKoName(document.getElementById('guessInput')?.value || '');
 
         const minH = toNum(sidebarFilters.heightMin);
         const maxH = toNum(sidebarFilters.heightMax);
@@ -1273,9 +1326,12 @@
         listEl.innerHTML = filtered.map(p => {
             const showGenDivider = p.gen !== lastGen;
             lastGen = p.gen;
+            const sideItemClass = history.some(h => h.ko === p.ko)
+                ? 'guessed'
+                : (liveInputNormalized && normalizeKoName(p.ko) === liveInputNormalized ? 'pending' : '');
             return `
             ${showGenDivider ? `<div class="side-gen-divider">${p.gen}세대</div>` : ''}
-            <div class="side-item ${history.some(h => h.ko === p.ko) ? 'guessed' : ''}" data-preview-image="${getImageUrl(p)}">
+            <div class="side-item ${sideItemClass}" data-preview-image="${getImageUrl(p)}">
                 <span class="side-item-no">No.${String(p.no).padStart(4, '0')}</span>
                 <span class="side-item-name">${p.ko}</span>
             </div>
@@ -1703,7 +1759,8 @@
 
     inputEl.addEventListener('input', function() {
         document.getElementById('errorMsg').style.display = 'none';
-        
+        renderSidebarList();
+
         const val = this.value.normalize('NFC');
         const normalizedVal = normalizeKoName(val);
         autoList.innerHTML = ''; 
