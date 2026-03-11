@@ -1411,6 +1411,7 @@
             }
         }
         updateModeUI();
+        renderSidebarList();
     }
 
     function restoreDailyProgress() {
@@ -2060,7 +2061,7 @@
             : `<span class="val-text card-filter-trigger" data-filter-type="shape" data-filter-value="${p.shape || ''}">${p.shape || '-'}</span>`;
         const buildBodyHtml = () => {
             const statValue = `${p.stats.hp}|${p.stats.atk}|${p.stats.def}|${p.stats.spa}|${p.stats.spd}|${p.stats.spe}`;
-            const radarSvg = getRadarChartSVG(p.stats, `class="card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;"`);
+            const radarSvg = getRadarChartSVG(p.stats, `class="card-filter-trigger card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;"`);
             return `
                 <div class="grid-layout">
                     <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
@@ -2086,7 +2087,6 @@
                                 </span>
                             </div>
                             <div class="info-row"><span class="label-text">크기:</span><span class="val-text"><span class="card-filter-trigger" data-filter-type="size-height" data-filter-value="${p.h}|${p.w}" title="좌클릭: 키 최소 / 우클릭: 키 최대">${p.h}m</span> / <span class="card-filter-trigger" data-filter-type="size-weight" data-filter-value="${p.h}|${p.w}" title="좌클릭: 몸무게 최소 / 우클릭: 몸무게 최대">${p.w}kg</span></span></div>
-                            <div class="info-row"><span class="label-text">종족값:</span><span class="val-text"><span class="card-filter-trigger" data-filter-type="stat-hp" data-filter-value="${p.stats.hp}" title="좌클릭: 최소 / 우클릭: 최대">HP ${p.stats.hp}</span>, <span class="card-filter-trigger" data-filter-type="stat-atk" data-filter-value="${p.stats.atk}" title="좌클릭: 최소 / 우클릭: 최대">공 ${p.stats.atk}</span>, <span class="card-filter-trigger" data-filter-type="stat-def" data-filter-value="${p.stats.def}" title="좌클릭: 최소 / 우클릭: 최대">방 ${p.stats.def}</span>, <span class="card-filter-trigger" data-filter-type="stat-spa" data-filter-value="${p.stats.spa}" title="좌클릭: 최소 / 우클릭: 최대">특공 ${p.stats.spa}</span>, <span class="card-filter-trigger" data-filter-type="stat-spd" data-filter-value="${p.stats.spd}" title="좌클릭: 최소 / 우클릭: 최대">특방 ${p.stats.spd}</span>, <span class="card-filter-trigger" data-filter-type="stat-spe" data-filter-value="${p.stats.spe}" title="좌클릭: 최소 / 우클릭: 최대">스피드 ${p.stats.spe}</span></span></div>
                         </div>
                     </div>
                     <div class="col-right"><div class="radar-chart-box">${radarSvg}</div></div>
@@ -2238,8 +2238,8 @@
         const size=130, center=65, radius=40, max=255, keys=['hp','atk','def','spe','spd','spa'], labels=['HP','공격','방어','스피드','특방','특공'];
         const pts = keys.map((k,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=(s[k]/max)*radius; return `${center+r*Math.cos(a)},${center+r*Math.sin(a)}`; }).join(' ');
         const bg = keys.map((_,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2; return `${center+radius*Math.cos(a)},${center+radius*Math.sin(a)}`; }).join(' ');
-        const lbls = labels.map((l,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=radius+15, x=center+r*Math.cos(a), y=center+r*Math.sin(a); 
-            return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${s[keys[i]]}</tspan></text>`; }).join('');
+        const lbls = labels.map((l,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=radius+15, x=center+r*Math.cos(a), y=center+r*Math.sin(a), key=keys[i], statValue=s[key]; 
+            return `<g class="card-filter-trigger" data-filter-type="stat-${key}" data-filter-value="${statValue}" style="cursor:pointer;"><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${statValue}</tspan></text></g>`; }).join('');
         return `<svg viewBox="0 0 130 130" ${interactiveAttrs}><polygon points="${bg}" fill="#f8f8f8" stroke="#ddd"/><polygon points="${pts}" fill="rgba(255,82,82,0.3)" stroke="#ff5252" stroke-width="1.5"/>${lbls}</svg>`;
     }
 
