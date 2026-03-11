@@ -178,11 +178,13 @@
         .compact-input:focus { outline: none; border-bottom-color: #2563eb; }
         .stat-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
         .range-slider-pair { position: relative; height: 24px; margin-top: 1px; }
+        .range-slider-pair::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); height: 4px; border-radius: 999px; background: #cbd5e1; pointer-events: none; }
         .range-slider-pair input[type="range"] { position: absolute; inset: 0; left: 8px; width: calc(100% - 16px); margin: 0; pointer-events: none; background: none; -webkit-appearance: none; appearance: none; }
-        .range-slider-pair input[type="range"]:first-child { z-index: 3; }
-        .range-slider-pair input[type="range"]:last-child { z-index: 2; }
-        .range-slider-pair input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: #cbd5e1; }
-        .range-slider-pair input[type="range"]::-moz-range-track { height: 4px; border-radius: 999px; background: #cbd5e1; }
+        .range-slider-pair input[type="range"]:first-child { z-index: 4; }
+        .range-slider-pair input[type="range"]:last-child { z-index: 3; }
+        .range-slider-pair input[type="range"]:focus-visible { z-index: 6; }
+        .range-slider-pair input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: transparent; }
+        .range-slider-pair input[type="range"]::-moz-range-track { height: 4px; border-radius: 999px; background: transparent; }
         .range-slider-pair input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #ff5252; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18); margin-top: -5px; pointer-events: auto; cursor: pointer; }
         .range-slider-pair input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #ff5252; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18); pointer-events: auto; cursor: pointer; }
         .filter-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
@@ -194,6 +196,7 @@
         .side-gen-divider { margin: 8px 0 2px; padding: 0 11px; font-size: 0.72rem; font-weight: 800; color: #64748b; letter-spacing: 0.01em; text-align: center; }
         .side-item-no { color: #64748b; font-weight: 700; min-width: 62px; }
         .side-item-name { color: #0f172a; font-weight: 700; }
+        .side-item.guessed .side-item-name { color: #94a3b8; }
         .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
         
         @media (max-width: 850px) {
@@ -765,42 +768,76 @@
         return Number.isFinite(parsed) ? parsed : fallback;
     }
 
-    function initDualRangeControl({ key, minInputId, maxInputId, minSliderId, maxSliderId, minBound, maxBound, step = 1 }) {
+    function initDualRangeControl({ key, minInputId, maxInputId, minSliderId, maxSliderId, minBound, maxBound, step = 1, allowedValues = null }) {
         const minInput = document.getElementById(minInputId);
         const maxInput = document.getElementById(maxInputId);
         const minSlider = document.getElementById(minSliderId);
         const maxSlider = document.getElementById(maxSliderId);
         if (!minInput || !maxInput || !minSlider || !maxSlider) return;
 
-        minSlider.min = String(minBound);
-        minSlider.max = String(maxBound);
-        minSlider.step = String(step);
-        maxSlider.min = String(minBound);
-        maxSlider.max = String(maxBound);
-        maxSlider.step = String(step);
+        const hasDiscreteValues = Array.isArray(allowedValues) && allowedValues.length > 0;
+
+        if (hasDiscreteValues) {
+            minSlider.min = '0';
+            minSlider.max = String(allowedValues.length - 1);
+            minSlider.step = '1';
+            maxSlider.min = '0';
+            maxSlider.max = String(allowedValues.length - 1);
+            maxSlider.step = '1';
+        } else {
+            minSlider.min = String(minBound);
+            minSlider.max = String(maxBound);
+            minSlider.step = String(step);
+            maxSlider.min = String(minBound);
+            maxSlider.max = String(maxBound);
+            maxSlider.step = String(step);
+        }
 
         const dec = String(step).includes('.') ? String(step).split('.')[1].length : 0;
         const normalize = (num) => Number(num.toFixed(dec));
+
+        const findClosestIndex = (num) => {
+            if (!hasDiscreteValues) return -1;
+            let bestIdx = 0;
+            let bestDiff = Infinity;
+            for (let i = 0; i < allowedValues.length; i += 1) {
+                const diff = Math.abs(allowedValues[i] - num);
+                if (diff < bestDiff) {
+                    bestDiff = diff;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
+        };
 
         const syncFromInputs = () => {
             const currentMin = toSliderNum(sidebarFilters[`${key}Min`] === '' ? minBound : sidebarFilters[`${key}Min`], minBound);
             const currentMax = toSliderNum(sidebarFilters[`${key}Max`] === '' ? maxBound : sidebarFilters[`${key}Max`], maxBound);
             const safeMin = Math.max(minBound, Math.min(currentMin, currentMax));
             const safeMax = Math.min(maxBound, Math.max(currentMax, safeMin));
-            minSlider.value = String(normalize(safeMin));
-            maxSlider.value = String(normalize(safeMax));
+            if (hasDiscreteValues) {
+                minSlider.value = String(findClosestIndex(safeMin));
+                maxSlider.value = String(findClosestIndex(safeMax));
+            } else {
+                minSlider.value = String(normalize(safeMin));
+                maxSlider.value = String(normalize(safeMax));
+            }
         };
 
         const syncFromSliders = () => {
-            let minVal = toSliderNum(minSlider.value, minBound);
-            let maxVal = toSliderNum(maxSlider.value, maxBound);
+            let minVal = hasDiscreteValues
+                ? allowedValues[Math.max(0, Math.min(allowedValues.length - 1, Math.round(toSliderNum(minSlider.value, 0))))]
+                : toSliderNum(minSlider.value, minBound);
+            let maxVal = hasDiscreteValues
+                ? allowedValues[Math.max(0, Math.min(allowedValues.length - 1, Math.round(toSliderNum(maxSlider.value, allowedValues.length - 1))))]
+                : toSliderNum(maxSlider.value, maxBound);
             if (minVal > maxVal) {
                 if (document.activeElement === minSlider) {
                     maxVal = minVal;
-                    maxSlider.value = String(minVal);
+                    maxSlider.value = hasDiscreteValues ? String(findClosestIndex(minVal)) : String(minVal);
                 } else {
                     minVal = maxVal;
-                    minSlider.value = String(maxVal);
+                    minSlider.value = hasDiscreteValues ? String(findClosestIndex(maxVal)) : String(maxVal);
                 }
             }
             const nextMin = normalize(minVal);
@@ -835,10 +872,12 @@
             step: 1
         }));
 
-        const heightValues = db.map(p => Number(p.h)).filter(Number.isFinite);
-        const weightValues = db.map(p => Number(p.w)).filter(Number.isFinite);
-        const maxHeight = heightValues.length ? Math.max(...heightValues) : 20;
-        const maxWeight = weightValues.length ? Math.max(...weightValues) : 999.9;
+        const heightValues = [...new Set(db.map(p => Number(p.h)).filter(Number.isFinite))].sort((a, b) => a - b);
+        const weightValues = [...new Set(db.map(p => Number(p.w)).filter(Number.isFinite))].sort((a, b) => a - b);
+        const minHeight = heightValues.length ? heightValues[0] : 0;
+        const minWeight = weightValues.length ? weightValues[0] : 0;
+        const maxHeight = heightValues.length ? heightValues[heightValues.length - 1] : 20;
+        const maxWeight = weightValues.length ? weightValues[weightValues.length - 1] : 999.9;
 
         const extraControls = [
             {
@@ -847,9 +886,10 @@
                 maxInputId: 'filterHeightMax',
                 minSliderId: 'filterHeightMinSlider',
                 maxSliderId: 'filterHeightMaxSlider',
-                minBound: 0,
-                maxBound: Math.ceil(maxHeight * 10) / 10,
-                step: 0.1
+                minBound: minHeight,
+                maxBound: maxHeight,
+                step: 0.1,
+                allowedValues: heightValues
             },
             {
                 key: 'weight',
@@ -857,9 +897,10 @@
                 maxInputId: 'filterWeightMax',
                 minSliderId: 'filterWeightMinSlider',
                 maxSliderId: 'filterWeightMaxSlider',
-                minBound: 0,
-                maxBound: Math.ceil(maxWeight * 10) / 10,
-                step: 0.1
+                minBound: minWeight,
+                maxBound: maxWeight,
+                step: 0.1,
+                allowedValues: weightValues
             }
         ];
 
@@ -870,8 +911,8 @@
         const options = {
             filterGen: [1,2,3,4,5,6,7,8,9].map(v => ({ value: String(v), label: `${v}세대` })),
             filterStatus: [...sets.status].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
-            filterType: [...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
-            filterType2: [{ value: '__none__', label: '없음(단일 타입)' }, ...[...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))],
+            filterType: [{ value: '__single__', label: '없음(단일타입)' }, ...[...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))],
+            filterType2: [{ value: '__none__', label: '없음(단일타입)' }, ...[...sets.types].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v }))],
             filterShape: [...sets.shapes].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterColor: [...sets.colors].sort((a, b) => a.localeCompare(b, 'ko')).map(v => ({ value: v, label: v })),
             filterExtra: [
@@ -1182,7 +1223,11 @@
             })
             .filter(p => !sidebarFilters.gen || String(p.gen) === sidebarFilters.gen)
             .filter(p => !sidebarFilters.status || p.status === sidebarFilters.status)
-            .filter(p => !sidebarFilters.type || p.type.includes(sidebarFilters.type))
+            .filter(p => {
+                if (!sidebarFilters.type) return true;
+                if (sidebarFilters.type === "__single__") return p.type.length === 1;
+                return p.type.includes(sidebarFilters.type);
+            })
             .filter(p => {
                 if (!sidebarFilters.type2) return true;
                 if (sidebarFilters.type2 === '__none__') return p.type.length === 1;
@@ -1230,7 +1275,7 @@
             lastGen = p.gen;
             return `
             ${showGenDivider ? `<div class="side-gen-divider">${p.gen}세대</div>` : ''}
-            <div class="side-item" data-preview-image="${getImageUrl(p)}">
+            <div class="side-item ${history.some(h => h.ko === p.ko) ? 'guessed' : ''}" data-preview-image="${getImageUrl(p)}">
                 <span class="side-item-no">No.${String(p.no).padStart(4, '0')}</span>
                 <span class="side-item-name">${p.ko}</span>
             </div>
@@ -1914,6 +1959,57 @@
         updateClearButtonVisibility(selectId);
     }
 
+    function applyCardStatFilter(filterType, rawValue, isMax = false) {
+        const value = (rawValue || '').trim();
+        if (!value) return;
+        const statKey = (filterType || '').replace('stat-', '');
+        if (!['hp', 'atk', 'def', 'spa', 'spd', 'spe'].includes(statKey)) return;
+        const filterKey = `${statKey}${isMax ? 'Max' : 'Min'}`;
+        const inputId = `filter${statKey.charAt(0).toUpperCase()}${statKey.slice(1)}${isMax ? 'Max' : 'Min'}`;
+        const inputEl = document.getElementById(inputId);
+        const isSame = sidebarFilters[filterKey] === value;
+        sidebarFilters[filterKey] = isSame ? '' : value;
+        if (inputEl) {
+            inputEl.value = sidebarFilters[filterKey];
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+            updateClearButtonVisibility(inputId);
+        }
+        renderSidebarList();
+    }
+
+    function applyCardStatsAllFilter(rawValue, isMax = false) {
+        const value = (rawValue || '').trim();
+        if (!value) return;
+        const [hp, atk, dfn, spa, spd, spe] = value.split('|').map(v => (v || '').trim());
+        if (![hp, atk, dfn, spa, spd, spe].every(Boolean)) return;
+
+        const statEntries = [
+            ['hp', hp],
+            ['atk', atk],
+            ['def', dfn],
+            ['spa', spa],
+            ['spd', spd],
+            ['spe', spe]
+        ];
+
+        const allSame = statEntries.every(([key, statValue]) => sidebarFilters[`${key}${isMax ? 'Max' : 'Min'}`] === statValue);
+
+        statEntries.forEach(([key, statValue]) => {
+            const filterKey = `${key}${isMax ? 'Max' : 'Min'}`;
+            const nextValue = allSame ? '' : statValue;
+            sidebarFilters[filterKey] = nextValue;
+            const inputId = `filter${key.charAt(0).toUpperCase()}${key.slice(1)}${isMax ? 'Max' : 'Min'}`;
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) {
+                inputEl.value = nextValue;
+                inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                updateClearButtonVisibility(inputId);
+            }
+        });
+
+        renderSidebarList();
+    }
+
     function applyCardType2Filter(rawValue) {
         const value = (rawValue || '').trim();
         if (!value) return;
@@ -1963,7 +2059,8 @@
             ? `<span class="card-filter-trigger" data-filter-type="shape" data-filter-value="${p.shape}" title="체형 검색"><img src="${shapeImg}" class="shape-icon" title="${p.shape}"></span>`
             : `<span class="val-text card-filter-trigger" data-filter-type="shape" data-filter-value="${p.shape || ''}">${p.shape || '-'}</span>`;
         const buildBodyHtml = () => {
-            const radarSvg = getRadarChartSVG(p.stats);
+            const statValue = `${p.stats.hp}|${p.stats.atk}|${p.stats.def}|${p.stats.spa}|${p.stats.spd}|${p.stats.spe}`;
+            const radarSvg = getRadarChartSVG(p.stats, `class="card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;"`);
             return `
                 <div class="grid-layout">
                     <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
@@ -1989,6 +2086,7 @@
                                 </span>
                             </div>
                             <div class="info-row"><span class="label-text">크기:</span><span class="val-text"><span class="card-filter-trigger" data-filter-type="size-height" data-filter-value="${p.h}|${p.w}" title="좌클릭: 키 최소 / 우클릭: 키 최대">${p.h}m</span> / <span class="card-filter-trigger" data-filter-type="size-weight" data-filter-value="${p.h}|${p.w}" title="좌클릭: 몸무게 최소 / 우클릭: 몸무게 최대">${p.w}kg</span></span></div>
+                            <div class="info-row"><span class="label-text">종족값:</span><span class="val-text"><span class="card-filter-trigger" data-filter-type="stat-hp" data-filter-value="${p.stats.hp}" title="좌클릭: 최소 / 우클릭: 최대">HP ${p.stats.hp}</span>, <span class="card-filter-trigger" data-filter-type="stat-atk" data-filter-value="${p.stats.atk}" title="좌클릭: 최소 / 우클릭: 최대">공 ${p.stats.atk}</span>, <span class="card-filter-trigger" data-filter-type="stat-def" data-filter-value="${p.stats.def}" title="좌클릭: 최소 / 우클릭: 최대">방 ${p.stats.def}</span>, <span class="card-filter-trigger" data-filter-type="stat-spa" data-filter-value="${p.stats.spa}" title="좌클릭: 최소 / 우클릭: 최대">특공 ${p.stats.spa}</span>, <span class="card-filter-trigger" data-filter-type="stat-spd" data-filter-value="${p.stats.spd}" title="좌클릭: 최소 / 우클릭: 최대">특방 ${p.stats.spd}</span>, <span class="card-filter-trigger" data-filter-type="stat-spe" data-filter-value="${p.stats.spe}" title="좌클릭: 최소 / 우클릭: 최대">스피드 ${p.stats.spe}</span></span></div>
                         </div>
                     </div>
                     <div class="col-right"><div class="radar-chart-box">${radarSvg}</div></div>
@@ -2000,7 +2098,13 @@
                 const filterTrigger = event.target.closest('.card-filter-trigger');
                 if (filterTrigger) {
                     openPokedexSidebar();
-                    applyCardFilter(filterTrigger.dataset.filterType, filterTrigger.dataset.filterValue);
+                    if ((filterTrigger.dataset.filterType || '').startsWith('stat-')) {
+                        applyCardStatFilter(filterTrigger.dataset.filterType, filterTrigger.dataset.filterValue, false);
+                    } else if (filterTrigger.dataset.filterType === 'stats-all') {
+                        applyCardStatsAllFilter(filterTrigger.dataset.filterValue, false);
+                    } else {
+                        applyCardFilter(filterTrigger.dataset.filterType, filterTrigger.dataset.filterValue);
+                    }
                     return;
                 }
 
@@ -2027,11 +2131,25 @@
 
             el.oncontextmenu = (event) => {
                 const filterTrigger = event.target.closest('.card-filter-trigger');
-                if (filterTrigger && (filterTrigger.dataset.filterType === 'size-height' || filterTrigger.dataset.filterType === 'size-weight')) {
-                    event.preventDefault();
-                    openPokedexSidebar();
-                    applyCardSizeMaxFilter(filterTrigger.dataset.filterValue, filterTrigger.dataset.filterType);
-                    return;
+                if (filterTrigger) {
+                    if (filterTrigger.dataset.filterType === 'size-height' || filterTrigger.dataset.filterType === 'size-weight') {
+                        event.preventDefault();
+                        openPokedexSidebar();
+                        applyCardSizeMaxFilter(filterTrigger.dataset.filterValue, filterTrigger.dataset.filterType);
+                        return;
+                    }
+                    if ((filterTrigger.dataset.filterType || '').startsWith('stat-')) {
+                        event.preventDefault();
+                        openPokedexSidebar();
+                        applyCardStatFilter(filterTrigger.dataset.filterType, filterTrigger.dataset.filterValue, true);
+                        return;
+                    }
+                    if (filterTrigger.dataset.filterType === 'stats-all') {
+                        event.preventDefault();
+                        openPokedexSidebar();
+                        applyCardStatsAllFilter(filterTrigger.dataset.filterValue, true);
+                        return;
+                    }
                 }
 
                 const typeBadge = event.target.closest('.type-badge');
@@ -2116,13 +2234,13 @@
         win.document.close();
     }
 
-    function getRadarChartSVG(s) {
+    function getRadarChartSVG(s, interactiveAttrs = "") {
         const size=130, center=65, radius=40, max=255, keys=['hp','atk','def','spe','spd','spa'], labels=['HP','공격','방어','스피드','특방','특공'];
         const pts = keys.map((k,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=(s[k]/max)*radius; return `${center+r*Math.cos(a)},${center+r*Math.sin(a)}`; }).join(' ');
         const bg = keys.map((_,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2; return `${center+radius*Math.cos(a)},${center+radius*Math.sin(a)}`; }).join(' ');
         const lbls = labels.map((l,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=radius+15, x=center+r*Math.cos(a), y=center+r*Math.sin(a); 
             return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${s[keys[i]]}</tspan></text>`; }).join('');
-        return `<svg viewBox="0 0 130 130"><polygon points="${bg}" fill="#f8f8f8" stroke="#ddd"/><polygon points="${pts}" fill="rgba(255,82,82,0.3)" stroke="#ff5252" stroke-width="1.5"/>${lbls}</svg>`;
+        return `<svg viewBox="0 0 130 130" ${interactiveAttrs}><polygon points="${bg}" fill="#f8f8f8" stroke="#ddd"/><polygon points="${pts}" fill="rgba(255,82,82,0.3)" stroke="#ff5252" stroke-width="1.5"/>${lbls}</svg>`;
     }
 
     function getTypeColor(t) { const m={'노말':'#6D6D4E','불꽃':'#9C531F','물':'#445E9C','전기':'#A1871F','풀':'#4E8234','얼음':'#638D8D','격투':'#7D1F1A','독':'#682A68','땅':'#927D44','비행':'#6D5E9C','에스퍼':'#9C295B','벌레':'#6D7815','바위':'#786824','고스트':'#493963','드래곤':'#4924A1','악':'#49392F','강철':'#787887','페어리':'#9B4A7D'}; return m[t]||'#555'; }
