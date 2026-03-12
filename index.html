@@ -424,7 +424,7 @@
 </aside>
 
 <script>
-    let db = [], allKoNames = [], normalizedKoNames = [], koNameIndex = new Map();
+    let db = [], allKoNames = [], normalizedKoNames = [], looseKoNames = [], choseongKoNames = [], koNameIndex = new Map();
     let targetData = null, targetVec = null, globalRankList = [], history = [];
     let tryCount = 0;
     let expandedCards = new Set();
@@ -478,6 +478,8 @@
     function parseData(txt) {
         allKoNames = [];
         normalizedKoNames = [];
+        looseKoNames = [];
+        choseongKoNames = [];
         koNameIndex = new Map();
         const lines = txt.split(/\r?\n/);
         const h = lines[0].split(',').map(x => x.trim().replace(/^\ufeff/, ''));
@@ -493,6 +495,8 @@
             allKoNames.push(ko);
             const normalizedKo = normalizeKoName(ko);
             normalizedKoNames.push(normalizedKo);
+            looseKoNames.push(stripHangulFinalConsonant(normalizedKo));
+            choseongKoNames.push(toChoseongString(normalizedKo));
             return {
                 normalizedKo: normalizedKo,
                 csvOrder,
@@ -1341,10 +1345,31 @@
         return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
     }
 
-    function getDailyTargetIndex(key, length) {
+    function getPreviousDayKey(key) {
+        const [year, month, day] = key.split('-').map(Number);
+        const utcDate = new Date(Date.UTC(year, month - 1, day));
+        utcDate.setUTCDate(utcDate.getUTCDate() - 1);
+        const yyyy = utcDate.getUTCFullYear();
+        const mm = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+        const dd = String(utcDate.getUTCDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function hashDailyKey(key, length) {
         let hash = 0;
         for (const ch of key) hash = ((hash * 31) + ch.charCodeAt(0)) >>> 0;
         return hash % length;
+    }
+
+    function getDailyTargetIndex(key, length) {
+        const todayIndex = hashDailyKey(key, length);
+        if (length <= 1) return todayIndex;
+
+        const prevKey = getPreviousDayKey(key);
+        const prevIndex = hashDailyKey(prevKey, length);
+        if (todayIndex !== prevIndex) return todayIndex;
+
+        return (todayIndex + 1) % length;
     }
 
     function loadDailyProgress() {
@@ -1720,7 +1745,7 @@
                 return;
             }
 
-            const looseName = stripHangulFinalConsonant(normalizedName);
+            const looseName = looseKoNames[idx];
             if (looseName.startsWith(looseVal)) {
                 looseStartsWithMatches.push(name);
                 return;
@@ -1735,7 +1760,7 @@
                 return;
             }
 
-            const choseongName = toChoseongString(normalizedName);
+            const choseongName = choseongKoNames[idx];
             if (choseongName.startsWith(choseongVal) || choseongName.includes(choseongVal) || isSingleEditMatch(choseongVal, choseongName)) {
                 choseongMatches.push(name);
             }
@@ -1754,17 +1779,15 @@
     const inputEl = document.getElementById('guessInput');
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
+    let autocompleteTimer = null;
 
-    inputEl.addEventListener('input', function() {
-        document.getElementById('errorMsg').style.display = 'none';
-        renderSidebarList();
-
-        const val = this.value.normalize('NFC');
+    function renderAutocompleteSuggestions(rawVal) {
+        const val = rawVal.normalize('NFC');
         const normalizedVal = normalizeKoName(val);
-        autoList.innerHTML = ''; 
+        autoList.innerHTML = '';
         if (!normalizedVal) { autoList.style.display='none'; return; }
         currentFocus = -1;
-        
+
         const matches = buildAutocompleteNames(normalizedVal);
         if (matches.length > 0) {
             autoList.style.display = 'block';
@@ -1782,7 +1805,17 @@
                 div.onclick = () => { inputEl.value = name; autoList.style.display='none'; handleGuess(); };
                 autoList.appendChild(div);
             });
+        } else {
+            autoList.style.display = 'none';
         }
+    }
+
+    inputEl.addEventListener('input', function() {
+        document.getElementById('errorMsg').style.display = 'none';
+
+        if (autocompleteTimer) clearTimeout(autocompleteTimer);
+        const nextVal = this.value;
+        autocompleteTimer = setTimeout(() => renderAutocompleteSuggestions(nextVal), 40);
     });
 
     inputEl.addEventListener('keydown', function(e) {
