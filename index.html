@@ -1842,6 +1842,14 @@
     document.addEventListener('click', e => { if (e.target !== inputEl) { autoList.innerHTML = ''; autoList.style.display = 'none'; } });
 
     function handleGuess() {
+        if (autocompleteTimer) {
+            clearTimeout(autocompleteTimer);
+            autocompleteTimer = null;
+        }
+        autoList.innerHTML = '';
+        autoList.style.display = 'none';
+        currentFocus = -1;
+
         const errorEl = document.getElementById('errorMsg');
         errorEl.style.display = 'none';
         const val = inputEl.value.trim().normalize('NFC');
