@@ -1780,8 +1780,19 @@
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
     let autocompleteTimer = null;
+    let autocompleteRequestToken = 0;
 
-    function renderAutocompleteSuggestions(rawVal) {
+    function renderAutocompleteSuggestions(rawVal, requestToken) {
+        if (requestToken !== autocompleteRequestToken) return;
+
+        const currentVal = inputEl.value;
+        if (currentVal !== rawVal) {
+            autoList.innerHTML = '';
+            autoList.style.display = 'none';
+            currentFocus = -1;
+            return;
+        }
+
         const val = rawVal.normalize('NFC');
         const normalizedVal = normalizeKoName(val);
         autoList.innerHTML = '';
@@ -1815,7 +1826,8 @@
 
         if (autocompleteTimer) clearTimeout(autocompleteTimer);
         const nextVal = this.value;
-        autocompleteTimer = setTimeout(() => renderAutocompleteSuggestions(nextVal), 40);
+        const requestToken = ++autocompleteRequestToken;
+        autocompleteTimer = setTimeout(() => renderAutocompleteSuggestions(nextVal, requestToken), 40);
     });
 
     inputEl.addEventListener('keydown', function(e) {
@@ -1842,6 +1854,7 @@
     document.addEventListener('click', e => { if (e.target !== inputEl) { autoList.innerHTML = ''; autoList.style.display = 'none'; } });
 
     function handleGuess() {
+        autocompleteRequestToken++;
         if (autocompleteTimer) {
             clearTimeout(autocompleteTimer);
             autocompleteTimer = null;
