@@ -207,10 +207,6 @@
         .side-empty { text-align: center; color: #94a3b8; padding: 18px 10px; font-size: 0.85rem; }
         
         @media (max-width: 850px) {
-            .grid-layout { grid-template-columns: 1fr; gap: 15px; }
-            .col-left { border: none; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-            .col-mid { grid-template-columns: 1fr; }
-            .col-right { border: none; border-top: 1px solid #eee; padding-top: 15px; }
             .side-panel { width: 92vw; right: -92vw; }
             .side-toggle.open { right: 92vw; }
             .side-hover-preview-panel { display: none !important; }
@@ -1779,8 +1775,8 @@
     const inputEl = document.getElementById('guessInput');
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
-    let autocompleteTimer = null;
     let autocompleteRequestToken = 0;
+    let isInputComposing = false;
 
     function renderAutocompleteSuggestions(rawVal, requestToken) {
         if (requestToken !== autocompleteRequestToken) return;
@@ -1823,11 +1819,21 @@
 
     inputEl.addEventListener('input', function() {
         document.getElementById('errorMsg').style.display = 'none';
+        if (isInputComposing) return;
 
-        if (autocompleteTimer) clearTimeout(autocompleteTimer);
+        const requestToken = ++autocompleteRequestToken;
+        renderAutocompleteSuggestions(this.value, requestToken);
+    });
+
+    inputEl.addEventListener('compositionstart', function() {
+        isInputComposing = true;
+    });
+
+    inputEl.addEventListener('compositionend', function() {
+        isInputComposing = false;
         const nextVal = this.value;
         const requestToken = ++autocompleteRequestToken;
-        autocompleteTimer = setTimeout(() => renderAutocompleteSuggestions(nextVal, requestToken), 40);
+        renderAutocompleteSuggestions(nextVal, requestToken);
     });
 
     inputEl.addEventListener('keydown', function(e) {
@@ -1855,10 +1861,6 @@
 
     function handleGuess() {
         autocompleteRequestToken++;
-        if (autocompleteTimer) {
-            clearTimeout(autocompleteTimer);
-            autocompleteTimer = null;
-        }
         autoList.innerHTML = '';
         autoList.style.display = 'none';
         currentFocus = -1;
@@ -1867,18 +1869,6 @@
         errorEl.style.display = 'none';
         const val = inputEl.value.trim().normalize('NFC');
         const normalizedVal = normalizeKoName(val);
-
-        if (currentMode === MODE_INFINITE && gameSolved) {
-            errorEl.innerText = '✅ 무한 모드를 클리어했습니다! 다시하기 버튼으로 새 게임을 시작하세요.';
-            errorEl.style.display = 'block';
-            return;
-        }
-
-        if (currentMode === MODE_DAILY && gameSolved) {
-            errorEl.innerText = '✅ 오늘의 문제는 이미 클리어했습니다! 무한모드에서 계속 플레이해 보세요.';
-            errorEl.style.display = 'block';
-            return;
-        }
 
         if (!normalizedVal) return;
 
