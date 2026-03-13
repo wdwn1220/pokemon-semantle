@@ -421,6 +421,7 @@
 
 <script>
     let db = [], allKoNames = [], normalizedKoNames = [], looseKoNames = [], choseongKoNames = [], koNameIndex = new Map();
+    let dbByKo = new Map(), dbByNameNo = new Map(), globalRankByNameNo = new Map();
     let targetData = null, targetVec = null, globalRankList = [], history = [];
     let tryCount = 0;
     let expandedCards = new Set();
@@ -477,9 +478,15 @@
         looseKoNames = [];
         choseongKoNames = [];
         koNameIndex = new Map();
+        dbByKo = new Map();
+        dbByNameNo = new Map();
         const lines = txt.split(/\r?\n/);
         const h = lines[0].split(',').map(x => x.trim().replace(/^\ufeff/, ''));
-        const get = (row, col) => { const idx = h.indexOf(col); return idx > -1 ? row[idx]?.trim() : null; };
+        const headerIndex = new Map(h.map((col, idx) => [col, idx]));
+        const get = (row, col) => {
+            const idx = headerIndex.get(col);
+            return typeof idx === 'number' ? row[idx]?.trim() : null;
+        };
         
         db = lines.slice(1).filter(l => l.trim()).map((l, csvOrder) => {
             const r = l.split(','); if (r.length < h.length) return null;
@@ -513,7 +520,28 @@
 
         db.forEach(p => {
             if (!koNameIndex.has(p.normalizedKo)) koNameIndex.set(p.normalizedKo, p);
+            if (!dbByKo.has(p.ko)) dbByKo.set(p.ko, p);
+            dbByNameNo.set(getPokemonKey(p.name, p.no), p);
         });
+    }
+
+    function getPokemonKey(name, no) {
+        return `${no}|${name}`;
+    }
+
+    function hydrateHistory(historyKo = []) {
+        return historyKo.map((koName, idx) => {
+            const pData = dbByKo.get(koName);
+            if (!pData) return null;
+            const rankedData = globalRankByNameNo.get(getPokemonKey(pData.name, pData.no));
+            if (!rankedData) return null;
+            return {
+                ...pData,
+                rank: rankedData.rank,
+                score: rankedData.score,
+                tryNo: historyKo.length - idx
+            };
+        }).filter(Boolean);
     }
 
     function initGame() {
@@ -1414,25 +1442,14 @@
 
     function restoreInfiniteProgress(progress) {
         if (!progress || !Array.isArray(progress.historyKo)) return false;
-        const restoredTarget = db.find(d => d.name === progress.targetName && d.no === progress.targetNo);
+        const restoredTarget = dbByNameNo.get(getPokemonKey(progress.targetName, progress.targetNo));
         if (!restoredTarget) return false;
 
         targetData = restoredTarget;
         targetVec = getVector(targetData);
         calculateGlobalRanks();
 
-        history = progress.historyKo.map((koName, idx) => {
-            const pData = db.find(d => d.ko === koName);
-            if (!pData) return null;
-            const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
-            if (rankIdx < 0) return null;
-            return {
-                ...pData,
-                rank: rankIdx + 1,
-                score: globalRankList[rankIdx].score,
-                tryNo: progress.historyKo.length - idx
-            };
-        }).filter(Boolean);
+        history = hydrateHistory(progress.historyKo);
 
         tryCount = progress.tryCount || progress.historyKo.length;
         gameSolved = Boolean(progress.gameSolved);
@@ -1493,18 +1510,7 @@
         const progress = loadDailyProgress();
         if (!progress || !Array.isArray(progress.historyKo)) return;
 
-        history = progress.historyKo.map((koName, idx) => {
-            const pData = db.find(d => d.ko === koName);
-            if (!pData) return null;
-            const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
-            if (rankIdx < 0) return null;
-            return {
-                ...pData,
-                rank: rankIdx + 1,
-                score: globalRankList[rankIdx].score,
-                tryNo: progress.historyKo.length - idx
-            };
-        }).filter(Boolean);
+        history = hydrateHistory(progress.historyKo);
 
         tryCount = progress.tryCount || progress.historyKo.length;
         gameSolved = Boolean(progress.gameSolved);
@@ -1607,6 +1613,7 @@
             return { ...p, score: s };
         }).sort((a, b) => b.score - a.score);
         globalRankList.forEach((p, i) => { p.rank = i + 1; });
+        globalRankByNameNo = new Map(globalRankList.map(p => [getPokemonKey(p.name, p.no), p]));
     }
 
     function calculateCosine(v1, v2) {
@@ -1873,8 +1880,13 @@
             return;
         }
 
-        const rankIdx = globalRankList.findIndex(x => x.name === pData.name);
-        const currentRank = rankIdx + 1;
+        const rankedData = globalRankByNameNo.get(getPokemonKey(pData.name, pData.no));
+        if (!rankedData) {
+            errorEl.innerText = "🚨 순위 정보를 불러오지 못했습니다. 게임을 다시 시작해 주세요.";
+            errorEl.style.display = 'block';
+            return;
+        }
+        const currentRank = rankedData.rank;
         
         // 정답을 맞힌 이후의 입력은 시도 횟수에 포함하지 않음
         if (!gameSolved) {
@@ -1883,7 +1895,7 @@
             if (currentRank > 1 && currentRank < bestRank) { bestRank = currentRank; }
         }
 
-        history.unshift({ ...pData, rank: currentRank, score: globalRankList[rankIdx].score, tryNo: gameSolved ? '-' : tryCount });
+        history.unshift({ ...pData, rank: currentRank, score: rankedData.score, tryNo: gameSolved ? '-' : tryCount });
         renderSidebarList();
         renderHistory(); 
         inputEl.value = "";
