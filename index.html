@@ -1776,7 +1776,6 @@
     const autoList = document.getElementById('autocomplete-list');
     let currentFocus = -1;
     let autocompleteRequestToken = 0;
-    let isInputComposing = false;
 
     function renderAutocompleteSuggestions(rawVal, requestToken) {
         if (requestToken !== autocompleteRequestToken) return;
@@ -1819,21 +1818,8 @@
 
     inputEl.addEventListener('input', function() {
         document.getElementById('errorMsg').style.display = 'none';
-        if (isInputComposing) return;
-
         const requestToken = ++autocompleteRequestToken;
         renderAutocompleteSuggestions(this.value, requestToken);
-    });
-
-    inputEl.addEventListener('compositionstart', function() {
-        isInputComposing = true;
-    });
-
-    inputEl.addEventListener('compositionend', function() {
-        isInputComposing = false;
-        const nextVal = this.value;
-        const requestToken = ++autocompleteRequestToken;
-        renderAutocompleteSuggestions(nextVal, requestToken);
     });
 
     inputEl.addEventListener('keydown', function(e) {
