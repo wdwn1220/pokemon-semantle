@@ -1385,15 +1385,37 @@
         return hash % length;
     }
 
-    function getDailyTargetIndex(key, length) {
+    function isTooClosePokedexNumber(currentEntry, previousEntry) {
+        if (!currentEntry || !previousEntry) return false;
+        const currentNo = Number(currentEntry.no) || 0;
+        const previousNo = Number(previousEntry.no) || 0;
+        return Math.abs(currentNo - previousNo) <= 1;
+    }
+
+    function getDailyTargetIndex(key, dataset) {
+        const length = dataset.length;
         const todayIndex = hashDailyKey(key, length);
         if (length <= 1) return todayIndex;
 
         const prevKey = getPreviousDayKey(key);
         const prevIndex = hashDailyKey(prevKey, length);
-        if (todayIndex !== prevIndex) return todayIndex;
+        const previousEntry = dataset[prevIndex];
 
-        return (todayIndex + 1) % length;
+        let candidateIndex = todayIndex;
+        let candidateEntry = dataset[candidateIndex];
+        const needsReshuffle = candidateIndex === prevIndex || isTooClosePokedexNumber(candidateEntry, previousEntry);
+        if (!needsReshuffle) return candidateIndex;
+
+        const step = (hashDailyKey(`${key}::step`, length - 1) + 1);
+        for (let i = 0; i < length; i++) {
+            candidateIndex = (todayIndex + (step * i)) % length;
+            candidateEntry = dataset[candidateIndex];
+            if (candidateIndex === prevIndex) continue;
+            if (isTooClosePokedexNumber(candidateEntry, previousEntry)) continue;
+            return candidateIndex;
+        }
+
+        return todayIndex;
     }
 
     function loadDailyProgress() {
@@ -1487,7 +1509,7 @@
 
         if (mode === MODE_DAILY) {
             dailyPuzzleKey = getTodayKey();
-            targetData = db[getDailyTargetIndex(dailyPuzzleKey, db.length)];
+            targetData = db[getDailyTargetIndex(dailyPuzzleKey, db)];
             targetVec = getVector(targetData);
             calculateGlobalRanks();
             restoreDailyProgress();
