@@ -1070,6 +1070,7 @@
         initAdvancedSummaryClearButtons();
         initDualRangeControls();
         initSidebarHoverPreview();
+        initSidebarPokemonInputControls();
 
         document.getElementById('resetFiltersBtn').onclick = () => {
             sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', hpMin: '', hpMax: '', atkMin: '', atkMax: '', defMin: '', defMax: '', spaMin: '', spaMax: '', spdMin: '', spdMax: '', speMin: '', speMax: '' };
@@ -1275,6 +1276,31 @@
         sidebarEl?.addEventListener('mouseleave', hidePreview);
     }
 
+    function initSidebarPokemonInputControls() {
+        const listEl = document.getElementById('sidePokemonList');
+        if (!listEl) return;
+
+        const applyPokemonNameToInput = (name, shouldSubmit = false) => {
+            const inputEl = document.getElementById('guessInput');
+            if (!inputEl || !name) return;
+            inputEl.value = name;
+            inputEl.focus();
+            if (shouldSubmit) handleGuess();
+        };
+
+        listEl.addEventListener('click', (e) => {
+            const item = e.target.closest('.side-item');
+            if (!item || !listEl.contains(item)) return;
+            applyPokemonNameToInput(item.dataset.pokemonName, false);
+        });
+
+        listEl.addEventListener('dblclick', (e) => {
+            const item = e.target.closest('.side-item');
+            if (!item || !listEl.contains(item)) return;
+            applyPokemonNameToInput(item.dataset.pokemonName, true);
+        });
+    }
+
     function renderSidebarList() {
         const listEl = document.getElementById('sidePokemonList');
         const resultCountEl = document.getElementById('sideResultCount');
@@ -1357,7 +1383,7 @@
             const sideItemClass = history.some(h => h.ko === p.ko) ? 'guessed' : '';
             return `
             ${showGenDivider ? `<div class="side-gen-divider">${p.gen}세대</div>` : ''}
-            <div class="side-item ${sideItemClass}" data-preview-image="${getImageUrl(p)}">
+            <div class="side-item ${sideItemClass}" data-preview-image="${getImageUrl(p)}" data-pokemon-name="${p.ko}" title="클릭: 입력창에 입력 / 더블클릭: 바로 입력">
                 <span class="side-item-no">No.${String(p.no).padStart(4, '0')}</span>
                 <span class="side-item-name">${p.ko}</span>
             </div>
