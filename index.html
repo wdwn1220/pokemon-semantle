@@ -48,7 +48,11 @@
         #guessInput:focus { border-color: var(--primary); }
         button.submit-btn { padding: 0 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
         button.submit-btn:hover { background: #1a252f; }
+        button.submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
         #inlineRestartBtn { background: var(--accent) !important; padding: 0 16px; font-size: 0.92rem; }
+        #hintBtn { background: #f59e0b; }
+        #hintBtn:hover:not(:disabled) { background: #d97706; }
+        #hintMsg { display: none; margin-top: 8px; border: 1px solid #fde68a; background: #fffbeb; color: #92400e; border-radius: 10px; font-size: 0.9rem; font-weight: 700; padding: 9px 12px; line-height: 1.35; }
         .mode-bar { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 14px; }
         .daily-date { text-align: center; margin-bottom: 8px; color: #475569; font-size: 0.88rem; font-weight: 700; }
         .mode-toggle-group { display: flex; gap: 8px; }
@@ -287,9 +291,11 @@
             <div class="input-wrapper">
                 <input type="text" id="guessInput" placeholder="포켓몬 이름 입력..." autocomplete="off">
                 <button class="submit-btn" onclick="handleGuess()">확인</button>
+                <button class="submit-btn" id="hintBtn" type="button" onclick="useAdaptiveHint()" disabled>💡 힌트</button>
                 <button class="submit-btn" id="inlineRestartBtn" onclick="restartInfiniteGame()" style="display:none;">🔄 다시하기</button>
             </div>
             <div id="autocomplete-list"></div>
+            <div id="hintMsg"></div>
         </div>
         
         <div id="historyList" class="history-list"></div>
@@ -440,6 +446,8 @@
     let worstBestRank = parseInt(localStorage.getItem('pokeSemantleWorstBestRank')) || 0;
     let bestRank = Infinity;
     let gameSolved = false;
+    let hintUsed = false;
+    let lastHintText = '';
     let dailyPuzzleKey = '';
     let gameStartAt = null;
     let currentSolveTimeMs = 0;
@@ -1456,6 +1464,8 @@
             historyKo: history.map(h => h.ko),
             tryCount,
             gameSolved,
+            hintUsed,
+            lastHintText,
             bestRank: bestRank === Infinity ? null : bestRank,
             gameStartAt,
             currentSolveTimeMs
@@ -1471,6 +1481,8 @@
             historyKo: history.map(h => h.ko),
             tryCount,
             gameSolved,
+            hintUsed,
+            lastHintText,
             bestRank: bestRank === Infinity ? null : bestRank,
             gameStartAt,
             currentSolveTimeMs
@@ -1501,11 +1513,15 @@
 
         tryCount = progress.tryCount || progress.historyKo.length;
         gameSolved = Boolean(progress.gameSolved);
+        hintUsed = Boolean(progress.hintUsed);
+        lastHintText = typeof progress.lastHintText === 'string' ? progress.lastHintText : '';
         bestRank = progress.bestRank ?? Infinity;
         gameStartAt = Number.isFinite(progress.gameStartAt) ? progress.gameStartAt : null;
         currentSolveTimeMs = progress.currentSolveTimeMs || 0;
 
         renderHistory();
+        renderHintMessage();
+        updateHintButtonState();
         if (gameSolved) {
             showSolvedBanner(history[0]?.ko || targetData.ko);
         }
@@ -1518,6 +1534,8 @@
         tryCount = 0;
         bestRank = Infinity;
         gameSolved = false;
+        hintUsed = false;
+        lastHintText = '';
         gameStartAt = null;
         currentSolveTimeMs = 0;
         expandedCards.clear();
@@ -1525,6 +1543,8 @@
         document.getElementById('errorMsg').style.display = 'none';
         inputEl.value = '';
         autoList.style.display = 'none';
+        renderHintMessage();
+        updateHintButtonState();
         renderHistory();
     }
 
@@ -1562,11 +1582,15 @@
 
         tryCount = progress.tryCount || progress.historyKo.length;
         gameSolved = Boolean(progress.gameSolved);
+        hintUsed = Boolean(progress.hintUsed);
+        lastHintText = typeof progress.lastHintText === 'string' ? progress.lastHintText : '';
         bestRank = progress.bestRank ?? Infinity;
         gameStartAt = Number.isFinite(progress.gameStartAt) ? progress.gameStartAt : null;
         currentSolveTimeMs = progress.currentSolveTimeMs || 0;
 
         renderHistory();
+        renderHintMessage();
+        updateHintButtonState();
         if (gameSolved) {
             showSolvedBanner(history[0]?.ko || targetData.ko);
         }
@@ -1598,6 +1622,255 @@
         document.getElementById('avgTimeDisplay').innerText = solvedGameCount > 0 ? formatDuration(totalSolveTimeMs / solvedGameCount) : '-';
         document.getElementById('bestRankDisplay').innerText = bestRank === Infinity ? '-' : `${bestRank}위`;
         document.getElementById('worstBestRankDisplay').innerText = worstBestRank > 0 ? `${worstBestRank}위` : '-';
+        updateHintButtonState();
+    }
+
+    function updateHintButtonState() {
+        const hintBtn = document.getElementById('hintBtn');
+        if (!hintBtn) return;
+        hintBtn.disabled = gameSolved || hintUsed || tryCount <= 0;
+    }
+
+    function renderHintMessage() {
+        const hintEl = document.getElementById('hintMsg');
+        if (!hintEl) return;
+        if (!lastHintText) {
+            hintEl.style.display = 'none';
+            hintEl.textContent = '';
+            return;
+        }
+        hintEl.style.display = 'block';
+        hintEl.textContent = `💡 ${lastHintText}`;
+    }
+
+    function normalizeRange(value, min, max) {
+        if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) return 0;
+        return Math.min(1, Math.max(0, (value - min) / (max - min)));
+    }
+
+    function getHistoryWeight(entry, idx) {
+        const recencyWeight = Math.exp(-0.35 * idx);
+        const rankBase = 1 / Math.log2(Math.max(2, entry.rank + 1));
+        return recencyWeight * rankBase;
+    }
+
+    function calculateHintKnowledge(knowledgeFn) {
+        if (!history.length) return 0;
+        let weightedSum = 0;
+        let weightTotal = 0;
+        history.forEach((entry, idx) => {
+            const w = getHistoryWeight(entry, idx);
+            const similarity = Math.min(1, Math.max(0, knowledgeFn(entry)));
+            weightedSum += w * similarity;
+            weightTotal += w;
+        });
+        if (weightTotal <= 0) return 0;
+        return weightedSum / weightTotal;
+    }
+
+    function createHintCandidatePool() {
+        const allTypes = targetData.type.filter(Boolean);
+        const dbHeightMin = Math.min(...db.map(p => p.h));
+        const dbHeightMax = Math.max(...db.map(p => p.h));
+        const dbWeightMin = Math.min(...db.map(p => p.w));
+        const dbWeightMax = Math.max(...db.map(p => p.w));
+        const heightBand = { min: Math.max(0, Math.floor(targetData.h * 2) / 2), max: Math.ceil(targetData.h * 2) / 2 };
+        const weightBand = { min: Math.max(0, Math.floor(targetData.w / 5) * 5), max: Math.ceil(targetData.w / 5) * 5 };
+
+        const candidates = [
+            {
+                id: `gen:${targetData.gen}`,
+                reveal: `세대 힌트: 정답은 ${targetData.gen}세대 포켓몬입니다.`,
+                matchFn: (p) => p.gen === targetData.gen,
+                knowledgeFn: (entry) => entry.gen === targetData.gen ? 1 : 0
+            },
+            {
+                id: `color:${targetData.color}`,
+                reveal: `색상 힌트: 정답의 도감 색상은 ${targetData.color} 계열입니다.`,
+                matchFn: (p) => p.color === targetData.color,
+                knowledgeFn: (entry) => entry.color === targetData.color ? 1 : 0
+            },
+            {
+                id: `shape:${targetData.shape}`,
+                reveal: `체형 힌트: 정답의 체형은 ${targetData.shape} 형태입니다.`,
+                matchFn: (p) => p.shape === targetData.shape,
+                knowledgeFn: (entry) => entry.shape === targetData.shape ? 1 : 0
+            },
+            {
+                id: `status:${targetData.status}`,
+                reveal: `분류 힌트: 정답의 분류는 ${targetData.status}입니다.`,
+                matchFn: (p) => p.status === targetData.status,
+                knowledgeFn: (entry) => entry.status === targetData.status ? 1 : 0
+            },
+            {
+                id: `height:${heightBand.min}-${heightBand.max}`,
+                reveal: `신장 힌트: 정답의 키는 ${heightBand.min.toFixed(1)}m ~ ${heightBand.max.toFixed(1)}m 사이입니다.`,
+                matchFn: (p) => p.h >= heightBand.min && p.h <= heightBand.max,
+                knowledgeFn: (entry) => {
+                    if (entry.h >= heightBand.min && entry.h <= heightBand.max) return 1;
+                    return 1 - Math.abs(normalizeRange(entry.h, dbHeightMin, dbHeightMax) - normalizeRange(targetData.h, dbHeightMin, dbHeightMax));
+                }
+            },
+            {
+                id: `weight:${weightBand.min}-${weightBand.max}`,
+                reveal: `체중 힌트: 정답의 몸무게는 ${weightBand.min.toFixed(0)}kg ~ ${weightBand.max.toFixed(0)}kg 사이입니다.`,
+                matchFn: (p) => p.w >= weightBand.min && p.w <= weightBand.max,
+                knowledgeFn: (entry) => {
+                    if (entry.w >= weightBand.min && entry.w <= weightBand.max) return 1;
+                    return 1 - Math.abs(normalizeRange(entry.w, dbWeightMin, dbWeightMax) - normalizeRange(targetData.w, dbWeightMin, dbWeightMax));
+                }
+            }
+        ];
+
+        allTypes.forEach(typeName => {
+            candidates.push({
+                id: `type:${typeName}`,
+                reveal: `타입 힌트: 정답은 ${typeName} 타입을 가지고 있습니다.`,
+                matchFn: (p) => p.type.includes(typeName),
+                knowledgeFn: (entry) => entry.type.includes(typeName) ? 1 : 0
+            });
+        });
+
+        return candidates.filter(candidate => candidate.reveal && candidate.id);
+    }
+
+    function buildNumericFallbackHint(targetPower, minPower, maxPower) {
+        if (!targetData || db.length <= 1) return null;
+
+        const dbHeightMin = Math.min(...db.map(p => p.h));
+        const dbHeightMax = Math.max(...db.map(p => p.h));
+        const dbWeightMin = Math.min(...db.map(p => p.w));
+        const dbWeightMax = Math.max(...db.map(p => p.w));
+
+        const specs = [
+            {
+                key: 'h',
+                label: '신장',
+                unit: 'm',
+                targetValue: targetData.h,
+                dbMin: dbHeightMin,
+                dbMax: dbHeightMax,
+                steps: [0.2, 0.4, 0.6, 0.8, 1.0],
+                formatter: (v) => v.toFixed(1)
+            },
+            {
+                key: 'w',
+                label: '체중',
+                unit: 'kg',
+                targetValue: targetData.w,
+                dbMin: dbWeightMin,
+                dbMax: dbWeightMax,
+                steps: [4, 8, 12, 16, 20],
+                formatter: (v) => v.toFixed(0)
+            }
+        ];
+
+        const numericCandidates = [];
+        specs.forEach(spec => {
+            spec.steps.forEach(step => {
+                const half = step / 2;
+                const rawMin = Math.max(spec.dbMin, spec.targetValue - half);
+                const rawMax = Math.min(spec.dbMax, spec.targetValue + half);
+                const precision = spec.key === 'h' ? 10 : 1;
+                const minValue = Math.max(spec.dbMin, Math.floor(rawMin * precision) / precision);
+                const maxValue = Math.min(spec.dbMax, Math.ceil(rawMax * precision) / precision);
+                if (maxValue < minValue) return;
+
+                const matchFn = (pokemon) => pokemon[spec.key] >= minValue && pokemon[spec.key] <= maxValue;
+                const matchingCount = db.reduce((acc, pokemon) => acc + (matchFn(pokemon) ? 1 : 0), 0);
+                const gain = 1 - (matchingCount / db.length);
+                const knowledge = calculateHintKnowledge((entry) => {
+                    const value = entry[spec.key];
+                    if (value >= minValue && value <= maxValue) return 1;
+                    return 1 - Math.abs(normalizeRange(value, spec.dbMin, spec.dbMax) - normalizeRange(spec.targetValue, spec.dbMin, spec.dbMax));
+                });
+                const power = gain * (1 - knowledge);
+                numericCandidates.push({
+                    id: `${spec.key}:${minValue}-${maxValue}`,
+                    reveal: `${spec.label} 힌트: 정답의 ${spec.label === '신장' ? '키' : '몸무게'}는 ${spec.formatter(minValue)}${spec.unit} ~ ${spec.formatter(maxValue)}${spec.unit} 사이입니다.`,
+                    gain,
+                    knowledge,
+                    power
+                });
+            });
+        });
+
+        const boundedNumeric = numericCandidates.filter(candidate => candidate.power >= minPower && candidate.power <= maxPower);
+        const pool = boundedNumeric.length ? boundedNumeric : numericCandidates;
+        if (!pool.length) return null;
+
+        pool.sort((a, b) => {
+            const aDiff = Math.abs(a.power - targetPower);
+            const bDiff = Math.abs(b.power - targetPower);
+            if (aDiff !== bDiff) return aDiff - bDiff;
+            return b.gain - a.gain;
+        });
+
+        return pool[0] || null;
+    }
+
+    function buildGuaranteedHint() {
+        if (targetData) {
+            return {
+                id: 'guaranteed:fallback',
+                reveal: `보장 힌트: 정답 포켓몬의 전국도감 번호는 ${targetData.no}번입니다.`,
+                gain: 0,
+                knowledge: 0,
+                power: 0
+            };
+        }
+        return {
+            id: 'guaranteed:generic',
+            reveal: '보장 힌트: 한 번 더 추측하면 힌트 정확도가 더 높아져요.',
+            gain: 0,
+            knowledge: 0,
+            power: 0
+        };
+    }
+
+    function pickAdaptiveHint() {
+        const totalCount = db.length;
+        if (!targetData || totalCount <= 1) return buildGuaranteedHint();
+
+        const candidates = createHintCandidatePool().map(candidate => {
+            const matchingCount = db.reduce((acc, pokemon) => acc + (candidate.matchFn(pokemon) ? 1 : 0), 0);
+            const gain = 1 - (matchingCount / totalCount);
+            const knowledge = calculateHintKnowledge(candidate.knowledgeFn);
+            const power = gain * (1 - knowledge);
+            return { ...candidate, matchingCount, gain, knowledge, power };
+        }).filter(candidate => Number.isFinite(candidate.power));
+
+        if (!candidates.length) return buildNumericFallbackHint(0.34, 0.22, 0.5) || buildGuaranteedHint();
+
+        const TARGET_POWER = 0.34;
+        const MIN_POWER = 0.22;
+        const MAX_POWER = 0.5;
+        const bounded = candidates.filter(candidate => candidate.power >= MIN_POWER && candidate.power <= MAX_POWER);
+
+        if (!bounded.length) {
+            return buildNumericFallbackHint(TARGET_POWER, MIN_POWER, MAX_POWER) || buildGuaranteedHint();
+        }
+
+        bounded.sort((a, b) => {
+            const aDiff = Math.abs(a.power - TARGET_POWER);
+            const bDiff = Math.abs(b.power - TARGET_POWER);
+            if (aDiff !== bDiff) return aDiff - bDiff;
+            return b.gain - a.gain;
+        });
+
+        return bounded[0] || buildNumericFallbackHint(TARGET_POWER, MIN_POWER, MAX_POWER) || buildGuaranteedHint();
+    }
+
+    function useAdaptiveHint() {
+        if (gameSolved || hintUsed || tryCount <= 0) return;
+        const hint = pickAdaptiveHint();
+        const reducedPercent = Math.round((hint?.gain || 0) * 100);
+        lastHintText = `${hint.reveal} (후보 약 ${reducedPercent}% 축소)`;
+        hintUsed = true;
+        renderHintMessage();
+        updateHintButtonState();
+        saveDailyProgress();
+        saveInfiniteProgress();
     }
 
     function updateModeUI() {
@@ -1941,6 +2214,7 @@
             if (tryCount === 0 && gameStartAt == null) gameStartAt = Date.now();
             tryCount++;
             if (currentRank > 1 && currentRank < bestRank) { bestRank = currentRank; }
+            updateHintButtonState();
         }
 
         history.unshift({ ...pData, rank: currentRank, score: rankedData.score, tryNo: gameSolved ? '-' : tryCount });
