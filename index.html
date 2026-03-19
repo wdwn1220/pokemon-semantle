@@ -1670,13 +1670,6 @@
 
     function createHintCandidatePool() {
         const allTypes = targetData.type.filter(Boolean);
-        const dbHeightMin = Math.min(...db.map(p => p.h));
-        const dbHeightMax = Math.max(...db.map(p => p.h));
-        const dbWeightMin = Math.min(...db.map(p => p.w));
-        const dbWeightMax = Math.max(...db.map(p => p.w));
-        const heightBand = { min: Math.max(0, Math.floor(targetData.h * 2) / 2), max: Math.ceil(targetData.h * 2) / 2 };
-        const weightBand = { min: Math.max(0, Math.floor(targetData.w / 5) * 5), max: Math.ceil(targetData.w / 5) * 5 };
-
         const candidates = [
             {
                 id: `gen:${targetData.gen}`,
@@ -1701,24 +1694,6 @@
                 reveal: `분류 힌트: 정답의 분류는 ${targetData.status}입니다.`,
                 matchFn: (p) => p.status === targetData.status,
                 knowledgeFn: (entry) => entry.status === targetData.status ? 1 : 0
-            },
-            {
-                id: `height:${heightBand.min}-${heightBand.max}`,
-                reveal: `신장 힌트: 정답의 키는 ${heightBand.min.toFixed(1)}m ~ ${heightBand.max.toFixed(1)}m 사이입니다.`,
-                matchFn: (p) => p.h >= heightBand.min && p.h <= heightBand.max,
-                knowledgeFn: (entry) => {
-                    if (entry.h >= heightBand.min && entry.h <= heightBand.max) return 1;
-                    return 1 - Math.abs(normalizeRange(entry.h, dbHeightMin, dbHeightMax) - normalizeRange(targetData.h, dbHeightMin, dbHeightMax));
-                }
-            },
-            {
-                id: `weight:${weightBand.min}-${weightBand.max}`,
-                reveal: `체중 힌트: 정답의 몸무게는 ${weightBand.min.toFixed(0)}kg ~ ${weightBand.max.toFixed(0)}kg 사이입니다.`,
-                matchFn: (p) => p.w >= weightBand.min && p.w <= weightBand.max,
-                knowledgeFn: (entry) => {
-                    if (entry.w >= weightBand.min && entry.w <= weightBand.max) return 1;
-                    return 1 - Math.abs(normalizeRange(entry.w, dbWeightMin, dbWeightMax) - normalizeRange(targetData.w, dbWeightMin, dbWeightMax));
-                }
             }
         ];
 
@@ -1847,18 +1822,24 @@
         const MAX_POWER = 0.5;
         const bounded = candidates.filter(candidate => candidate.power >= MIN_POWER && candidate.power <= MAX_POWER);
 
-        if (!bounded.length) {
-            return buildNumericFallbackHint(TARGET_POWER, MIN_POWER, MAX_POWER) || buildGuaranteedHint();
+        if (bounded.length) {
+            bounded.sort((a, b) => {
+                const aDiff = Math.abs(a.power - TARGET_POWER);
+                const bDiff = Math.abs(b.power - TARGET_POWER);
+                if (aDiff !== bDiff) return aDiff - bDiff;
+                return b.gain - a.gain;
+            });
+            return bounded[0];
         }
 
-        bounded.sort((a, b) => {
+        const nonNumericFallback = [...candidates].sort((a, b) => {
             const aDiff = Math.abs(a.power - TARGET_POWER);
             const bDiff = Math.abs(b.power - TARGET_POWER);
             if (aDiff !== bDiff) return aDiff - bDiff;
             return b.gain - a.gain;
-        });
+        })[0];
 
-        return bounded[0] || buildNumericFallbackHint(TARGET_POWER, MIN_POWER, MAX_POWER) || buildGuaranteedHint();
+        return nonNumericFallback || buildNumericFallbackHint(TARGET_POWER, MIN_POWER, MAX_POWER) || buildGuaranteedHint();
     }
 
     function useAdaptiveHint() {
