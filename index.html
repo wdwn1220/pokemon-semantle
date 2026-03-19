@@ -1668,8 +1668,79 @@
         return weightedSum / weightTotal;
     }
 
+    function getHintModeConfig() {
+        const attemptCount = Math.max(0, tryCount);
+        if (attemptCount <= 2) {
+            return {
+                phase: 'early',
+                targetPower: 0.28,
+                minPower: 0.16,
+                maxPower: 0.38,
+                gainCeiling: 0.72,
+                gainFloor: 0.08,
+                knowledgePenaltyScale: 0.95,
+                knowledgePenaltyExponent: 1.4,
+                numericFallbackTryThreshold: 4,
+                guaranteedTryThreshold: 7,
+                preferNumericWhenKnowledgeHigh: false
+            };
+        }
+        if (attemptCount <= 5) {
+            return {
+                phase: 'mid',
+                targetPower: 0.34,
+                minPower: 0.22,
+                maxPower: 0.52,
+                gainCeiling: 0.86,
+                gainFloor: 0.1,
+                knowledgePenaltyScale: 1.05,
+                knowledgePenaltyExponent: 1.7,
+                numericFallbackTryThreshold: 5,
+                guaranteedTryThreshold: 8,
+                preferNumericWhenKnowledgeHigh: true
+            };
+        }
+        return {
+            phase: 'late',
+            targetPower: 0.5,
+            minPower: 0.28,
+            maxPower: 0.82,
+            gainCeiling: 1,
+            gainFloor: 0.12,
+            knowledgePenaltyScale: 1.2,
+            knowledgePenaltyExponent: 2.1,
+            numericFallbackTryThreshold: 0,
+            guaranteedTryThreshold: 6,
+            preferNumericWhenKnowledgeHigh: true
+        };
+    }
+
+    function getHintBaseWeight(id) {
+        if (id.startsWith('gen:')) return 1.05;
+        if (id.startsWith('type:')) return 1.08;
+        if (id.startsWith('ability:')) return 1.02;
+        if (id.startsWith('color:')) return 0.98;
+        if (id.startsWith('shape:')) return 0.94;
+        if (id.startsWith('status:')) return 0.82;
+        if (id.startsWith('numeric:')) return 1.04;
+        return 1;
+    }
+
+    function calculateHintPower(gain, knowledge, baseWeight = 1, mode = getHintModeConfig()) {
+        const safeGain = Math.min(1, Math.max(0, gain));
+        const safeKnowledge = Math.min(1, Math.max(0, knowledge));
+        const penaltyBase = Math.max(0, 1 - (safeKnowledge * mode.knowledgePenaltyScale));
+        const knowledgePenalty = Math.pow(penaltyBase, mode.knowledgePenaltyExponent);
+        return safeGain * knowledgePenalty * baseWeight;
+    }
+
+    function getAbilitySet(pokemon) {
+        return new Set([...(pokemon?.abilities || []), pokemon?.hidden].filter(Boolean));
+    }
+
     function createHintCandidatePool() {
         const allTypes = targetData.type.filter(Boolean);
+        const allAbilities = [...getAbilitySet(targetData)];
         const candidates = [
             {
                 id: `gen:${targetData.gen}`,
@@ -1706,10 +1777,21 @@
             });
         });
 
-        return candidates.filter(candidate => candidate.reveal && candidate.id);
+        allAbilities.forEach(abilityName => {
+            candidates.push({
+                id: `ability:${abilityName}`,
+                reveal: `특성 힌트: 정답은 ${abilityName} 특성을 가지고 있습니다.`,
+                matchFn: (p) => getAbilitySet(p).has(abilityName),
+                knowledgeFn: (entry) => getAbilitySet(entry).has(abilityName) ? 1 : 0
+            });
+        });
+
+        return candidates
+            .map(candidate => ({ ...candidate, baseWeight: getHintBaseWeight(candidate.id) }))
+            .filter(candidate => candidate.reveal && candidate.id);
     }
 
-    function buildNumericFallbackHint(targetPower, minPower, maxPower) {
+    function buildNumericFallbackHint(mode = getHintModeConfig()) {
         if (!targetData || db.length <= 1) return null;
 
         const dbHeightMin = Math.min(...db.map(p => p.h));
@@ -1759,7 +1841,7 @@
                     if (value >= minValue && value <= maxValue) return 1;
                     return 1 - Math.abs(normalizeRange(value, spec.dbMin, spec.dbMax) - normalizeRange(spec.targetValue, spec.dbMin, spec.dbMax));
                 });
-                const power = gain * (1 - knowledge);
+                const power = calculateHintPower(gain, knowledge, getHintBaseWeight(`numeric:${spec.key}`), mode);
                 numericCandidates.push({
                     id: `${spec.key}:${minValue}-${maxValue}`,
                     reveal: `${spec.label} 힌트: 정답의 ${spec.label === '신장' ? '키' : '몸무게'}는 ${spec.formatter(minValue)}${spec.unit} ~ ${spec.formatter(maxValue)}${spec.unit} 사이입니다.`,
@@ -1770,13 +1852,13 @@
             });
         });
 
-        const boundedNumeric = numericCandidates.filter(candidate => candidate.power >= minPower && candidate.power <= maxPower);
+        const boundedNumeric = numericCandidates.filter(candidate => candidate.gain >= mode.gainFloor && candidate.gain <= mode.gainCeiling && candidate.power >= mode.minPower && candidate.power <= mode.maxPower);
         const pool = boundedNumeric.length ? boundedNumeric : numericCandidates;
         if (!pool.length) return null;
 
         pool.sort((a, b) => {
-            const aDiff = Math.abs(a.power - targetPower);
-            const bDiff = Math.abs(b.power - targetPower);
+            const aDiff = Math.abs(a.power - mode.targetPower);
+            const bDiff = Math.abs(b.power - mode.targetPower);
             if (aDiff !== bDiff) return aDiff - bDiff;
             return b.gain - a.gain;
         });
@@ -1805,41 +1887,52 @@
 
     function pickAdaptiveHint() {
         const totalCount = db.length;
+        const mode = getHintModeConfig();
         if (!targetData || totalCount <= 1) return buildGuaranteedHint();
 
         const candidates = createHintCandidatePool().map(candidate => {
             const matchingCount = db.reduce((acc, pokemon) => acc + (candidate.matchFn(pokemon) ? 1 : 0), 0);
             const gain = 1 - (matchingCount / totalCount);
             const knowledge = calculateHintKnowledge(candidate.knowledgeFn);
-            const power = gain * (1 - knowledge);
+            const power = calculateHintPower(gain, knowledge, candidate.baseWeight, mode);
             return { ...candidate, matchingCount, gain, knowledge, power };
         }).filter(candidate => Number.isFinite(candidate.power));
 
-        if (!candidates.length) return buildNumericFallbackHint(0.34, 0.22, 0.5) || buildGuaranteedHint();
+        const viableCandidates = candidates.filter(candidate => candidate.gain >= mode.gainFloor && candidate.gain <= mode.gainCeiling);
+        const averageKnowledge = candidates.length ? candidates.reduce((sum, candidate) => sum + candidate.knowledge, 0) / candidates.length : 0;
+        const preferNumericFallback = tryCount >= mode.numericFallbackTryThreshold && (mode.preferNumericWhenKnowledgeHigh ? averageKnowledge >= 0.45 : !viableCandidates.length);
 
-        const TARGET_POWER = 0.34;
-        const MIN_POWER = 0.22;
-        const MAX_POWER = 0.5;
-        const bounded = candidates.filter(candidate => candidate.power >= MIN_POWER && candidate.power <= MAX_POWER);
+        if (!candidates.length) {
+            return buildNumericFallbackHint(mode) || buildGuaranteedHint();
+        }
+
+        const bounded = viableCandidates.filter(candidate => candidate.power >= mode.minPower && candidate.power <= mode.maxPower);
 
         if (bounded.length) {
             bounded.sort((a, b) => {
-                const aDiff = Math.abs(a.power - TARGET_POWER);
-                const bDiff = Math.abs(b.power - TARGET_POWER);
+                const aDiff = Math.abs(a.power - mode.targetPower);
+                const bDiff = Math.abs(b.power - mode.targetPower);
                 if (aDiff !== bDiff) return aDiff - bDiff;
                 return b.gain - a.gain;
             });
             return bounded[0];
         }
 
-        const nonNumericFallback = [...candidates].sort((a, b) => {
-            const aDiff = Math.abs(a.power - TARGET_POWER);
-            const bDiff = Math.abs(b.power - TARGET_POWER);
+        if (preferNumericFallback) {
+            const numericFallback = buildNumericFallbackHint(mode);
+            if (numericFallback) return numericFallback;
+        }
+
+        const nonNumericFallback = [...(viableCandidates.length ? viableCandidates : candidates)].sort((a, b) => {
+            const aDiff = Math.abs(a.power - mode.targetPower);
+            const bDiff = Math.abs(b.power - mode.targetPower);
             if (aDiff !== bDiff) return aDiff - bDiff;
             return b.gain - a.gain;
         })[0];
 
-        return nonNumericFallback || buildNumericFallbackHint(TARGET_POWER, MIN_POWER, MAX_POWER) || buildGuaranteedHint();
+        if (nonNumericFallback) return nonNumericFallback;
+        if (tryCount >= mode.guaranteedTryThreshold) return buildGuaranteedHint();
+        return buildNumericFallbackHint(mode) || buildGuaranteedHint();
     }
 
     function useAdaptiveHint() {
