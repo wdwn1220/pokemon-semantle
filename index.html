@@ -2220,15 +2220,8 @@
     }
 
     function buildAutocompleteNames(normalizedVal) {
-        const looseVal = stripHangulFinalConsonant(normalizedVal);
-        const choseongVal = toChoseongString(normalizedVal);
-
         const startsWithMatches = [];
         const includesMatches = [];
-        const looseStartsWithMatches = [];
-        const looseIncludesMatches = [];
-        const typoMatches = [];
-        const choseongMatches = [];
 
         allKoNames.forEach((name, idx) => {
             const normalizedName = normalizedKoNames[idx];
@@ -2240,35 +2233,11 @@
                 includesMatches.push(name);
                 return;
             }
-
-            const looseName = looseKoNames[idx];
-            if (looseName.startsWith(looseVal)) {
-                looseStartsWithMatches.push(name);
-                return;
-            }
-            if (looseName.includes(looseVal)) {
-                looseIncludesMatches.push(name);
-                return;
-            }
-
-            if (isSingleEditMatch(normalizedVal, normalizedName) || isSingleEditMatch(looseVal, looseName)) {
-                typoMatches.push(name);
-                return;
-            }
-
-            const choseongName = choseongKoNames[idx];
-            if (choseongName.startsWith(choseongVal) || choseongName.includes(choseongVal) || isSingleEditMatch(choseongVal, choseongName)) {
-                choseongMatches.push(name);
-            }
         });
 
         return [
             ...startsWithMatches,
-            ...includesMatches,
-            ...looseStartsWithMatches,
-            ...looseIncludesMatches,
-            ...typoMatches,
-            ...choseongMatches
+            ...includesMatches
         ].slice(0, 25);
     }
 
@@ -2333,6 +2302,18 @@
             if (currentFocus > -1 && x.length > 0) x[currentFocus].click(); 
             else handleGuess();
         }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.defaultPrevented || e.isComposing || e.keyCode === 229 || e.key !== 'Enter') return;
+        if (e.target === inputEl) return;
+
+        const target = e.target;
+        const tagName = target?.tagName;
+        if (tagName === 'TEXTAREA' || target?.id === 'filterAbilityInput') return;
+
+        e.preventDefault();
+        handleGuess();
     });
 
     function addActive(x) {
@@ -2646,14 +2627,14 @@
         const getImgAttrs = (size, fallback) => lazyImages
             ? `src="https://via.placeholder.com/${size}?text=Loading" data-src="${imgUrl}" loading="lazy" decoding="async" onerror="this.src='${fallback}';"`
             : `src="${imgUrl}" onerror="this.src='${fallback}';"`;
-        const typeHtml = p.type.map(t => `<span class="type-badge card-filter-trigger" data-filter-type="type" data-filter-value="${t}" style="background:${getPastelColor(t)}; color:${getTypeColor(t)}">${t}</span>`).join('');
+        const typeHtml = p.type.map(t => `<span class="type-badge card-filter-trigger" data-filter-type="type" data-filter-value="${t}" style="background:${getPastelColor(t)}; color:${getTypeColor(t)}" title="좌클릭: 타입1 / 우클릭: 타입2">${t}</span>`).join('');
         const shapeImg = getShapeImg(p.shape);
         const shapeContent = shapeImg
             ? `<span class="card-filter-trigger" data-filter-type="shape" data-filter-value="${p.shape}" title="체형 검색"><img src="${shapeImg}" class="shape-icon" title="${p.shape}"></span>`
             : `<span class="val-text card-filter-trigger" data-filter-type="shape" data-filter-value="${p.shape || ''}">${p.shape || '-'}</span>`;
         const buildBodyHtml = () => {
             const statValue = `${p.stats.hp}|${p.stats.atk}|${p.stats.def}|${p.stats.spa}|${p.stats.spd}|${p.stats.spe}`;
-            const radarSvg = getRadarChartSVG(p.stats, `class="card-filter-trigger card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;"`);
+            const radarSvg = getRadarChartSVG(p.stats, `class="card-filter-trigger card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;" title="좌클릭: 종족값 전체 최소 / 우클릭: 종족값 전체 최대"`);
             return `
                 <div class="grid-layout">
                     <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
@@ -2831,7 +2812,7 @@
         const pts = keys.map((k,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=(s[k]/max)*radius; return `${center+r*Math.cos(a)},${center+r*Math.sin(a)}`; }).join(' ');
         const bg = keys.map((_,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2; return `${center+radius*Math.cos(a)},${center+radius*Math.sin(a)}`; }).join(' ');
         const lbls = labels.map((l,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=radius+15, x=center+r*Math.cos(a), y=center+r*Math.sin(a), key=keys[i], statValue=s[key]; 
-            return `<g class="card-filter-trigger" data-filter-type="stat-${key}" data-filter-value="${statValue}" style="cursor:pointer;"><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${statValue}</tspan></text></g>`; }).join('');
+            return `<g class="card-filter-trigger" data-filter-type="stat-${key}" data-filter-value="${statValue}" style="cursor:pointer;" title="좌클릭: ${l} 최소 / 우클릭: ${l} 최대"><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${statValue}</tspan></text></g>`; }).join('');
         return `<svg viewBox="0 0 130 130" ${interactiveAttrs}><polygon points="${bg}" fill="#f8f8f8" stroke="#ddd"/><polygon points="${pts}" fill="rgba(255,82,82,0.3)" stroke="#ff5252" stroke-width="1.5"/>${lbls}</svg>`;
     }
 
