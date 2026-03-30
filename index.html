@@ -2321,7 +2321,6 @@
     document.addEventListener('keydown', function(e) {
         if (e.defaultPrevented || e.isComposing || e.keyCode === 229) return;
         if (!(e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && e.key.toLowerCase() === 's')) return;
-        if (isEditableElement(document.activeElement)) return;
 
         e.preventDefault();
         togglePokedexSidebar();
@@ -2645,7 +2644,7 @@
             : `<span class="val-text card-filter-trigger" data-filter-type="shape" data-filter-value="${p.shape || ''}">${p.shape || '-'}</span>`;
         const buildBodyHtml = () => {
             const statValue = `${p.stats.hp}|${p.stats.atk}|${p.stats.def}|${p.stats.spa}|${p.stats.spd}|${p.stats.spe}`;
-            const radarSvg = getRadarChartSVG(p.stats, `class="card-filter-trigger card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;" title="좌클릭: 종족값 전체 최소 / 우클릭: 종족값 전체 최대"`);
+            const radarSvg = getRadarChartSVG(p.stats, `class="card-filter-trigger card-stats-all-trigger" data-filter-type="stats-all" data-filter-value="${statValue}" style="cursor:pointer;"`, "좌클릭: 종족값 전체 최소 / 우클릭: 종족값 전체 최대");
             return `
                 <div class="grid-layout">
                     <div class="col-left"><div class="big-img-box"><img ${getImgAttrs('220x220', 'https://via.placeholder.com/220x220?text=No+Image')} class="big-img"></div></div>
@@ -2818,13 +2817,14 @@
         win.document.close();
     }
 
-    function getRadarChartSVG(s, interactiveAttrs = "") {
+    function getRadarChartSVG(s, interactiveAttrs = "", rootTooltip = "") {
         const size=130, center=65, radius=40, max=255, keys=['hp','atk','def','spe','spd','spa'], labels=['HP','공격','방어','스피드','특방','특공'];
         const pts = keys.map((k,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=(s[k]/max)*radius; return `${center+r*Math.cos(a)},${center+r*Math.sin(a)}`; }).join(' ');
         const bg = keys.map((_,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2; return `${center+radius*Math.cos(a)},${center+radius*Math.sin(a)}`; }).join(' ');
-        const lbls = labels.map((l,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=radius+15, x=center+r*Math.cos(a), y=center+r*Math.sin(a), key=keys[i], statValue=s[key]; 
-            return `<g class="card-filter-trigger" data-filter-type="stat-${key}" data-filter-value="${statValue}" style="cursor:pointer;" title="좌클릭: ${l} 최소 / 우클릭: ${l} 최대"><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${statValue}</tspan></text></g>`; }).join('');
-        return `<svg viewBox="0 0 130 130" ${interactiveAttrs}><polygon points="${bg}" fill="#f8f8f8" stroke="#ddd"/><polygon points="${pts}" fill="rgba(255,82,82,0.3)" stroke="#ff5252" stroke-width="1.5"/>${lbls}</svg>`;
+        const lbls = labels.map((l,i)=>{ const a=i*(Math.PI*2/6)-Math.PI/2, r=radius+15, x=center+r*Math.cos(a), y=center+r*Math.sin(a), key=keys[i], statValue=s[key], tooltip=`좌클릭: ${l} 최소 / 우클릭: ${l} 최대`; 
+            return `<g class="card-filter-trigger" data-filter-type="stat-${key}" data-filter-value="${statValue}" style="cursor:pointer;" title="${tooltip}"><title>${tooltip}</title><text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#555" font-weight="bold"><tspan x="${x}" dy="-5">${l}</tspan><tspan x="${x}" dy="11" font-weight="normal" fill="#333">${statValue}</tspan></text></g>`; }).join('');
+        const svgTitle = rootTooltip ? `<title>${rootTooltip}</title>` : "";
+        return `<svg viewBox="0 0 130 130" ${interactiveAttrs}>${svgTitle}<polygon points="${bg}" fill="#f8f8f8" stroke="#ddd"/><polygon points="${pts}" fill="rgba(255,82,82,0.3)" stroke="#ff5252" stroke-width="1.5"/>${lbls}</svg>`;
     }
 
     function getTypeColor(t) { const m={'노말':'#6D6D4E','불꽃':'#9C531F','물':'#445E9C','전기':'#A1871F','풀':'#4E8234','얼음':'#638D8D','격투':'#7D1F1A','독':'#682A68','땅':'#927D44','비행':'#6D5E9C','에스퍼':'#9C295B','벌레':'#6D7815','바위':'#786824','고스트':'#493963','드래곤':'#4924A1','악':'#49392F','강철':'#787887','페어리':'#9B4A7D'}; return m[t]||'#555'; }
