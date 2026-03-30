@@ -1351,7 +1351,7 @@
         const filtered = db
             .filter(p => {
                 if (!sidebarFilters.name) return true;
-                return isLooseKoreanNameMatch(sidebarFilters.name, p.ko) || (p.name || '').toLowerCase().includes(sidebarFilters.name);
+                return normalizeKoName(p.ko).includes(sidebarFilters.name) || (p.name || '').toLowerCase().includes(sidebarFilters.name);
             })
             .filter(p => !sidebarFilters.gen || String(p.gen) === sidebarFilters.gen)
             .filter(p => !sidebarFilters.status || p.status === sidebarFilters.status)
@@ -2222,23 +2222,62 @@
     function buildAutocompleteNames(normalizedVal) {
         const startsWithMatches = [];
         const includesMatches = [];
+        const looseMatches = [];
+        const typoMatches = [];
+        const choseongMatches = [];
+
+        const looseVal = stripHangulFinalConsonant(normalizedVal);
+        const choseongVal = toChoseongString(normalizedVal);
 
         allKoNames.forEach((name, idx) => {
             const normalizedName = normalizedKoNames[idx];
+            if (!normalizedName) return;
+
             if (normalizedName.startsWith(normalizedVal)) {
                 startsWithMatches.push(name);
                 return;
             }
+
             if (normalizedName.includes(normalizedVal)) {
                 includesMatches.push(name);
                 return;
             }
+
+            const looseName = looseKoNames[idx];
+            if (looseVal && looseName && (looseName.startsWith(looseVal) || looseName.includes(looseVal))) {
+                looseMatches.push(name);
+                return;
+            }
+
+            if (normalizedVal.length >= 2 && isSingleEditMatch(normalizedVal, normalizedName)) {
+                typoMatches.push(name);
+                return;
+            }
+
+            const choseongName = choseongKoNames[idx];
+            if (choseongVal && choseongName && (choseongName.startsWith(choseongVal) || choseongName.includes(choseongVal))) {
+                choseongMatches.push(name);
+                return;
+            }
+
+            if (choseongVal && choseongName && choseongVal.length >= 2 && isSingleEditMatch(choseongVal, choseongName)) {
+                choseongMatches.push(name);
+                return;
+            }
         });
 
-        return [
-            ...startsWithMatches,
-            ...includesMatches
-        ].slice(0, 25);
+        const uniqueMatches = [];
+        const seen = new Set();
+
+        [startsWithMatches, includesMatches, looseMatches, typoMatches, choseongMatches].forEach(group => {
+            group.forEach(name => {
+                if (seen.has(name)) return;
+                seen.add(name);
+                uniqueMatches.push(name);
+            });
+        });
+
+        return uniqueMatches.slice(0, 25);
     }
 
     const inputEl = document.getElementById('guessInput');
