@@ -318,7 +318,7 @@
     </div>
 </div>
 
-<button id="sideToggleBtn" class="side-toggle" onclick="togglePokedexSidebar()">◀</button>
+<button id="sideToggleBtn" class="side-toggle" onclick="togglePokedexSidebar()" title="사이드바 열기/닫기 (Alt+S)">◀</button>
 <aside id="pokedexSidebar" class="side-panel" aria-label="포켓몬 검색 사이드바">
     <div id="sideHoverPreviewPanel" class="side-hover-preview-panel" aria-hidden="true"><img id="sideHoverPreviewImg" src="https://via.placeholder.com/140" alt="포켓몬 미리보기"></div>
     <div class="side-header"><h3>📚 포켓몬 검색</h3></div>
@@ -2304,16 +2304,27 @@
         }
     });
 
+    function isEditableElement(el) {
+        if (!el) return false;
+        return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable;
+    }
+
     document.addEventListener('keydown', function(e) {
         if (e.defaultPrevented || e.isComposing || e.keyCode === 229 || e.key !== 'Enter') return;
         if (e.target === inputEl) return;
-
-        const target = e.target;
-        const tagName = target?.tagName;
-        if (tagName === 'TEXTAREA' || target?.id === 'filterAbilityInput') return;
+        if (isEditableElement(document.activeElement)) return;
 
         e.preventDefault();
-        handleGuess();
+        inputEl.focus();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.defaultPrevented || e.isComposing || e.keyCode === 229) return;
+        if (!(e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && e.key.toLowerCase() === 's')) return;
+        if (isEditableElement(document.activeElement)) return;
+
+        e.preventDefault();
+        togglePokedexSidebar();
     });
 
     function addActive(x) {
