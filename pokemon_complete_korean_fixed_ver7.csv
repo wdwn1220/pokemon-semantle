@@ -94,7 +94,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 69,bellsprout,모다피,1,일반,꽃포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,독,0.7,4,2,엽록소,,먹보,300,50,75,35,70,30,40,4,1,식물,,인간형,초록,
 70,weepinbell,우츠동,1,일반,파리잡이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,독,1,6.4,2,엽록소,,먹보,390,65,90,50,85,45,55,4,1,식물,,기둥형,초록,
 71,victreebel,우츠보트,1,일반,파리잡이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,독,1.7,15.5,2,엽록소,,먹보,490,80,105,65,100,70,70,4,1,식물,,기둥형,초록,
-71,victreebel-mega,메가우츠보트,1,일반,파리잡이포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,풀,독,4.5,125.5,2,엽록소,,,590,80,125,85,135,95,70,4,1,식물,,기둥형,초록,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/007102.png
+71,victreebel-mega,메가우츠보트,1,일반,파리잡이포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,풀,독,4.5,125.5,2,엽록소,,,590,80,125,85,135,95,70,4,1,식물,,기둥형,노랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/007102.png
 72,tentacool,왕눈해,1,일반,해파리포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,물,독,0.9,45.5,3,클리어바디,해감액,젖은접시,335,40,40,35,50,100,70,1,1,수중 3,,다족형,파랑,
 73,tentacruel,독파리,1,일반,해파리포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,물,독,1.6,55,3,클리어바디,해감액,젖은접시,515,80,70,65,80,120,100,1,1,수중 3,,다족형,파랑,
 74,geodude,꼬마돌,1,일반,암석포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,바위,땅,0.4,20,3,돌머리,옹골참,모래숨기,300,40,80,100,30,30,20,4,1,광물,,팔형,갈색,
@@ -163,7 +163,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 119,seaking,왕콘치,1,일반,금붕어포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,1.3,39,3,쓱쓱,수의베일,피뢰침,450,80,92,65,65,80,68,2,1,수중 2,,물고기형,빨강,
 120,staryu,별가사리,1,일반,별포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,0.8,34.5,3,발광,자연회복,애널라이즈,340,30,45,55,70,55,85,1,1,수중 3,,기둥형,갈색,
 121,starmie,아쿠스타,1,일반,수수께끼포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,물,에스퍼,1.1,80,3,발광,자연회복,애널라이즈,520,60,75,85,100,85,115,1,1,수중 3,,기둥형,보라,
-121,starmie-mega,메가아쿠스타,1,일반,수수께끼포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,물,에스퍼,2.3,80,3,발광,자연회복,,660,60,140,105,130,105,120,1,1,수중 3,,인간형,보라,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/012102.png
+121,starmie-mega,메가아쿠스타,1,일반,수수께끼포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,물,에스퍼,2.3,80,3,발광,자연회복,,660,60,140,105,130,105,120,1,1,수중 3,,기둥형,보라,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/012102.png
 122,mr-mime,마임맨,1,일반,배리어포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,에스퍼,페어리,1.3,54.5,3,방음,필터,테크니션,460,40,45,65,100,120,90,2,1,인간형,,인간형,담홍,
 122,mr-mime-galarian,가라르마임맨,1,일반,배리어포켓몬,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,2,얼음,에스퍼,1.4,56.8,3,의기양양,배리어프리,아이스바디,460,50,65,65,90,90,100,2,1,인간형,,인간형,하양,
 123,scyther,스라크,1,일반,버마재비포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,비행,1.5,56,3,벌레의알림,테크니션,불굴의마음,500,70,110,80,55,80,105,2,1,벌레,,다익형,초록,
@@ -447,7 +447,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 356,dusclops,미라몽,3,일반,손짓포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,고스트,,1.6,30.6,2,프레셔,,통찰,455,40,70,130,60,130,25,3,1,부정형,,인간형,검정,
 357,tropius,트로피우스,3,일반,후르츠포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,비행,2,100,3,엽록소,선파워,수확,460,99,68,83,72,87,51,1,2,괴수,식물,사족형,초록,
 358,chimecho,치렁,3,일반,풍경포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,에스퍼,,0.6,1,1,부유,,,455,75,50,80,95,90,65,3,1,부정형,,팔형,파랑,
-358,chimecho-mega,메가치렁,3,일반,풍경포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,에스퍼,강철,1.2,8,1,부유,,,555,75,50,110,135,120,65,3,1,부정형,,팔형,파랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/035802.png
+358,chimecho-mega,메가치렁,3,일반,풍경포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,에스퍼,강철,1.2,8,1,부유,,,555,75,50,110,135,120,65,3,1,부정형,,군집형,파랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/035802.png
 359,absol,앱솔,3,일반,재난포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,악,,1.2,47,3,프레셔,대운,정의의마음,465,65,130,60,75,60,75,4,1,육상,,사족형,하양,
 359,absol-mega,메가앱솔,3,일반,재난포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,악,,1.2,49,1,매직미러,,,565,65,150,60,115,60,115,4,1,육상,,사족형,하양,
 359,absol-mega-z,메가앱솔Z,3,일반,재난포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,악,고스트,1.2,49,3,프레셔,대운,,565,65,154,60,75,60,151,4,1,육상,,사족형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/035903.png
@@ -501,7 +501,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 396,starly,찌르꼬,4,일반,찌르레기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,노말,비행,0.3,2,2,날카로운눈,,이판사판,245,40,55,30,30,30,60,4,1,비행,,단익형,갈색,
 397,staravia,찌르버드,4,일반,찌르레기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,노말,비행,0.6,15.5,2,위협,,이판사판,340,55,75,50,40,40,80,4,1,비행,,단익형,갈색,
 398,staraptor,찌르호크,4,일반,맹금포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,노말,비행,1.2,24.9,2,위협,,이판사판,485,85,120,70,50,60,100,4,1,비행,,단익형,갈색,
-398,staraptor-mega,메가찌르호크,4,일반,맹금포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,비행,1.9,50,2,위협,,,585,85,140,100,60,90,110,4,1,비행,,단익형,갈색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/039802.png
+398,staraptor-mega,메가찌르호크,4,일반,맹금포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,비행,1.9,50,2,위협,,,585,85,140,100,60,90,110,4,1,비행,,단익형,회색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/039802.png
 399,bidoof,비버니,4,일반,둥글쥐포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,노말,,0.5,20,3,단순,천진,변덕쟁이,250,59,45,40,35,40,31,2,2,수중 1,육상,사족형,갈색,
 400,bibarel,비버통,4,일반,비버포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,노말,물,1,31.5,3,단순,천진,변덕쟁이,410,79,85,60,55,60,71,2,2,수중 1,육상,이족꼬리형,갈색,
 401,kricketot,귀뚤뚜기,4,일반,귀뚜라미포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,벌레,,0.3,2.2,2,탈피,,도주,194,37,25,41,25,41,25,4,1,벌레,,인간형,빨강,
@@ -558,7 +558,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 447,riolu,리오르,4,일반,파문포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,격투,,0.7,20.2,3,불굴의마음,정신력,짓궂은마음,285,40,70,40,35,40,60,4,1,알미발견,,이족꼬리형,파랑,
 448,lucario,루카리오,4,일반,파동포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,격투,강철,1.2,54,3,불굴의마음,정신력,정의의마음,525,70,110,70,115,70,90,4,2,육상,인간형,이족꼬리형,파랑,
 448,lucario-mega,메가루카리오,4,일반,파동포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,강철,1.3,57.5,1,적응력,,,625,70,145,88,140,70,112,4,2,육상,인간형,이족꼬리형,파랑,
-448,lucario-mega-z,메가루카리오Z,4,일반,파동포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,강철,1.3,49.4,3,불굴의마음,정신력,,625,70,100,70,164,70,151,4,2,육상,인간형,이족꼬리형,파랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/044803.png
+448,lucario-mega-z,메가루카리오Z,4,일반,파동포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,강철,1.3,49.4,3,불굴의마음,정신력,,625,70,100,70,164,70,151,4,2,육상,인간형,이족꼬리형,회색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/044803.png
 449,hippopotas,히포포타스,4,일반,하마포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,땅,,0.8,49.5,2,모래날림,,모래의힘,330,68,72,78,38,42,32,1,1,육상,,사족형,갈색,
 450,hippowdon,하마돈,4,일반,중량포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,땅,,2,300,2,모래날림,,모래의힘,525,108,112,118,68,72,47,1,1,육상,,사족형,갈색,
 451,skorupi,스콜피,4,일반,전갈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,독,벌레,0.8,12,3,전투무장,스나이퍼,날카로운눈,330,40,50,90,30,55,65,1,2,벌레,수중 3,곤충형,보라,
@@ -606,7 +606,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 484,palkia,펄기아,4,전설,공간포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,물,드래곤,4.2,336,2,프레셔,,텔레파시,680,90,120,100,150,120,100,1,1,알미발견,,이족꼬리형,보라,
 484,palkia-origin,펄기아(오리진폼),4,전설,공간포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,물,드래곤,6.3,659,2,프레셔,,텔레파시,680,90,100,100,150,120,120,1,1,알미발견,,사족형,보라,
 485,heatran,히드런,4,준전설,화구포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,불꽃,강철,1.7,430,2,타오르는불꽃,,불꽃몸,600,91,90,106,130,106,77,1,1,알미발견,,사족형,갈색,
-485,heatran-mega,메가히드런,4,준전설,화구포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,불꽃,강철,2.8,570,2,타오르는불꽃,,,700,91,120,106,175,141,67,1,1,알미발견,,사족형,빨강,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/048502.png
+485,heatran-mega,메가히드런,4,준전설,화구포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,불꽃,강철,2.8,570,2,타오르는불꽃,,,700,91,120,106,175,141,67,1,1,알미발견,,사족형,갈색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/048502.png
 486,regigigas,레지기가스,4,준전설,거대포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,노말,,3.7,420,1,슬로스타트,,,670,110,160,110,80,110,100,1,1,알미발견,,인간형,하양,
 487,giratina-altered,기라티나,4,전설,반골포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,고스트,드래곤,4.5,750,2,프레셔,,텔레파시,680,150,100,120,100,120,90,1,1,알미발견,,다족형,검정,
 487,giratina-origin,기라티나(오리진폼),4,전설,반골포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,고스트,드래곤,6.9,650,1,부유,,,680,150,120,100,120,100,90,1,1,알미발견,,뱀형,검정,
@@ -614,7 +614,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 489,phione,피오네,4,환상,해양포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,0.4,3.1,1,촉촉바디,,,480,80,80,80,80,80,80,1,2,수중 1,요정,팔형,파랑,
 490,manaphy,마나피,4,환상,회유포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,0.3,1.4,1,촉촉바디,,,600,100,100,100,100,100,100,1,2,수중 1,요정,인간형,파랑,
 491,darkrai,다크라이,4,환상,암흑포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,악,,1.5,50.5,1,나이트메어,,,600,70,90,90,135,90,125,1,1,알미발견,,인간형,검정,
-491,darkrai-mega,메가다크라이,4,환상,암흑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,악,,3,240,1,나이트메어,,,700,70,120,130,165,130,85,1,1,알미발견,,인간형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/049102.png
+491,darkrai-mega,메가다크라이,4,환상,암흑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,악,,3,240,1,나이트메어,,,700,70,120,130,165,130,85,1,1,알미발견,,팔형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/049102.png
 492,shaymin-land,쉐이미,4,환상,감사포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,풀,,0.2,2.1,1,자연회복,,,600,100,100,100,100,100,100,4,1,알미발견,,사족형,초록,
 492,shaymin-sky,쉐이미(스카이폼),4,환상,감사포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,풀,비행,0.4,5.2,1,하늘의은총,,,600,100,103,75,120,75,127,4,1,알미발견,,사족형,초록,
 493,arceus,아르세우스,4,환상,창조포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,3.2,320,1,멀티타입,,,720,120,120,120,120,120,120,1,1,알미발견,,사족형,하양,
@@ -657,7 +657,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 528,swoobat,맘박쥐,5,일반,구애포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,에스퍼,비행,0.9,10.5,3,천진,서투름,단순,425,67,57,55,77,55,114,2,2,육상,비행,단익형,파랑,
 529,drilbur,두더류,5,일반,두더지포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,땅,,0.3,8.5,3,모래헤치기,모래의힘,틀깨기,328,60,85,40,30,45,68,2,1,육상,,이족꼬리형,회색,
 530,excadrill,몰드류,5,일반,땅밑포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,땅,강철,0.7,40.4,3,모래헤치기,모래의힘,틀깨기,508,110,135,60,50,65,88,2,1,육상,,인간형,회색,
-530,excadrill-mega,메가몰드류,5,일반,땅밑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,땅,강철,0.9,60,3,모래헤치기,모래의힘,,608,110,165,100,65,65,103,2,1,육상,,인간형,빨강,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/053002.png
+530,excadrill-mega,메가몰드류,5,일반,땅밑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,땅,강철,0.9,60,3,모래헤치기,모래의힘,,608,110,165,100,65,65,103,2,1,육상,,인간형,회색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/053002.png
 531,audino,다부니,5,일반,히어링포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,노말,,1.1,31,3,치유의마음,재생력,서투름,445,103,60,86,60,86,50,3,1,요정,,이족꼬리형,담홍,
 531,audino-mega,메가다부니,5,일반,히어링포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,노말,페어리,1.5,32,1,치유의마음,,,545,103,60,126,80,126,50,3,1,요정,,이족꼬리형,하양,
 532,timburr,으랏차,5,일반,근골포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,격투,,0.6,12.5,3,근성,우격다짐,철주먹,305,75,80,55,25,35,35,4,1,인간형,,인간형,회색,
@@ -674,7 +674,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 543,venipede,마디네,5,일반,지네포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,독,0.4,5.3,3,독가시,벌레의알림,가속,260,30,45,59,30,39,57,4,1,벌레,,곤충형,빨강,
 544,whirlipede,휠구,5,일반,눈썹지네포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,독,1.2,58.5,3,독가시,벌레의알림,가속,360,40,55,99,40,79,47,4,1,벌레,,머리형,회색,
 545,scolipede,펜드라,5,일반,메가지네포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,독,2.5,200.5,3,독가시,벌레의알림,가속,485,60,100,89,55,69,112,4,1,벌레,,곤충형,빨강,
-545,scolipede-mega,메가펜드라,5,일반,메가지네포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,벌레,독,3.2,230.5,3,독가시,벌레의알림,,585,60,140,149,75,99,62,4,1,벌레,,곤충형,빨강,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/054502.png
+545,scolipede-mega,메가펜드라,5,일반,메가지네포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,벌레,독,3.2,230.5,3,독가시,벌레의알림,,585,60,140,149,75,99,62,4,1,벌레,,곤충형,보라,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/054502.png
 546,cottonee,소미안,5,일반,솜뭉치포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,페어리,0.3,0.6,3,짓궂은마음,틈새포착,엽록소,280,40,27,60,37,50,66,2,2,식물,요정,머리형,초록,
 547,whimsicott,엘풍,5,일반,바람숨기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,페어리,0.7,6.6,3,짓궂은마음,틈새포착,엽록소,480,60,67,85,77,75,116,2,2,식물,요정,인간형,초록,
 548,petilil,치릴리,5,일반,뿌리포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,풀,,0.5,6.6,3,엽록소,마이페이스,리프가드,280,45,35,50,70,50,30,2,1,식물,,기둥형,초록,
@@ -697,7 +697,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 558,crustle,암팰리스,5,일반,바위집포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,바위,1.4,200,3,옹골참,조가비갑옷,깨어진갑옷,485,70,105,125,65,75,45,2,2,벌레,광물,곤충형,빨강,
 559,scraggy,곤율랭,5,일반,탈피포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,악,격투,0.6,11.8,3,탈피,자기과신,위협,348,50,75,70,35,70,48,2,2,육상,드래곤,이족꼬리형,노랑,
 560,scrafty,곤율거니,5,일반,악당포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,악,격투,1.1,30,3,탈피,자기과신,위협,488,65,90,115,45,115,58,2,2,육상,드래곤,이족꼬리형,빨강,
-560,scrafty-mega,메가곤율거니,5,일반,악당포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,악,격투,1.1,31,3,탈피,자기과신,,588,65,130,135,55,135,68,2,2,육상,드래곤,이족꼬리형,하양,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/056002.png
+560,scrafty-mega,메가곤율거니,5,일반,악당포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,악,격투,1.1,31,3,탈피,자기과신,,588,65,130,135,55,135,68,2,2,육상,드래곤,이족꼬리형,갈색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/056002.png
 561,sigilyph,심보러,5,일반,흡사새포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,에스퍼,비행,1.4,14,3,미라클스킨,매직가드,색안경,490,72,58,80,103,80,97,2,1,비행,,단익형,검정,
 562,yamask,데스마스,5,일반,영혼포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,고스트,,0.5,1.5,1,미라,,,303,38,30,85,55,65,30,2,2,광물,부정형,팔형,검정,
 562,yamask-galarian,가라르데스마스,5,일반,영혼포켓몬,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,2,땅,고스트,0.5,1.5,1,떠도는영혼,,,303,38,55,85,30,65,30,2,2,광물,부정형,팔형,검정,
@@ -805,7 +805,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 650,chespin,도치마론,6,일반,밤송이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,풀,,0.4,9,2,심록,,방탄,313,56,61,65,48,45,38,4,1,육상,,이족꼬리형,초록,
 651,quilladin,도치보구,6,일반,가시갑옷포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,풀,,0.7,29,2,심록,,방탄,405,61,78,95,56,58,57,4,1,육상,,이족꼬리형,초록,
 652,chesnaught,브리가론,6,일반,가시갑옷포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,풀,격투,1.6,90,2,심록,,방탄,530,88,107,122,74,75,64,4,1,육상,,이족꼬리형,초록,
-652,chesnaught-mega,메가브리가론,6,일반,가시갑옷포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,풀,격투,1.6,90,2,방탄,,,630,88,137,172,74,115,44,4,1,육상,,이족꼬리형,초록,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/065202.png
+652,chesnaught-mega,메가브리가론,6,일반,가시갑옷포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,풀,격투,1.6,90,2,방탄,,,630,88,137,172,74,115,44,4,1,육상,,이족꼬리형,하양,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/065202.png
 653,fennekin,푸호꼬,6,일반,여우포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,불꽃,,0.4,9.4,2,맹화,,매지션,307,40,45,40,62,60,60,4,1,육상,,사족형,빨강,
 654,braixen,테르나,6,일반,여우포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,불꽃,,1,14.5,2,맹화,,매지션,409,59,59,58,90,70,73,4,1,육상,,이족꼬리형,빨강,
 655,delphox,마폭시,6,일반,여우포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,불꽃,에스퍼,1.5,39,2,맹화,,매지션,534,75,69,72,114,100,104,4,1,육상,,이족꼬리형,빨강,
@@ -827,8 +827,8 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 668,pyroar-mega,메가화염레오,6,일반,임금포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,불꽃,노말,1.5,93.3,3,투쟁심,긴장감,,607,86,88,92,129,86,126,4,1,육상,,사족형,갈색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/066803.png
 669,flabebe,플라베베,6,일반,한송이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,페어리,,0.1,0.1,2,플라워베일,,공생,303,44,38,39,61,79,42,2,1,요정,,팔형,하양,
 670,floette,플라엣테,6,일반,한송이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,페어리,,0.2,0.9,2,플라워베일,,공생,371,54,45,47,75,98,52,2,1,요정,,팔형,하양,
-670,floette-eternal,영원의꽃플라엣테,6,일반,한송이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,페어리,,0.2,0.9,2,플라워베일,,공생,551,74,65,67,125,128,92,2,1,요정,,팔형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/067002.png
-670,floette-mega,메가플라엣테,6,일반,한송이포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,페어리,,0.2,100.8,2,플라워베일,,,651,74,85,87,155,148,102,2,1,요정,,팔형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/067003.png
+670,floette-eternal,영원의꽃플라엣테,6,일반,한송이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,페어리,,0.2,0.9,2,플라워베일,,공생,551,74,65,67,125,128,92,2,1,요정,,팔형,하양,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/067002.png
+670,floette-mega,메가플라엣테,6,일반,한송이포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,페어리,,0.2,100.8,2,플라워베일,,,651,74,85,87,155,148,102,2,1,요정,,팔형,하양,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/067003.png
 671,florges,플라제스,6,일반,가든포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,페어리,,1.1,10,2,플라워베일,,공생,552,78,65,68,112,154,75,2,1,요정,,팔형,하양,
 672,skiddo,메이클,6,일반,라이드포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,풀,,0.9,31,2,초식,,풀모피,350,66,65,48,62,57,52,2,1,육상,,사족형,갈색,
 673,gogoat,고고트,6,일반,라이드포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,풀,,1.7,91,2,초식,,풀모피,531,123,100,62,97,81,68,2,1,육상,,사족형,갈색,
@@ -838,7 +838,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 677,espurr,냐스퍼,6,일반,자제포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,에스퍼,,0.3,3.5,3,날카로운눈,틈새포착,마이페이스,355,62,48,54,63,60,68,2,1,육상,,이족꼬리형,회색,
 678,meowstic-male,냐오닉스(수컷),6,일반,억제포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,에스퍼,,0.6,8.5,3,날카로운눈,틈새포착,짓궂은마음,466,74,48,76,83,81,104,2,1,육상,,이족꼬리형,파랑,
 678,meowstic-female,냐오닉스(암컷),6,일반,억제포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,에스퍼,,0.6,8.5,3,날카로운눈,틈새포착,승기,466,74,48,76,83,81,104,2,1,육상,,이족꼬리형,하양,
-678,meowstic-mega,메가냐오닉스,6,일반,억제포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,에스퍼,,0.8,10.1,3,날카로운눈,틈새포착,,566,74,48,76,143,101,124,2,1,육상,,이족꼬리형,파랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/067803.png
+678,meowstic-mega,메가냐오닉스,6,일반,억제포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,1,에스퍼,,0.8,10.1,3,날카로운눈,틈새포착,,566,74,48,76,143,101,124,2,1,육상,,이족꼬리형,하양,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/067803.png
 679,honedge,단칼빙,6,일반,도검포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,강철,고스트,0.8,2,1,노가드,,,325,45,80,100,35,37,28,2,1,광물,,기둥형,갈색,
 680,doublade,쌍검킬,6,일반,도검포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,강철,고스트,0.8,4.5,1,노가드,,,448,59,110,150,45,49,35,2,1,광물,,군집형,갈색,
 681,aegislash-shield,킬가르도(실드폼),6,일반,왕검포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,강철,고스트,1.7,53,1,배틀스위치,,,500,60,50,140,50,140,60,2,1,광물,,기둥형,갈색,
@@ -852,7 +852,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 687,malamar-mega,메가칼라마네로,6,일반,역전포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,악,에스퍼,2.9,69.8,3,심술꾸러기,흡반,,582,86,102,88,98,120,88,2,2,수중 1,수중 2,기둥형,파랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/068702.png
 688,binacle,거북손손,6,일반,두손포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,바위,물,0.5,31,3,단단한발톱,스나이퍼,나쁜손버릇,306,42,52,67,39,56,50,2,1,수중 3,,군집형,갈색,
 689,barbaracle,거북손데스,6,일반,집합포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,바위,물,1.3,96,3,단단한발톱,스나이퍼,나쁜손버릇,500,72,105,115,54,86,68,2,1,수중 3,,군집형,갈색,
-689,barbaracle-mega,메가거북손데스,6,일반,집합포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,바위,격투,2.2,100,3,단단한발톱,스나이퍼,,600,72,140,130,64,106,88,2,1,수중 3,,군집형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/068902.png
+689,barbaracle-mega,메가거북손데스,6,일반,집합포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,바위,격투,2.2,100,3,단단한발톱,스나이퍼,,600,72,140,130,64,106,88,2,1,수중 3,,군집형,갈색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/068902.png
 690,skrelp,수레기,6,일반,풀모방포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,독,물,0.5,7.3,3,독가시,독수,적응력,320,50,60,60,60,60,30,2,2,수중 1,드래곤,기둥형,갈색,
 691,dragalge,드래캄,6,일반,풀모방포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,독,드래곤,1.8,81.5,3,독가시,독수,적응력,494,65,75,90,97,123,44,2,2,수중 1,드래곤,기둥형,갈색,
 691,dragalge-mega,메가드래캄,6,일반,풀모방포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,독,드래곤,2.1,100.3,3,독가시,독수,,594,65,85,105,132,163,44,2,2,수중 1,드래곤,기둥형,갈색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/069102.png
@@ -866,7 +866,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 699,aurorus,아마루르가,6,일반,툰드라포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,바위,얼음,2.7,225,2,프리즈스킨,,눈퍼뜨리기,521,123,77,72,99,92,58,2,1,괴수,,사족형,파랑,
 700,sylveon,님피아,6,일반,연결포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,페어리,,1,23.5,2,헤롱헤롱바디,,페어리스킨,525,95,65,65,110,130,60,2,1,육상,,사족형,담홍,
 701,hawlucha,루차불,6,일반,레슬링포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,격투,비행,0.8,21.5,3,유연,곡예,틀깨기,500,78,92,75,74,63,118,2,2,비행,인간형,인간형,초록,
-701,hawlucha-mega,메가루차불,6,일반,레슬링포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,비행,1,25,3,유연,곡예,,600,78,137,100,74,93,118,2,2,비행,인간형,인간형,초록,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/070102.png
+701,hawlucha-mega,메가루차불,6,일반,레슬링포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,격투,비행,1,25,3,유연,곡예,,600,78,137,100,74,93,118,2,2,비행,인간형,인간형,노랑,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/070102.png
 702,dedenne,데덴네,6,일반,안테나포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,전기,페어리,0.2,2.2,3,볼주머니,픽업,플러스,431,67,58,57,81,67,101,2,2,육상,요정,이족꼬리형,노랑,
 703,carbink,멜리시,6,일반,보석포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,바위,페어리,0.3,5.7,2,클리어바디,,옹골참,500,50,50,150,50,150,50,1,2,요정,광물,머리형,회색,
 704,goomy,미끄메라,6,일반,연체포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,드래곤,,0.3,2.8,3,초식,촉촉바디,미끈미끈,300,45,50,35,55,75,40,1,1,드래곤,,뱀형,보라,
@@ -889,7 +889,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 718,zygarde-10,지가르데(10%폼),6,전설,질서포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,드래곤,땅,1.2,33.5,2,오라브레이크,스웜체인지,,486,54,100,71,61,85,115,1,1,알미발견,,사족형,검정,
 718,zygarde-50,지가르데(50%폼),6,전설,질서포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,드래곤,땅,5,305,2,오라브레이크,스웜체인지,,600,108,100,121,81,95,95,1,1,알미발견,,뱀형,초록,
 718,zygarde-complete,지가르데(퍼팩트폼),6,전설,질서포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,드래곤,땅,4.5,610,1,스웜체인지,,,708,216,100,121,91,95,85,1,1,알미발견,,이족꼬리형,검정,
-718,zygarde-mega,메가지가르데,6,전설,질서포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,드래곤,땅,7.7,610,1,스웜체인지,,,778,216,70,91,216,85,100,1,1,알미발견,,이족꼬리형,검정,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/071804.png
+718,zygarde-mega,메가지가르데,6,전설,질서포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,드래곤,땅,7.7,610,1,스웜체인지,,,778,216,70,91,216,85,100,1,1,알미발견,,이족꼬리형,초록,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/071804.png
 719,diancie,디안시,6,환상,보석포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,바위,페어리,0.7,8.8,1,클리어바디,,,600,50,100,150,100,150,50,1,1,알미발견,,팔형,담홍,
 719,diancie-mega,메가디안시,6,환상,보석포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,바위,페어리,1.1,27.8,1,매직미러,,,700,50,160,110,160,110,110,1,1,알미발견,,팔형,담홍,
 720,hoopa,후파,6,환상,장난포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,에스퍼,고스트,0.5,9,1,매지션,,,600,80,110,60,150,130,70,1,1,알미발견,,팔형,보라,
@@ -950,7 +950,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 766,passimian,내던숭이,7,일반,연계포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,격투,,2,82.8,2,리시버,,오기,490,100,120,90,40,60,80,1,1,육상,,이족꼬리형,하양,
 767,wimpod,꼬시레,7,일반,주행포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,물,0.5,12,1,도망태세,,,230,25,35,40,20,30,80,2,2,벌레,수중 3,다족형,회색,
 768,golisopod,갑주무사,7,일반,장갑포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,벌레,물,2,108,1,위기회피,,,530,75,125,140,60,90,40,2,2,벌레,수중 3,인간형,회색,
-768,golisopod-mega,메가갑주무사,7,일반,장갑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,벌레,강철,2.3,148,1,위기회피,,,630,75,150,175,70,120,40,2,2,벌레,수중 3,인간형,회색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/076802.png
+768,golisopod-mega,메가갑주무사,7,일반,장갑포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,2,벌레,강철,2.3,148,1,위기회피,,,630,75,150,175,70,120,40,2,2,벌레,수중 3,다족형,회색,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/076802.png
 769,sandygast,모래꿍,7,일반,모래산포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,고스트,땅,0.5,70,2,꾸덕꾸덕굳기,,모래숨기,320,55,55,80,70,45,15,2,1,부정형,,뱀형,갈색,
 770,palossand,모래성이당,7,일반,모래성포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,고스트,땅,1.3,250,2,꾸덕꾸덕굳기,,모래숨기,480,85,75,110,100,75,35,2,1,부정형,,뱀형,갈색,
 771,pyukumuku,해무기,7,일반,해삼포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,0.3,1.2,2,내용물분출,,천진,410,55,60,130,30,130,5,3,1,수중 1,,뱀형,검정,
@@ -1189,7 +1189,7 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 976,veluza,가비루사,9,일반,분리포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,물,에스퍼,2.5,90,2,틀깨기,,예리함,478,90,102,73,78,65,70,3,1,수중 2,,물고기형,회색,
 977,dondozo,어써러셔,9,일반,큰메기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,1,물,,12,220,3,천진,둔감,수의베일,530,150,100,115,65,65,35,1,1,수중 2,,물고기형,파랑,
 978,tatsugiri-curly,싸리용,9,일반,의태포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,2,드래곤,물,0.3,8,2,사령탑,,마중물,475,68,50,60,120,95,82,4,1,수중 2,,물고기형,빨강,
-978,tatsugiri-curly-mega,메가싸리용,9,일반,의태포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,2,드래곤,물,0.6,24,2,사령탑,,,575,68,65,90,135,125,92,4,1,수중 2,,물고기형,빨강,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/097804.png
+978,tatsugiri-curly-mega,메가싸리용,9,일반,의태포켓몬,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,2,드래곤,물,0.6,24,2,사령탑,,,575,68,65,90,135,125,92,4,1,수중 2,,군집형,빨강,https://data1.pokemonkorea.co.kr/newdata/pokedex/full/097804.png
 979,annihilape,저승갓숭,9,일반,분노숭이포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,격투,고스트,1.2,56,3,의기양양,정신력,오기,535,110,115,80,50,90,90,2,1,육상,,인간형,회색,
 980,clodsire,토오,9,일반,가시물고기포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,독,땅,1.8,223,3,독가시,저수,천진,430,130,75,60,45,100,20,2,2,수중 1,육상,사족형,갈색,
 981,farigiraf,키키링,9,일반,긴목포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,노말,에스퍼,3.2,160,3,되새김질,테일아머,초식,520,120,90,70,110,70,60,2,1,육상,,사족형,갈색,
