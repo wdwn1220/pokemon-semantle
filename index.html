@@ -58,7 +58,12 @@
         #inlineRestartBtn { background: var(--accent) !important; padding: 0 16px; font-size: 0.92rem; }
         #hintBtn { background: #f59e0b; }
         #hintBtn:hover:not(:disabled) { background: #d97706; }
-        #hintBtn:disabled { background: #9ca3af; color: #e5e7eb; }
+        #hintBtn:disabled,
+        #hintBtn[disabled] {
+            background-color: #9ca3af !important;
+            color: #e5e7eb;
+            opacity: 1;
+        }
         #hintMsg { display: none; margin-top: 10px; border: 1px solid #fde68a; background: #fffbeb; color: #92400e; border-radius: 12px; font-size: 0.92rem; font-weight: 800; padding: 0; line-height: 1.35; overflow: hidden; }
         .guide-notice { margin: 14px auto 24px; max-width: 600px; border: 1px solid #dbe2ea; border-radius: 12px; background: #fff; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05); }
         .guide-notice > summary { cursor: pointer; padding: 12px 14px; font-size: 0.9rem; font-weight: 800; color: #334155; list-style: none; position: relative; }
