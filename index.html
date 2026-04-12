@@ -2184,7 +2184,12 @@
 
     function getVector(p) {
         let v = [];
-        for(let g=1; g<=9; g++) v.push(p.gen === g ? 1.8 : 0);
+        const maxGenDistance = 8;
+        for (let g = 1; g <= 9; g++) {
+            const genDistance = Math.abs(p.gen - g);
+            const proximityScore = Math.max(0, 1 - (genDistance / maxGenDistance));
+            v.push(proximityScore * 1.8);
+        }
         sets.status.forEach(s => v.push(p.status === s ? 2.0 : 0));
         sets.types.forEach(t => v.push(p.type.includes(t) ? 2.1 : 0));
         sets.categories.forEach(c => v.push(p.category === c ? 2.0 : 0));
