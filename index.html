@@ -510,6 +510,7 @@
     const sidebarPreviewCache = new Set();
     const sidebarPreviewInflight = new Map();
     const SIDEBAR_PRELOAD_BATCH_SIZE = 28;
+    const SIDEBAR_SCROLL_PRELOAD_BUFFER_PX = 120;
 
     window.onload = async function() {
         try {
@@ -1321,12 +1322,35 @@
         }
     }
 
+    function getSidebarVisiblePreviewImageUrls(listEl) {
+        if (!listEl) return [];
+        const items = Array.from(listEl.querySelectorAll('.side-item[data-preview-image]'));
+        if (!items.length) return [];
+
+        const minY = Math.max(0, listEl.scrollTop - SIDEBAR_SCROLL_PRELOAD_BUFFER_PX);
+        const maxY = listEl.scrollTop + listEl.clientHeight + SIDEBAR_SCROLL_PRELOAD_BUFFER_PX;
+
+        return items
+            .filter(item => {
+                const top = item.offsetTop;
+                const bottom = top + item.offsetHeight;
+                return bottom >= minY && top <= maxY;
+            })
+            .map(item => item.dataset.previewImage)
+            .filter(Boolean);
+    }
+
+    function preloadVisibleSidebarItems(listEl) {
+        warmSidebarPreviewImages(getSidebarVisiblePreviewImageUrls(listEl));
+    }
+
     function initSidebarHoverPreview() {
         const listEl = document.getElementById('sidePokemonList');
         const panelEl = document.getElementById('sideHoverPreviewPanel');
         const imgEl = document.getElementById('sideHoverPreviewImg');
         const sidebarEl = document.getElementById('pokedexSidebar');
         if (!listEl || !panelEl || !imgEl) return;
+        let scrollPreloadFrame = null;
 
         const hidePreview = () => panelEl.classList.remove('show');
         const previewMargin = 12;
@@ -1367,7 +1391,14 @@
             hidePreview();
         });
 
-        listEl.addEventListener('scroll', hidePreview, { passive: true });
+        listEl.addEventListener('scroll', () => {
+            hidePreview();
+            if (scrollPreloadFrame !== null) return;
+            scrollPreloadFrame = requestAnimationFrame(() => {
+                scrollPreloadFrame = null;
+                preloadVisibleSidebarItems(listEl);
+            });
+        }, { passive: true });
         sidebarEl?.addEventListener('mouseleave', hidePreview);
     }
 
@@ -1486,6 +1517,7 @@
         }).join('');
 
         warmSidebarPreviewImages(filtered.slice(0, SIDEBAR_PRELOAD_BATCH_SIZE).map(p => getImageUrl(p)));
+        preloadVisibleSidebarItems(listEl);
     }
 
     function getTodayKey() {
