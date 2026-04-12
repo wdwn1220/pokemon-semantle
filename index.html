@@ -507,6 +507,9 @@
     const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
     const SHOW_CLEAR_RECORDS_BUTTON = false;
     const customDropdownMap = new Map();
+    const sidebarPreviewCache = new Set();
+    const sidebarPreviewInflight = new Map();
+    const SIDEBAR_PRELOAD_BATCH_SIZE = 28;
 
     window.onload = async function() {
         try {
@@ -1283,6 +1286,40 @@
         return Number.isNaN(n) ? fallback : n;
     }
 
+    function preloadSidebarPreviewImage(url) {
+        if (!url) return Promise.resolve(false);
+        if (sidebarPreviewCache.has(url)) return Promise.resolve(true);
+        if (sidebarPreviewInflight.has(url)) return sidebarPreviewInflight.get(url);
+
+        const loader = new Image();
+        loader.decoding = 'async';
+        const preloadPromise = new Promise(resolve => {
+            loader.onload = () => {
+                sidebarPreviewCache.add(url);
+                sidebarPreviewInflight.delete(url);
+                resolve(true);
+            };
+            loader.onerror = () => {
+                sidebarPreviewInflight.delete(url);
+                resolve(false);
+            };
+        });
+
+        sidebarPreviewInflight.set(url, preloadPromise);
+        loader.src = url;
+        return preloadPromise;
+    }
+
+    function warmSidebarPreviewImages(imageUrls, limit = SIDEBAR_PRELOAD_BATCH_SIZE) {
+        if (!Array.isArray(imageUrls) || !imageUrls.length) return;
+        let count = 0;
+        for (const url of imageUrls) {
+            if (!url || sidebarPreviewCache.has(url) || sidebarPreviewInflight.has(url)) continue;
+            preloadSidebarPreviewImage(url);
+            count += 1;
+            if (count >= limit) break;
+        }
+    }
 
     function initSidebarHoverPreview() {
         const listEl = document.getElementById('sidePokemonList');
@@ -1309,6 +1346,8 @@
             if (!item || !listEl.contains(item)) return;
             const imgUrl = item.dataset.previewImage;
             if (!imgUrl) return;
+            const siblingPreviewUrls = [imgUrl, item.nextElementSibling?.dataset?.previewImage, item.previousElementSibling?.dataset?.previewImage].filter(Boolean);
+            warmSidebarPreviewImages(siblingPreviewUrls, siblingPreviewUrls.length);
             imgEl.src = imgUrl;
             placePreviewNearItem(item);
             panelEl.classList.add('show');
@@ -1445,6 +1484,8 @@
             </div>
         `;
         }).join('');
+
+        warmSidebarPreviewImages(filtered.slice(0, SIDEBAR_PRELOAD_BATCH_SIZE).map(p => getImageUrl(p)));
     }
 
     function getTodayKey() {
