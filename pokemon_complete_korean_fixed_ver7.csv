@@ -1243,6 +1243,4 @@ pokedex_number,name_en,name_ko,generation,status,category,is_paldean,is_hisuian,
 1024,terapagos,테라파고스,9,전설,테라스탈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,0.2,6.5,1,테라체인지,,,450,90,65,85,65,85,60,1,1,알미발견,,사족형,파랑,
 1024,terapagos-terastal,테라파고스(테라스탈폼),9,전설,테라스탈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,0.3,16,1,테라셸,,,600,95,95,110,105,110,85,1,1,알미발견,,머리형,파랑,
 1024,terapagos-stellar,테라파고스(스텔라폼),9,전설,테라스탈포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,1,노말,,1.7,77,1,제로포밍,,,700,160,105,110,130,110,85,1,1,알미발견,,머리형,파랑,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
 1025,pecharunt,복숭악동,9,환상,지배포켓몬,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,2,독,고스트,0.3,0.3,1,독조종,,,600,88,88,160,88,88,88,1,1,알미발견,,머리형,보라,
