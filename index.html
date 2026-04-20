@@ -2209,7 +2209,7 @@
     function calculateExpDecayNumericSimilarity(p, target) {
         if (!p || !target) return 0;
         const statKeys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-        const statDecay = 0.03;
+        const statDecay = 0.8;
         const heightDecay = 0.95;
         const weightDecay = 0.75;
 
@@ -2220,8 +2220,8 @@
             const value = Number.isFinite(p.stats?.[key]) ? p.stats[key] : 0;
             const targetValue = Number.isFinite(target.stats?.[key]) ? target.stats[key] : 0;
             const diff = Math.abs(value - targetValue);
-            weighted += Math.exp(-statDecay * diff) * 1.1;
-            total += 1.1;
+            weighted += Math.exp(-statDecay * diff) * 1.0;
+            total += 1.0;
         });
 
         const heightDiff = Math.abs((Number.isFinite(p.h) ? p.h : 0) - (Number.isFinite(target.h) ? target.h : 0));
