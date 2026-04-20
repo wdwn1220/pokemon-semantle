@@ -2184,10 +2184,10 @@
 
     function getVector(p) {
         let v = [];
-        const maxGenDistance = 8;
+        const genDecayBase = 0.5;
         for (let g = 1; g <= 9; g++) {
             const genDistance = Math.abs(p.gen - g);
-            const proximityScore = Math.max(0, 1 - (genDistance / maxGenDistance));
+            const proximityScore = Math.pow(genDecayBase, genDistance);
             v.push(proximityScore * 1.8);
         }
         sets.status.forEach(s => v.push(p.status === s ? 2.0 : 0));
