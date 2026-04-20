@@ -2195,8 +2195,6 @@
         sets.categories.forEach(c => v.push(p.category === c ? 2.0 : 0));
         sets.shapes.forEach(s => v.push(p.shape === s ? 1.5 : 0));
         sets.colors.forEach(c => v.push(p.color === c ? 1.5 : 0));
-        ['hp','atk','def','spa','spd','spe'].forEach(k => v.push((p.stats[k] / 255) * 1.5));
-        v.push((p.h / 20) * 1.5); v.push((p.w / 999) * 1.5);
         const myAbils = new Set([...p.abilities]); if(p.hidden) myAbils.add(p.hidden);
         sets.abilities.forEach(a => v.push(myAbils.has(a) ? 1.5 : 0));
         
@@ -2208,9 +2206,42 @@
         return v;
     }
 
+    function calculateExpDecayNumericSimilarity(p, target) {
+        if (!p || !target) return 0;
+        const statKeys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
+        const statDecay = 0.03;
+        const heightDecay = 0.95;
+        const weightDecay = 0.75;
+
+        let weighted = 0;
+        let total = 0;
+
+        statKeys.forEach(key => {
+            const value = Number.isFinite(p.stats?.[key]) ? p.stats[key] : 0;
+            const targetValue = Number.isFinite(target.stats?.[key]) ? target.stats[key] : 0;
+            const diff = Math.abs(value - targetValue);
+            weighted += Math.exp(-statDecay * diff) * 1.1;
+            total += 1.1;
+        });
+
+        const heightDiff = Math.abs((Number.isFinite(p.h) ? p.h : 0) - (Number.isFinite(target.h) ? target.h : 0));
+        weighted += Math.exp(-heightDecay * heightDiff) * 1.0;
+        total += 1.0;
+
+        const safeLog = num => Math.log1p(Math.max(0, Number.isFinite(num) ? num : 0));
+        const weightDiff = Math.abs(safeLog(p.w) - safeLog(target.w));
+        weighted += Math.exp(-weightDecay * weightDiff) * 1.0;
+        total += 1.0;
+
+        if (total <= 0) return 0;
+        return (weighted / total) * 100;
+    }
+
     function calculateGlobalRanks() {
         globalRankList = db.map(p => {
-            let s = calculateCosine(getVector(p), targetVec);
+            const categoricalScore = calculateCosine(getVector(p), targetVec);
+            const numericScore = calculateExpDecayNumericSimilarity(p, targetData);
+            let s = (categoricalScore * 0.7) + (numericScore * 0.3);
             if (p.no === targetData.no && p.name === targetData.name) s = 100;
             return { ...p, score: s };
         }).sort((a, b) => b.score - a.score);
