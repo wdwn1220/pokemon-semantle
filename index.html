@@ -2188,7 +2188,7 @@
         for (let g = 1; g <= 9; g++) {
             const genDistance = Math.abs(p.gen - g);
             const proximityScore = Math.pow(genDecayBase, genDistance);
-            v.push(proximityScore * 1.8);
+            v.push(proximityScore * 2.0);
         }
         sets.status.forEach(s => v.push(p.status === s ? 2.0 : 0));
         sets.types.forEach(t => v.push(p.type.includes(t) ? 2.1 : 0));
@@ -2209,7 +2209,7 @@
     function calculateExpDecayNumericSimilarity(p, target) {
         if (!p || !target) return 0;
         const statKeys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-        const statDecay = 0.2;
+        const statDecay = 0.1;
         const heightDecay = 0.5;
         const weightDecay = 0.2;
 
