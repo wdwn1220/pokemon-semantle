@@ -2241,7 +2241,7 @@
         globalRankList = db.map(p => {
             const categoricalScore = calculateCosine(getVector(p), targetVec);
             const numericScore = calculateExpDecayNumericSimilarity(p, targetData);
-            let s = (categoricalScore * 0.8) + (numericScore * 0.2);
+            let s = (categoricalScore * 0.765) + (numericScore * 0.235);
             if (p.no === targetData.no && p.name === targetData.name) s = 100;
             return { ...p, score: s };
         }).sort((a, b) => b.score - a.score);
