@@ -2209,9 +2209,9 @@
     function calculateExpDecayNumericSimilarity(p, target) {
         if (!p || !target) return 0;
         const statKeys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-        const statDecay = 0.6;
-        const heightDecay = 0.85;
-        const weightDecay = 0.4;
+        const statDecay = 0.2;
+        const heightDecay = 0.5;
+        const weightDecay = 0.2;
 
         let weighted = 0;
         let total = 0;
