@@ -280,7 +280,7 @@
         </div>
 
         <div id="successArea">
-            <h2 class="success-title">🎉 정답입니다! <span id="answerName" style="color: #ff5252;"></span>!!! 🎉</h2>
+            <h2 class="success-title">🎉 정답입니다! <span id="answerName" style="color: #ff5252;"></span><span id="specialDailyName" style="margin-left: 6px;"></span>!!! 🎉</h2>
             <div class="success-stats-grid" id="successStatsGrid">
                 <div class="success-stat-card">
                     <h3 class="success-stat-title">📈 순위</h3>
@@ -499,12 +499,14 @@
     let dailyPuzzleKey = '';
     let gameStartAt = null;
     let currentSolveTimeMs = 0;
+    let activeSpecialDailyRule = null;
     let sidebarFilters = { name: '', gen: '', status: '', type: '', type2: '', shape: '', color: '', extra: '', category: '', categorySearch: '', selectedAbilities: [], heightMin: '', heightMax: '', weightMin: '', weightMax: '', hpMin: '', hpMax: '', atkMin: '', atkMax: '', defMin: '', defMax: '', spaMin: '', spaMax: '', spdMin: '', spdMax: '', speMin: '', speMax: '' };
 
     const sets = { types: new Set(), status: new Set(), shapes: new Set(), colors: new Set(), categories: new Set(), abilities: new Set() };
     const CLEARABLE_FILTER_IDS = ['sideNameSearch','filterGen','filterStatus','filterType','filterType2','filterShape','filterColor','filterCategorySearch','filterHeightMin','filterHeightMax','filterWeightMin','filterWeightMax','filterHpMin','filterHpMax','filterAtkMin','filterAtkMax','filterDefMin','filterDefMax','filterSpaMin','filterSpaMax','filterSpdMin','filterSpdMax','filterSpeMin','filterSpeMax','filterExtra'];
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
     const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
+    const LAST_SOLVED_DAILY_KEY = 'pokeSemantleLastSolvedDailyKey';
     const SHOW_CLEAR_RECORDS_BUTTON = false;
     // 특수 날짜 정답 룰
     // match.type:
@@ -517,16 +519,18 @@
     const SPECIAL_DAILY_RULES = [
         {
             id: 'childrens-day-baby',
+            anniversaryKo: '어린이날',
+            anniversaryEmoji: '🧒',
             match: { type: 'monthDay', month: 5, day: 5 },
             poolKo: ['피츄', '삐', '푸푸린', '토게피', '루리리', '꼬지지', '먹고자', '마자', '에레키드', '마그비', '배루키', '핑복', '리오르', '흉내내', '랑딸랑', '타만타', '일레즌', '뽀뽀라', '꼬몽울']
         },
         {
             id: 'halloween-ghost',
+            anniversaryKo: '할로윈',
+            anniversaryEmoji: '🎃',
             match: { type: 'monthDay', month: 10, day: 31 },
             poolFilters: { typeAny: ['고스트'] }
-        },
-        {
-            id: '
+        }
     ];
     const customDropdownMap = new Map();
     const sidebarPreviewCache = new Set();
@@ -639,6 +643,7 @@
 
         const savedMode = localStorage.getItem('pokeSemantleMode');
         currentMode = savedMode === MODE_INFINITE ? MODE_INFINITE : MODE_DAILY;
+        reconcileDailyStreak();
         startGame(currentMode);
 
         document.getElementById('loadingArea').style.display = 'none';
@@ -668,6 +673,7 @@
         const keysToClear = [
             'pokeSemantleMode',
             INFINITE_PROGRESS_KEY,
+            LAST_SOLVED_DAILY_KEY,
             'pokeSemantleStreak',
             'pokeSemantleMaxStreak',
             'pokeSemantleSolvedGameCount',
@@ -1556,6 +1562,33 @@
         return `${yyyy}-${mm}-${dd}`;
     }
 
+    function getUtcTimeFromDailyKey(key) {
+        if (typeof key !== 'string') return NaN;
+        const [year, month, day] = key.split('-').map(Number);
+        if (!year || !month || !day) return NaN;
+        return Date.UTC(year, month - 1, day);
+    }
+
+    function getDailyKeyDiffDays(fromKey, toKey) {
+        const fromUtc = getUtcTimeFromDailyKey(fromKey);
+        const toUtc = getUtcTimeFromDailyKey(toKey);
+        if (!Number.isFinite(fromUtc) || !Number.isFinite(toUtc)) return NaN;
+        const DAY_MS = 24 * 60 * 60 * 1000;
+        return Math.floor((toUtc - fromUtc) / DAY_MS);
+    }
+
+    function reconcileDailyStreak(todayKey = getTodayKey()) {
+        if (streak <= 0) return;
+        const lastSolvedKey = localStorage.getItem(LAST_SOLVED_DAILY_KEY);
+        if (!lastSolvedKey) return;
+        const diffDays = getDailyKeyDiffDays(lastSolvedKey, todayKey);
+        if (!Number.isFinite(diffDays)) return;
+        if (diffDays >= 2) {
+            streak = 0;
+            localStorage.setItem('pokeSemantleStreak', streak);
+        }
+    }
+
     function hashDailyKey(key, length) {
         let hash = 0;
         for (const ch of key) hash = ((hash * 31) + ch.charCodeAt(0)) >>> 0;
@@ -1661,13 +1694,18 @@
         return pool[hashDailyKey(seed, pool.length)];
     }
 
-    function getSpecialDailyTarget(key) {
+    function getSpecialDailyTargetWithRule(key) {
         for (const rule of SPECIAL_DAILY_RULES) {
             if (!isSpecialRuleMatched(key, rule.match)) continue;
             const picked = getRandomPokemonFromPool(resolveSpecialRulePool(rule), `${key}::${rule.id}`);
-            if (picked) return picked;
+            if (picked) return { target: picked, rule };
         }
         return null;
+    }
+
+    function getDailyModeButtonEmoji() {
+        if (activeSpecialDailyRule?.anniversaryEmoji) return activeSpecialDailyRule.anniversaryEmoji;
+        return '📅';
     }
 
     function loadDailyProgress() {
@@ -1777,12 +1815,15 @@
 
         if (mode === MODE_DAILY) {
             dailyPuzzleKey = getTodayKey();
-            targetData = getSpecialDailyTarget(dailyPuzzleKey) || db[getDailyTargetIndex(dailyPuzzleKey, db)];
+            const specialDaily = getSpecialDailyTargetWithRule(dailyPuzzleKey);
+            activeSpecialDailyRule = specialDaily?.rule || null;
+            targetData = specialDaily?.target || db[getDailyTargetIndex(dailyPuzzleKey, db)];
             targetVec = getVector(targetData);
             calculateGlobalRanks();
             restoreDailyProgress();
             saveDailyProgress();
         } else {
+            activeSpecialDailyRule = null;
             if (forceReset) clearInfiniteProgress();
             const progress = forceReset ? null : loadInfiniteProgress();
             if (!restoreInfiniteProgress(progress)) {
@@ -1830,8 +1871,16 @@
 
     function showSolvedBanner(pokemonName) {
         const isDailyMode = currentMode === MODE_DAILY;
+        const specialDailyName = document.getElementById('specialDailyName');
         document.getElementById('successArea').style.display = 'block';
         document.getElementById('answerName').innerText = pokemonName;
+        if (isDailyMode && activeSpecialDailyRule?.anniversaryKo) {
+            specialDailyName.innerText = `(${activeSpecialDailyRule.anniversaryKo})`;
+            specialDailyName.style.display = 'inline';
+        } else {
+            specialDailyName.innerText = '';
+            specialDailyName.style.display = 'none';
+        }
         document.getElementById('successStatsGrid').style.display = isDailyMode ? 'grid' : 'none';
         document.getElementById('successRankSection').style.display = 'block';
         document.getElementById('streakCount').innerText = streak;
@@ -2251,9 +2300,11 @@
         const dailyModeBtn = document.getElementById('dailyModeBtn');
         const infiniteModeBtn = document.getElementById('infiniteModeBtn');
         const isDailyMode = currentMode === MODE_DAILY;
+        const dailyModeEmoji = getDailyModeButtonEmoji();
 
         dailyModeBtn.classList.toggle('active', isDailyMode);
         infiniteModeBtn.classList.toggle('active', !isDailyMode);
+        dailyModeBtn.innerText = `${dailyModeEmoji} 오늘의 모드`;
 
         dailyDateLabel.style.display = 'block';
         dailyDateLabel.innerText = `오늘 날짜: ${getTodayKey()}`;
@@ -2688,6 +2739,7 @@
 
             localStorage.setItem('pokeSemantleStreak', streak);
             localStorage.setItem('pokeSemantleMaxStreak', maxStreak);
+            localStorage.setItem(LAST_SOLVED_DAILY_KEY, dailyPuzzleKey);
             localStorage.setItem('pokeSemantleSolvedGameCount', solvedGameCount);
             localStorage.setItem('pokeSemantleTotalTrySum', totalTrySum);
             localStorage.setItem('pokeSemantleMinTryCount', minTryCount);
