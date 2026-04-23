@@ -510,19 +510,23 @@
     // match.type:
     // - 'exact': 특정 하루만
     // - 'monthDay': 매년 같은 월/일
+    // 'exact' 예시 :
+    // { id: 'launch-day', match: { type: 'exact', date: '2026-12-01' }, poolKo: ['피카츄', '이브이'] }
     // poolFilters 예시:
     // { gen: 1, color: '보라', typeAny: ['고스트'], abilityAny: ['부유'], hpMin: 60, hpMax: 120 }
     const SPECIAL_DAILY_RULES = [
         {
             id: 'childrens-day-baby',
             match: { type: 'monthDay', month: 5, day: 5 },
-            poolKo: ['피츄', '삐', '푸푸린', '토게피', '루리리', '꼬지지', '먹고자', '마자', '에레키드', '마그비', '배루키', '핑복', '리오르', '흉내내', '랑딸랑', '곤율랭', '타만타']
+            poolKo: ['피츄', '삐', '푸푸린', '토게피', '루리리', '꼬지지', '먹고자', '마자', '에레키드', '마그비', '배루키', '핑복', '리오르', '흉내내', '랑딸랑', '타만타', '일레즌', '뽀뽀라', '꼬몽울']
         },
         {
             id: 'halloween-ghost',
             match: { type: 'monthDay', month: 10, day: 31 },
             poolFilters: { typeAny: ['고스트'] }
-        }
+        },
+        {
+            id: '
     ];
     const customDropdownMap = new Map();
     const sidebarPreviewCache = new Set();
