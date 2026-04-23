@@ -506,6 +506,24 @@
     const CSV_FILENAME = 'pokemon_complete_korean_fixed_ver7.csv';
     const INFINITE_PROGRESS_KEY = 'pokeSemantleInfiniteProgress';
     const SHOW_CLEAR_RECORDS_BUTTON = false;
+    // 특수 날짜 정답 룰
+    // match.type:
+    // - 'exact': 특정 하루만
+    // - 'monthDay': 매년 같은 월/일
+    // poolFilters 예시:
+    // { gen: 1, color: '보라', typeAny: ['고스트'], abilityAny: ['부유'], hpMin: 60, hpMax: 120 }
+    const SPECIAL_DAILY_RULES = [
+        {
+            id: 'childrens-day-baby',
+            match: { type: 'monthDay', month: 5, day: 5 },
+            poolKo: ['피츄', '삐', '푸푸린', '토게피', '루리리', '꼬지지', '먹고자', '마자', '에레키드', '마그비', '배루키', '핑복', '리오르', '흉내내', '랑딸랑', '곤율랭', '타만타']
+        },
+        {
+            id: 'halloween-ghost',
+            match: { type: 'monthDay', month: 10, day: 31 },
+            poolFilters: { typeAny: ['고스트'] }
+        }
+    ];
     const customDropdownMap = new Map();
     const sidebarPreviewCache = new Set();
     const sidebarPreviewInflight = new Map();
@@ -1573,6 +1591,81 @@
         return todayIndex;
     }
 
+    function isSpecialRuleMatched(key, ruleMatch) {
+        if (!ruleMatch || !ruleMatch.type) return false;
+        if (ruleMatch.type === 'exact') return ruleMatch.date === key;
+        if (ruleMatch.type === 'monthDay') {
+            const [, month, day] = key.split('-').map(Number);
+            return month === Number(ruleMatch.month) && day === Number(ruleMatch.day);
+        }
+        return false;
+    }
+
+    function pokemonMatchesRuleFilters(pokemon, filters = {}) {
+        const equalsChecks = ['gen', 'status', 'shape', 'color', 'category'];
+        for (const key of equalsChecks) {
+            if (filters[key] === undefined || filters[key] === null || filters[key] === '') continue;
+            if (pokemon[key] !== filters[key]) return false;
+        }
+
+        if (Array.isArray(filters.typeAny) && filters.typeAny.length) {
+            if (!filters.typeAny.some((t) => pokemon.type.includes(t))) return false;
+        }
+        if (Array.isArray(filters.typeAll) && filters.typeAll.length) {
+            if (!filters.typeAll.every((t) => pokemon.type.includes(t))) return false;
+        }
+
+        const abilitySet = getAbilitySet(pokemon);
+        if (Array.isArray(filters.abilityAny) && filters.abilityAny.length) {
+            if (!filters.abilityAny.some((a) => abilitySet.has(a))) return false;
+        }
+        if (Array.isArray(filters.abilityAll) && filters.abilityAll.length) {
+            if (!filters.abilityAll.every((a) => abilitySet.has(a))) return false;
+        }
+
+        if (filters.noMin != null && pokemon.no < Number(filters.noMin)) return false;
+        if (filters.noMax != null && pokemon.no > Number(filters.noMax)) return false;
+        if (filters.heightMin != null && pokemon.h < Number(filters.heightMin)) return false;
+        if (filters.heightMax != null && pokemon.h > Number(filters.heightMax)) return false;
+        if (filters.weightMin != null && pokemon.w < Number(filters.weightMin)) return false;
+        if (filters.weightMax != null && pokemon.w > Number(filters.weightMax)) return false;
+
+        const statRanges = [
+            ['hp', 'hpMin', 'hpMax'],
+            ['atk', 'atkMin', 'atkMax'],
+            ['def', 'defMin', 'defMax'],
+            ['spa', 'spaMin', 'spaMax'],
+            ['spd', 'spdMin', 'spdMax'],
+            ['spe', 'speMin', 'speMax'],
+            ['total', 'totalMin', 'totalMax']
+        ];
+        for (const [statKey, minKey, maxKey] of statRanges) {
+            if (filters[minKey] != null && pokemon.stats[statKey] < Number(filters[minKey])) return false;
+            if (filters[maxKey] != null && pokemon.stats[statKey] > Number(filters[maxKey])) return false;
+        }
+        return true;
+    }
+
+    function resolveSpecialRulePool(rule) {
+        if (Array.isArray(rule.poolKo)) return rule.poolKo.map((ko) => dbByKo.get(ko)).filter(Boolean);
+        if (rule.poolFilters) return db.filter((pokemon) => pokemonMatchesRuleFilters(pokemon, rule.poolFilters));
+        return [];
+    }
+
+    function getRandomPokemonFromPool(pool, seed) {
+        if (!pool.length) return null;
+        return pool[hashDailyKey(seed, pool.length)];
+    }
+
+    function getSpecialDailyTarget(key) {
+        for (const rule of SPECIAL_DAILY_RULES) {
+            if (!isSpecialRuleMatched(key, rule.match)) continue;
+            const picked = getRandomPokemonFromPool(resolveSpecialRulePool(rule), `${key}::${rule.id}`);
+            if (picked) return picked;
+        }
+        return null;
+    }
+
     function loadDailyProgress() {
         const raw = localStorage.getItem(`pokeSemantleDailyProgress_${dailyPuzzleKey}`);
         if (!raw) return null;
@@ -1680,7 +1773,7 @@
 
         if (mode === MODE_DAILY) {
             dailyPuzzleKey = getTodayKey();
-            targetData = db[getDailyTargetIndex(dailyPuzzleKey, db)];
+            targetData = getSpecialDailyTarget(dailyPuzzleKey) || db[getDailyTargetIndex(dailyPuzzleKey, db)];
             targetVec = getVector(targetData);
             calculateGlobalRanks();
             restoreDailyProgress();
