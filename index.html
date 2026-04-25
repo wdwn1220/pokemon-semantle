@@ -2332,7 +2332,7 @@
 
     function getVector(p) {
         let v = [];
-        const genDecayBase = 0.5;
+        const genDecayBase = 0.8;
         for (let g = 1; g <= 9; g++) {
             const genDistance = Math.abs(p.gen - g);
             const proximityScore = Math.pow(genDecayBase, genDistance);
@@ -2357,9 +2357,9 @@
     function calculateExpDecayNumericSimilarity(p, target) {
         if (!p || !target) return 0;
         const statKeys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-        const statDecay = 0.2;
-        const heightDecay = 0.3;
-        const weightDecay = 0.3;
+        const statDecay = 0.1;
+        const heightDecay = 0.15;
+        const weightDecay = 0.15;
 
         let weighted = 0;
         let total = 0;
